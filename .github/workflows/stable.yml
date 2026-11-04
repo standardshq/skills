@@ -1,0 +1,19 @@
+name: Stable
+
+on:
+  push:
+    tags: [stable]
+
+permissions:
+  contents: read
+
+jobs:
+  ancestor:
+    name: stable is an ancestor of main
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main

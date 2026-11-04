@@ -1,0 +1,38 @@
+name: Conformance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  skills:
+    name: Skills conformance (skills-ref)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      # The commit Standards validates against: bump both together.
+      SKILLS_REF_COMMIT: 69ef37e9424c0a7ea9dd2293b559e43ec8176379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.7.13"
+          python-version: "3.12"
+      - name: Index is up to date
+        run: uv run --no-project --with pyyaml python scripts/build-index.py --check
+      - name: Install skills-ref
+        run: |
+          git init --quiet "$RUNNER_TEMP/agentskills"
+          git -C "$RUNNER_TEMP/agentskills" fetch --quiet --depth 1 https://github.com/agentskills/agentskills.git "$SKILLS_REF_COMMIT"
+          git -C "$RUNNER_TEMP/agentskills" checkout --quiet --detach FETCH_HEAD
+          uv sync --quiet --frozen --no-dev --project "$RUNNER_TEMP/agentskills/skills-ref"
+      - name: Validate every skill
+        run: |
+          shopt -s nullglob
+          for skill in skills/*/; do
+            "$RUNNER_TEMP/agentskills/skills-ref/.venv/bin/skills-ref" validate "$skill"
+          done
