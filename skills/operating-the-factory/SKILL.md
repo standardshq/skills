@@ -126,7 +126,7 @@ An open `wait` whose `owner` is empty, an agent, or deactivated:
 | Seen | Act |
 |---|---|
 | two actors holding one lease: a claim written while another actor's lease on the issue was unexpired and not cleared, or two runs leaving work (two open pull requests from one repository, two `attempt` rows for overlapping runs) | `signal` (`rule: double_holder`, both actors, the times); a Décision when both runs left work |
-| a lease renewed in a loop without progress: held more than 2 hours after its claim, or renewed 4 times with no new commit on the branch and no new timeline row but a `handoff` | `signal` summarising the run's attempts and where it stands (the summary is the action); a second time for the same claim: Décision |
+| a lease renewed in a loop without progress: held more than 2 hours after its claim, or renewed 4 times with no new commit on the branch and no new timeline row other than a `handoff` | `signal` summarising the run's attempts and where it stands (the summary is the action); a second time for the same claim: Décision |
 | `failedAttempts` ≥ 3 on an issue neither `paused` with a `decision` wait newer than its latest `attempt`, nor `mine` nor `done` | `signal` summarising the last three attempts; Décision |
 | a `verdict`, `go` or `check-run` written by the issue's current or last lease holder (`working-on-issues` § Verification) | `signal` (`rule: self_verification`): the row is void and landing ignores it; Décision |
 
@@ -137,7 +137,7 @@ For every open pull request linked to an `in_review` issue, read live with the G
 | Seen | Act |
 |---|---|
 | dropped from the merge queue: its GitHub timeline shows it enqueued after its `go` row and no longer, unmerged, head unchanged | **re-queue once** (enable auto-merge with the repository's `method`), `signal` (`rule: requeued`, `subject` the head); dropped again on the same head: Décision |
-| idle: no timeline row but a `handoff` on the issue and no commit, review or check on the pull request for the idle period (§ Thresholds) | when its GitHub timeline shows this head was enqueued and then dropped, the row above applies. Otherwise (a head never enqueued, whatever its rows): `signal` (`rule: idle_review`), Décision; never enqueue it yourself |
+| idle: no timeline row other than a `handoff` on the issue and no commit, review or check on the pull request for the idle period (§ Thresholds) | when its GitHub timeline shows this head was enqueued and then dropped, the row above applies. Otherwise (a head never enqueued, whatever its rows): `signal` (`rule: idle_review`), Décision; never enqueue it yourself |
 
 A pull request whose issue carries a pending close (read recipe step 7) is landing's to close: idle
 more than 24 hours, the `signal` and a Décision; never re-queue it.
@@ -216,8 +216,8 @@ default.
 | a pause being written (§ 1) | 5 minutes after the move to `paused` | activity |
 | a wait on a resolved target, an open wait on an issue not `paused` (§ 1) | 90 minutes | the target's state, the wait's `createdAt` |
 | the activity window of a pass (§ 2, § 3) | since the previous pass, 15-minute overlap | activity |
-| a lease looping (§ 5) | held > 2 hours after its claim, or 4 renewals with no commit and no row but a `handoff` | activity, the branch |
-| a pull request idle (§ 6) | 24 hours with no row but a `handoff`, and no commit, review or check | timeline, GitHub |
+| a lease looping (§ 5) | held > 2 hours after its claim, or 4 renewals with no commit and no timeline row other than a `handoff` | activity, the branch |
+| a pull request idle (§ 6) | 24 hours with no timeline row other than a `handoff`, and no commit, review or check | timeline, GitHub |
 | a wait's deadline when you write one (§ 1, § 12) | created + 14 days | `working-on-issues` § Pausing |
 | the fixing window (`landing-pull-requests`) | 30 minutes after the `fixing` row's `createdAt` | timeline |
 | Décisions piling up (§ 8) | 10 open, unanswered, to one person | Décisions |

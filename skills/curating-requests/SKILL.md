@@ -34,7 +34,8 @@ deciding, and again right before writing:
 
    | Your last reply | Do |
    |---|---|
-   | a link to an issue, or a decline | stop |
+   | a decline | stop |
+   | a link to an issue | a message posted after it that changes what to do or adds proof, on an open issue: treat it as « an open issue » in Gate 3, on that issue. Any other message: stop |
    | a question | a message posted after it is the answer, judge again with it; the message it answered, or an older one: stop |
    | none | judge |
 
@@ -82,7 +83,7 @@ messages are the usual near-miss.
 
 | Found | Do |
 |---|---|
-| an open issue | DUPLICATE: append to its `context` a dated line « Also reported by <author> on <date>: <permalink> » and what the message adds |
+| an open issue | DUPLICATE: append to its `context` a dated line « Also reported by <author> on <date>: <permalink> » and what the message adds. When the message changes what to do, also append that to `## Problem` of its `body`, with attribution (change that section alone, `working-on-issues` § Two layers); a message that only adds proof stays in `context` |
 | a `done` issue, `closeReason: done` | reply that it shipped and where it stands; new evidence that it still fails is a new issue citing `issues:<id>` |
 | a `done` issue closed `refuted`, `overtaken`, `duplicate` or `wont_do` | reply with the recorded reason (its newest `handoff` row and rulings). Re-raise only with evidence the earlier decision lacked (a customer commitment, a measured cost, a new usage): a new issue citing `issues:<id>` and saying what is new |
 | a `paused` issue | DUPLICATE as above; the wait's owner sees the new evidence |
@@ -133,7 +134,7 @@ lease and every other field alone: screening queues, people prioritise.
 In the language of the message, **short**: the verdict or the question on the first line, three
 lines at most, product language. Paths and evidence belong in the issue, not the thread.
 
-Order is fixed: decide → write the issue (or the duplicate's `context` line) → read it back →
+Order is fixed: decide → write the issue (or the duplicate's lines) → read it back →
 post **one** reply carrying the link of each issue written. If the write failed, post nothing: a
 reply pointing at nothing is worse than none, and no later run retries it for you. The permalink in
 the issue's `context`, then your reply, are what makes a second delivery of the event skip the

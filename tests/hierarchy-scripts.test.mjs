@@ -286,14 +286,19 @@ test("the screening scripts read an issue's body and context, no other field", a
   assert.equal(text, "in body\nin context");
 });
 
-test("issue-duplicates compares title and body, never context", async () => {
+test("issue-duplicates pairs on paths in body or context, and on the title", async () => {
   const { candidatePairs } = await import(join(skills, "screening-issues/scripts/issue-duplicates.mjs"));
   const row = (id, values) => ({ id, createdAt: at(0), values: { title: `zebra${id}`, status: "backlog", ...values } });
   const paths = "src/one/a.ts and src/two/b.ts";
   const inBody = candidatePairs([row("a", { body: paths }), row("b", { body: paths })]);
   assert.deepEqual(inBody.map((pair) => [pair.a.id, pair.b.id]), [["a", "b"]]);
   const inContext = candidatePairs([row("a", { context: paths }), row("b", { context: paths })]);
-  assert.deepEqual(inContext, []);
+  assert.deepEqual(inContext.map((pair) => [pair.a.id, pair.b.id]), [["a", "b"]]);
+  const titleInBody = candidatePairs([
+    row("a", { body: "the export drops rows" }),
+    row("b", { body: "the export drops rows" }),
+  ]);
+  assert.deepEqual(titleInBody, []);
   const sameTitle = candidatePairs([
     row("a", { title: "the export drops rows" }),
     row("b", { title: "the export drops rows" }),

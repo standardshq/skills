@@ -83,8 +83,12 @@ Rules (no code enforces them):
 - A person's reply or a ruling that changes what to do goes into `body`, written by the routine
   that acts on it.
 - `context` is added to, never rewritten: the permalinks in it stop a message being handled twice.
-- A `handoff` row (`timeline-kinds.md`): write a new one before you stop, every time: where the
-  work stands, the next step, open questions. It wakes nothing.
+- A `handoff` row (`timeline-kinds.md`): a run that held the lease, or paused or moved the issue,
+  writes a new one before it stops: where the work stands, the next step, open questions. It wakes
+  nothing. Intake, scouts and a pass that changed nothing write none, apart from the
+  note § Pausing asks for on a `mine` issue. Review writes one only when
+  it hands an issue on (moved, or sent to a person), never per sweep. The Maintenance routine's
+  wakes and applied rulings write none: their `woke` and `applied` rows say what happened.
 
 ## Statuses and who moves them
 
@@ -207,7 +211,7 @@ timeout`).
 4. Clear `leaseHolder` and `leaseExpiresAt`.
 5. Re-read the issue and check the state you meant to leave. If a write failed, say exactly which
    state is left in a new `handoff` row and in your report; never claim a transition you did not
-   verify.
+   verify. After writing `body`, check `## Request` and `## Acceptance` read as before.
 
 **The one exception:** a stage hand-off row (an `assessment` row carrying `resumeAt: screening`,
 `timeline-kinds.md` § Stage hand-offs) starts Triage the moment it exists. A `screening` row's

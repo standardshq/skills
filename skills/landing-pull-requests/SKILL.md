@@ -94,7 +94,8 @@ target branch's values, never its own. Then route on the rows first, the head se
 - **`fixing`** inside the fixing window: another run owns it; skip.
 - **a person asked for a change:** a person's review (changes requested, or a comment asking for a
   change) or a `ruling` asking one (« Change », « Fix »), newer than the latest `go` or `verdict` on
-  this head or, with none on this head, the pull request's latest `verdict`. It beats a `go`: the
+  this head or, with none on this head, the pull request's latest `verdict`. It beats a `go`: update `## Plan` of `body` with the person's words, quoted and attributed, once
+  per review or ruling (change that section alone, `working-on-issues` § Two layers), before dispatching the fixer. The
   fixer goes first with the person's words, quoted, as its brief, then a juror judges them as in
   rounds 2 and 3 (§ 4). At its round limit, § 7 « Three rounds » wins instead: the maintainer's
   Décision cites the review.

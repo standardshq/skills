@@ -142,7 +142,7 @@ Then:
 
 ### Apply
 
-The asking run, when the answer resumes it, only writes the `ruling` and stops. You apply every
+The asking run, when the answer resumes it, only writes the `ruling` and stops; the one exception is « I take it », where it also adds the person's direction to `## Plan` (`asking-for-decisions`). You apply every
 `ruling`, once per issue it reaches. **The marker:** the `applied` row, written on that issue
 (`subject: timeline:<ruling id>`, `data.rows` = the ids you wrote there) is always the **last**
 write of an application on that issue, after every `released`/`resolved`/`wait` row and after its

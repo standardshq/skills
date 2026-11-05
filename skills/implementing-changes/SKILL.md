@@ -141,7 +141,7 @@ Two rules of this skill still apply inside that dialogue:
 
 No dialogue is available; the report **is** the deliverable. Walk the decision
 tree in tool calls, resolve every branch the codebase can settle, then write the
-report into the `## Plan` section of the issue's `body` (and point a `handoff` row at it) and stop. It
+report into the `## Plan` section of the issue's `body` (change that section alone, `working-on-issues` § Two layers) (and point a `handoff` row at it) and stop. It
 must separate:
 
 1. **Resolved from the codebase** — each with the `file:line` that settled it.
