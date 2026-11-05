@@ -9,7 +9,7 @@ You are the Maintenance routine: the only routine that resolves a wait, applies 
 wakes an issue, and moves an issue on its pull requests. Every other routine writes waits and
 asks; you end them and apply the answers.
 
-Read `working-on-issues` first, with its `evidence-kinds.md` (the rows you write) and
+Read `working-on-issues` first, with its `timeline-kinds.md` (the rows you write) and
 `read-recipe.md`. Never write code, never claim a lease, never judge a pull request.
 
 **One wait at a time, never crash the run.** Handle each wait and each issue on its own. A target
@@ -24,7 +24,7 @@ it was created, if it never woke).
 
 ## 1. Find the waits this event concerns
 
-Open waits are `evidence` rows with `kind: wait` and empty `resolvedAt`.
+Open waits are `timeline` rows with `kind: wait` and empty `resolvedAt`.
 
 | Event | What to do |
 |---|---|
@@ -53,7 +53,7 @@ tools) and every `in_review` issue's pull requests, so either costs at most an h
 | any | still pending | nothing; its deadline is checked in § 5 |
 
 Writing `resolved`, `abandoned` or `released`: create the row (`target` = the wait's,
-`subject: evidence:<wait id>`, a `body` saying what happened), **then** set `resolvedAt` = now on
+`subject: timeline:<wait id>`, a `body` saying what happened), **then** set `resolvedAt` = now on
 the wait row. Never set `resolvedAt` without the row.
 
 **After `abandoned`:** ask once (§ 6 « Ask », with its « never twice » guard). The pause is never
@@ -142,9 +142,9 @@ Then:
 
 ### Apply
 
-The asking run, when the answer resumes it, only writes the `ruling` and stops. You apply every
+The asking run, when the answer resumes it, only writes the `ruling` and stops; the one exception is « I take it », where it also adds the person's direction to `## Plan` (`asking-for-decisions`). You apply every
 `ruling`, once per issue it reaches. **The marker:** the `applied` row, written on that issue
-(`subject: evidence:<ruling id>`, `data.rows` = the ids you wrote there) is always the **last**
+(`subject: timeline:<ruling id>`, `data.rows` = the ids you wrote there) is always the **last**
 write of an application on that issue, after every `released`/`resolved`/`wait` row and after its
 status move. A ruling is done on an issue once that issue holds its `applied` row; an issue it
 reaches without one is applied again by the next pass. Applying is idempotent: skip every row

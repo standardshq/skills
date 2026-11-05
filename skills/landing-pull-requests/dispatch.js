@@ -37,7 +37,7 @@ export const meta = {
 // judges it at the Standard counts, never landing alone. An untouched green
 // Sight head that touches none of those never comes here: landing writes its
 // rows itself. A fixer that returns the head unchanged ends the chain
-// `with-maintainer`. Every row is an `evidence`
+// `with-maintainer`. Every row is a `timeline`
 // row on `issue` whose `subject` is `github:<repo>#<number>@<sha>`; no comment
 // on the pull request is state.
 
@@ -91,7 +91,7 @@ function subject(pr, head) {
 }
 
 function rowRule() {
-  return `Write rows with your record tools as \`evidence\` on the issue, never as a comment on the pull request. Before writing a \`verdict\`, \`go\` or \`check-run\`, apply "Whose rows count" in the ledger section of the ${args.skill} skill.`;
+  return `Write rows with your record tools as \`timeline\` rows on the issue, never as a comment on the pull request. Before writing a \`verdict\`, \`go\` or \`check-run\`, apply "Whose rows count" in the ledger section of the ${args.skill} skill.`;
 }
 
 function factoryGate(pr) {
@@ -149,7 +149,7 @@ function juror(pr, round, judged) {
         pr,
       )}** as § 4 of the ${
         args.skill
-      } skill lists them. The dossier adds the issue's acceptance and rulings and every review a person left on the pull request.`
+      } skill lists them. The dossier adds the issue's \`## Acceptance\` and rulings and every review a person left on the pull request.`
     : `Round ${round}. Judge two things only: the previous verdict's entries with the fixer's answers, and \`git diff ${judged}..${pr.head}\`.
 For each entry return **closed** (quote the test or excerpt that proves it) or **open** (what is still missing). Then read the delta alone and return any \`blocking\` it introduces. Nothing else is in scope.
 

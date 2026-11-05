@@ -9,7 +9,7 @@ The structure makes stuck work unlikely; you catch what slips. Every 15 minutes 
 `signal` for what you notice, take at most the one action the table allows for it, and otherwise
 ask a person. You are a safety net, not a stage: you never do another skill's work.
 
-Read `working-on-issues` first, with `evidence-kinds.md` and `read-recipe.md`: the statuses, who
+Read `working-on-issues` first, with `timeline-kinds.md` and `read-recipe.md`: the statuses, who
 moves them, the moves an agent may make on a person's behalf and the evidence each needs, the
 lease, the wait shape. Read `waking-issues` to know what that skill owns, so you leave it to it: a Maintenance
 run does both, as separate passes, and this one never wakes an issue. Ask people with `asking-for-decisions`.
@@ -21,7 +21,7 @@ run does both, as separate passes, and this one never wakes an issue. Ask people
   even when the answer looks obvious. A wait on a resolved target is `waking-issues`' to end.
 - Claim a lease, write code, judge or merge a pull request, write `verdict`, `go`, `check-run` or
   `attempt`.
-- Edit or delete an evidence row. Every correction you make is a new row.
+- Edit or delete a timeline row. Every correction you make is a new row.
 - Re-ask a question: deadlines and their one question, Extend's one re-ask included, are the
   `waking-issues`' (§ 6).
 - Take an action the table below does not list. When the right move is not on it, do not take it:
@@ -31,7 +31,7 @@ run does both, as separate passes, and this one never wakes an issue. Ask people
 ## How every action is written
 
 1. **Notice first:** a `signal` row on the issue (`data.rule`, `subject` naming what it is about:
-   a pull request head, `evidence:<id>`, `projects:<id>`), `body` saying what you saw, with
+   a pull request head, `timeline:<id>`, `projects:<id>`), `body` saying what you saw, with
    dates from the records' server timestamps. You noticed it already when a `signal` with the same
    `rule` and `subject` is newer than the condition's start: do not write it again, and take only
    the next step the table allows (a Décision after a re-queue, for instance).
@@ -47,7 +47,7 @@ run does both, as separate passes, and this one never wakes an issue. Ask people
 health): write the `signal` on the project's **« Factory operations log »** issue, and link the
 record in the Décision (`record:projects:<id>`). One per project, found by its title and
 `origin: operator`; any routine that finds it missing creates it, on first need, with `status: done`, `closeReason: done`, `type:
-chore`, `origin: operator`, and an `intent` saying it only carries the factory routines' signals. It is
+chore`, `origin: operator`, and a `body` saying it only carries the factory routines' signals. It is
 never screened, launched or reopened; the dashboard's Health block reads the signals on it. A
 repository serving several projects: the log of each.
 
@@ -67,12 +67,12 @@ the end of the pass.
 | Broken | Act |
 |---|---|
 | an issue `paused` with no open `wait` row, its move to `paused` more than 5 minutes old (younger: a pause being written) | write the missing wait: ask the first active maintainer « paused, waiting on nothing » with **Resume it**, **Close it**, **I take it**, then a `decision` `wait` on that Décision (`owner` the maintainer, `resumeAt` the stage the status before the pause implies, `waking-issues` § 7, deadline per § Thresholds, `data.question`). The status stays `paused`. Then the factory-bug issue |
-| an open `wait` whose target resolved (`evidence-kinds.md` § Targets) more than 90 minutes ago (`waking-issues`' hourly pass missed it) | nothing to the wait: the `signal`, the factory-bug issue, and a Décision naming the issues |
+| an open `wait` whose target resolved (`timeline-kinds.md` § Targets) more than 90 minutes ago (`waking-issues`' hourly pass missed it) | nothing to the wait: the `signal`, the factory-bug issue, and a Décision naming the issues |
 | an open `wait` on an issue that is not `paused`, with no person's move out of `paused` newer than it (an agent's move is § 2's to revert, as `waking-issues` § 5 leaves it), more than 90 minutes old | the same: `signal`, factory-bug issue, Décision |
 
 **The factory-bug issue:** one open issue per broken rule, in the project of the issue that broke
-it: `type: bug`, `origin: operator`, title « Factory: <rule> », `problem` naming each case (issue,
-row ids, times) and what you did, `acceptance` « the invariant holds on the next Maintenance pass ».
+it: `type: bug`, `origin: operator`, title « Factory: <rule> », `body` with `## Problem` naming each case (issue,
+row ids, times) and what you did, and `## Acceptance` « the invariant holds on the next Maintenance pass ».
 One already open for that rule: add a dated line to its `context` instead.
 
 ### 2. Moves an agent wrote
@@ -115,8 +115,8 @@ An open `wait` whose `owner` is empty, an agent, or deactivated:
 
 - its project has an active maintainer: **re-route** it, once. Write a new `wait` row identical to
   it (same `issue`, `target`, `waitKind`, `resumeAt`, `data`, the deadline unchanged) with `owner`
-  the first active maintainer and a `body` citing the old row (`evidence:<id>`) and why, then the
-  `signal` (`rule: wait_rerouted`, `subject: evidence:<old id>`). The old row stays as it is; the
+  the first active maintainer and a `body` citing the old row (`timeline:<id>`) and why, then the
+  `signal` (`rule: wait_rerouted`, `subject: timeline:<old id>`). The old row stays as it is; the
   that skill ends both when the target resolves, and asks at the deadline. A wait already
   re-routed (a `wait_rerouted` signal on it) is never re-routed again.
 - no active maintainer: the `signal` (`rule: no_owner`), once.
@@ -126,7 +126,7 @@ An open `wait` whose `owner` is empty, an agent, or deactivated:
 | Seen | Act |
 |---|---|
 | two actors holding one lease: a claim written while another actor's lease on the issue was unexpired and not cleared, or two runs leaving work (two open pull requests from one repository, two `attempt` rows for overlapping runs) | `signal` (`rule: double_holder`, both actors, the times); a Décision when both runs left work |
-| a lease renewed in a loop without progress: held more than 2 hours after its claim, or renewed 4 times with no new commit on the branch and no new evidence row | `signal` summarising the run's attempts and where it stands (the summary is the action); a second time for the same claim: Décision |
+| a lease renewed in a loop without progress: held more than 2 hours after its claim, or renewed 4 times with no new commit on the branch and no new timeline row other than a `handoff` | `signal` summarising the run's attempts and where it stands (the summary is the action); a second time for the same claim: Décision |
 | `failedAttempts` ≥ 3 on an issue neither `paused` with a `decision` wait newer than its latest `attempt`, nor `mine` nor `done` | `signal` summarising the last three attempts; Décision |
 | a `verdict`, `go` or `check-run` written by the issue's current or last lease holder (`working-on-issues` § Verification) | `signal` (`rule: self_verification`): the row is void and landing ignores it; Décision |
 
@@ -136,8 +136,8 @@ For every open pull request linked to an `in_review` issue, read live with the G
 
 | Seen | Act |
 |---|---|
-| dropped from the merge queue: its timeline shows it enqueued after its `go` row and no longer, unmerged, head unchanged | **re-queue once** (enable auto-merge with the repository's `method`), `signal` (`rule: requeued`, `subject` the head); dropped again on the same head: Décision |
-| idle: no evidence row on the issue and no commit, review or check on the pull request for the idle period (§ Thresholds) | when its timeline shows this head was enqueued and then dropped, the row above applies. Otherwise (a head never enqueued, whatever its rows): `signal` (`rule: idle_review`), Décision; never enqueue it yourself |
+| dropped from the merge queue: its GitHub timeline shows it enqueued after its `go` row and no longer, unmerged, head unchanged | **re-queue once** (enable auto-merge with the repository's `method`), `signal` (`rule: requeued`, `subject` the head); dropped again on the same head: Décision |
+| idle: no timeline row other than a `handoff` on the issue and no commit, review or check on the pull request for the idle period (§ Thresholds) | when its GitHub timeline shows this head was enqueued and then dropped, the row above applies. Otherwise (a head never enqueued, whatever its rows): `signal` (`rule: idle_review`), Décision; never enqueue it yourself |
 
 A pull request whose issue carries a pending close (read recipe step 7) is landing's to close: idle
 more than 24 hours, the `signal` and a Décision; never re-queue it.
@@ -149,8 +149,8 @@ and at least two open pull requests fail the same check. Find the open issue for
 operator`, title « Target branch red: owner/repo »): one exists, the `signal` on it (`rule:
 target_red`, `subject: github:owner/repo@<sha>`), and a Décision when it is `paused` or has
 not moved in 24 hours. None: **open it** on the repository's own `projects` record (`type: bug`,
-`origin: operator`, `problem` the failing check and its run, `acceptance` the check green on
-`targetBranch`), then the `signal`. You never wake it: screening picks it up, a person launches it.
+`origin: operator`, `body` with `## Problem` the failing check and its run, and `## Acceptance` the
+check green on `targetBranch`), then the `signal`. You never wake it: screening picks it up, a person launches it.
 
 ### 8. Décisions piling up
 
@@ -216,10 +216,10 @@ default.
 | a pause being written (§ 1) | 5 minutes after the move to `paused` | activity |
 | a wait on a resolved target, an open wait on an issue not `paused` (§ 1) | 90 minutes | the target's state, the wait's `createdAt` |
 | the activity window of a pass (§ 2, § 3) | since the previous pass, 15-minute overlap | activity |
-| a lease looping (§ 5) | held > 2 hours after its claim, or 4 renewals with no commit and no row | activity, the branch |
-| a pull request idle (§ 6) | 24 hours with no row, commit, review or check | evidence, GitHub |
+| a lease looping (§ 5) | held > 2 hours after its claim, or 4 renewals with no commit and no timeline row other than a `handoff` | activity, the branch |
+| a pull request idle (§ 6) | 24 hours with no timeline row other than a `handoff`, and no commit, review or check | timeline, GitHub |
 | a wait's deadline when you write one (§ 1, § 12) | created + 14 days | `working-on-issues` § Pausing |
-| the fixing window (`landing-pull-requests`) | 30 minutes after the `fixing` row's `createdAt` | evidence |
+| the fixing window (`landing-pull-requests`) | 30 minutes after the `fixing` row's `createdAt` | timeline |
 | Décisions piling up (§ 8) | 10 open, unanswered, to one person | Décisions |
 | a routine failing (§ 9) | its last 3 runs | the routines' run history |
 | the health check (§ 10) | once a day, first pass after 06:00 UTC | – |

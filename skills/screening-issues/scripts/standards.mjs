@@ -12,8 +12,8 @@ import { promisify } from "node:util";
 const run = promisify(execFile);
 const MAX_BUFFER = 64 * 1024 * 1024;
 
-/** The sections an issue cites its evidence in. */
-export const SECTIONS = ["intent", "problem", "acceptance", "context", "plan", "handoff"];
+/** The fields an issue cites its evidence in. */
+export const SECTIONS = ["body", "context"];
 
 /** `issues:<id>`: another Standards issue. */
 export const STANDARDS_REF = /\bissues:([\w-]{6,})/g;

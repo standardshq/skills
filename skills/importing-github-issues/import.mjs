@@ -6,12 +6,12 @@
  *   node import.mjs plan --github <file>[,<file>…] --repository <owner/repo> --project <id>
  *                        --maintainer <user id> --sha <target branch sha>
  *                        [--existing <issues.json>] [--confirmations <file>]
- *   node import.mjs check --open <numbers.json> --existing <issues.json> --evidence <evidence.json>
+ *   node import.mjs check --open <numbers.json> --existing <issues.json> --timeline <timeline.json>
  *                         --project <id>
  *
  * `query` prints the GraphQL search query the skill runs with `gh api graphql
  * --paginate --slurp`. `plan` reads those pages and prints, as JSON on stdout,
- * every issue to create with its fields, its evidence rows and its draft wait;
+ * every issue to create with its fields, its timeline rows and its draft wait;
  * a summary goes to stderr. It never calls GitHub or the workspace and writes
  * nothing: the agent applies the plan with its record tools, after the
  * maintainer's go. `check` compares what was imported with the open GitHub
@@ -65,7 +65,7 @@ const PREVIEW_VERDICTS = {
 };
 const PAUSE_LABELS = ["factory:paused", "needs-decision", "needs-design", "preview:parked"];
 
-/** `land:` stamps on a pull request head, as evidence rows. */
+/** `land:` stamps on a pull request head, as timeline rows. */
 const STAMPS = [
   { pattern: /^land:\s*tier\s+(sight|standard|full)\s+([0-9a-f]{7,40})/i, kind: "tier" },
   { pattern: /^land:\s*verdict\s+\d+\s+([0-9a-f]{7,40})/i, kind: "verdict" },
@@ -156,7 +156,7 @@ function discussion(issue) {
   return { blocks, left };
 }
 
-/** Evidence rows for the stamps of each open linked pull request. */
+/** Timeline rows for the stamps of each open linked pull request. */
 function stampRows(pullRequest, ref) {
   const rows = [];
   const notes = [];
@@ -321,11 +321,11 @@ export function plan(issues, options) {
       (pr) => `${pr.repository?.nameWithOwner ?? repository}#${pr.number}`,
     );
     const notes = [];
-    const evidence = [];
+    const timeline = [];
 
     for (const [label, verdict] of Object.entries(PREVIEW_VERDICTS)) {
       if (labels.includes(label)) {
-        evidence.push({
+        timeline.push({
           kind: "assessment",
           subject: `github:${repository}@${sha}`,
           body: `Imported from the \`${label}\` label of ${issue.url}: the previous pipeline's preview verdict, a ranking, never an approval. The sha is the target branch at the import, not the branch the preview read.`,
@@ -338,7 +338,7 @@ export function plan(issues, options) {
         (each) => each.state === "OPEN",
       )) {
         const stamped = stampRows(pr, `${pr.repository?.nameWithOwner ?? repository}#${pr.number}`);
-        evidence.push(...stamped.rows);
+        timeline.push(...stamped.rows);
         notes.push(...stamped.notes);
       }
     }
@@ -420,14 +420,14 @@ export function plan(issues, options) {
         closeReason,
         project,
         githubNumber: issue.number,
-        problem: issue.body ?? "",
+        body: issue.body ?? "",
         context,
         pullRequests: pullRequests.join("\n"),
       },
       // The parent is set on creation only (`write` with `parent`); it is never a relation to write after.
       parent,
       relations: { blockedBy },
-      evidence,
+      timeline,
       wait,
     });
   }
@@ -463,13 +463,13 @@ export function plan(issues, options) {
         count((entry) => entry.wait?.waitKind === kind),
       ]),
     ),
-    evidenceRows: entries.reduce((sum, entry) => sum + entry.evidence.length, 0),
+    timelineRows: entries.reduce((sum, entry) => sum + entry.timeline.length, 0),
     awaitingConfirmation: awaiting,
   };
   return { summary, ready: awaiting.length === 0, entries, skipped };
 }
 
-export function check({ open, existing, evidence, project }) {
+export function check({ open, existing, timeline, project }) {
   const numbers = new Set(open.map((each) => Number(each.number ?? each)));
   const mine = existing.filter(
     (record) => String(record.values?.project?.id ?? record.values?.project) === project,
@@ -484,7 +484,7 @@ export function check({ open, existing, evidence, project }) {
     .filter(([number, record]) => record.values?.status !== "done" && !numbers.has(number))
     .map(([number]) => number);
   const openWaits = new Set(
-    evidence
+    timeline
       .filter((row) => row.kind === "wait" && !row.resolvedAt && !row.values?.resolvedAt)
       .map((row) => String(row.issue?.id ?? row.issue ?? row.values?.issue)),
   );
@@ -515,7 +515,7 @@ const USAGE = `usage:
   import.mjs plan --github <file>[,<file>…] --repository <owner/repo> --project <id> --maintainer <user id>
                   --sha <target branch sha>
                   [--existing <issues.json>] [--confirmations <file>]
-  import.mjs check --open <numbers.json> --existing <issues.json> --evidence <evidence.json> --project <id>`;
+  import.mjs check --open <numbers.json> --existing <issues.json> --timeline <timeline.json> --project <id>`;
 
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
@@ -540,13 +540,13 @@ async function main() {
       process.exit(result.ready ? 0 : 1);
     }
     if (command === "check") {
-      for (const flag of ["open", "existing", "evidence", "project"]) {
+      for (const flag of ["open", "existing", "timeline", "project"]) {
         if (!options[flag]) throw new Error(`--${flag} is required`);
       }
       const result = check({
         open: await readJson(options.open),
         existing: await readJson(options.existing),
-        evidence: await readJson(options.evidence),
+        timeline: await readJson(options.timeline),
         project: options.project,
       });
       console.log(JSON.stringify(result, null, 2));

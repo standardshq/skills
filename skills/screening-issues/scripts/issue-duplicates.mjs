@@ -50,7 +50,10 @@ function intersect(left, right) {
   return [...left].filter((value) => right.has(value));
 }
 
-/** What a pair is compared on. Citations are `issues:<id>` and `#N` keys. */
+/**
+ * What a pair is compared on: paths and citations from `body` and `context`,
+ * tokens from `title`. Citations are `issues:<id>` and `#N` keys.
+ */
 export function describe(issue) {
   const values = valuesOf(issue);
   const text = issueText(issue);

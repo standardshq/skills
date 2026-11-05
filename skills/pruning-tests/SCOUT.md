@@ -86,7 +86,7 @@ of the probe; no minimum. A pass that finds nothing worth a review is complete,
 and its coverage note is the deliverable.
 
 One issue per candidate, filed by `filing-findings` (its budget, ranking and
-search come first), carrying in `problem` and `context`:
+search come first), carrying in `body` (`## Problem`) and `context`:
 
 1. the candidate — test ids, file, and the shape it matched;
 2. the cost, each figure with its source;

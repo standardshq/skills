@@ -1,6 +1,6 @@
 ---
 name: measuring-the-factory
-description: Use when the Maintenance routine runs, nightly. Exports issues, status history, evidence, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself.
+description: Use when the Maintenance routine runs, nightly. Exports issues, status history, timeline rows, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself.
 ---
 
 # Measuring the factory
@@ -10,9 +10,9 @@ skill's folder, run on an export you write. A number you compute, round, estimat
 yourself is the one failure of this skill: when the script cannot measure something, the page
 shows nothing for it, and that is correct.
 
-Read `working-on-issues` first (`read-recipe.md` for where each fact lives, `evidence-kinds.md`
+Read `working-on-issues` first (`read-recipe.md` for where each fact lives, `timeline-kinds.md`
 for the rows the script counts). You write only `factory-snapshots`; you never touch an issue, an
-evidence row or a project record.
+timeline row or a project record.
 
 ## 1. Write the export
 
@@ -37,12 +37,12 @@ missing from the dashboard. Read with your record tools, every page of every que
       "values": {
         "title": "…", "status": "…", "type": "…", "origin": "…", "closeReason": "…",
         "project": "<id>", "parent": "record:<id>",
-        "pullRequests": "owner/repo#N\nowner/repo#M", "problem": "…", "context": "…"
+        "pullRequests": "owner/repo#N\nowner/repo#M", "body": "…", "context": "…"
       },
       "statusHistory": [{ "at": "<iso>", "to": "<status>", "byPerson": true }]
     }
   ],
-  "evidence": [
+  "timeline": [
     { "id": "…", "issue": "<id>", "kind": "…", "createdAt": "<iso>", "subject": "…", "data": "{…}",
       "waitKind": "<wait rows>", "resolvedAt": "<wait rows, empty while open>" }
   ],
@@ -55,9 +55,9 @@ missing from the dashboard. Read with your record tools, every page of every que
 
 | Part | Where you read it |
 |---|---|
-| `issues` | the `issues` object, every status, every project. Sections as markdown text, relations as ids |
+| `issues` | the `issues` object, every status, every project. `body` and `context` as markdown text, relations as ids |
 | `statusHistory` | each issue's activity: every write of `status`, oldest first, the first one being the value at creation; `byPerson` true when a person wrote it, false for an agent (`working-on-issues` § Statuses: who made a move is read in the activity, never inferred) |
-| `evidence` | the `evidence` object, kinds `wait` (with `waitKind` and `resolvedAt`), `verdict` and `ruling` at least; `data` as stored |
+| `timeline` | the `timeline` object, kinds `wait` (with `waitKind` and `resolvedAt`), `verdict` and `ruling` at least; `data` as stored |
 | `pullRequests` | every line of every issue's `pullRequests`, read live with your GitHub tools: state, merge time, close time |
 | `runs` | the run history of the factory's routines (the workspace's agent runs and AI usage): one entry per run with its cost in the workspace's currency, and the issue or project it worked on when the run says so |
 | `projects` | the `projects` object, every record with its `parent` (`record:<id>`; the `parentId` attribute) and, for a repository, its `fullName` |
@@ -140,5 +140,5 @@ verbatim, and every export entry you left out and why. A run that wrote nothing 
 - a value typed, rounded or estimated by you, or a gap « filled » with zero;
 - `deploys` invented for a repository with no deploy workflow;
 - a second row for the same series, host and week;
-- an issue, evidence row or project record written by this run;
+- an issue, timeline row or project record written by this run;
 - the forecast drawn from fewer than 3 weeks because the page looked empty.

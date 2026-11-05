@@ -1,6 +1,6 @@
 ---
 name: landing-pull-requests
-description: Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its evidence rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says.
+description: Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its timeline rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says.
 ---
 
 # Landing pull requests
@@ -10,7 +10,7 @@ writes code on the branch; a **juror** judges a head; a **demonstrator** perform
 go heads promises on the running stack, on video. The one who wrote the fix never decides it is
 good.
 
-Read `working-on-issues` first, with `read-recipe.md` and `evidence-kinds.md`: § Verification, §
+Read `working-on-issues` first, with `read-recipe.md` and `timeline-kinds.md`: § Verification, §
 Pausing and § Pull requests hold every rule of state below, and win when this skill disagrees.
 Judge with `evaluating-changes` (`SOLO.md`). Ask people with `asking-for-decisions`.
 
@@ -50,8 +50,8 @@ pull request to one dispatch (§ Dispatch) and enqueues every go together.
 
 ## The ledger
 
-Every decision is an `evidence` row on the issue, `subject: github:owner/repo#N@<sha>` naming the
-exact head, fields as `evidence-kinds.md` gives them. The rows are landing's whole memory: read
+Every decision is a `timeline` row on the issue, `subject: github:owner/repo#N@<sha>` naming the
+exact head, fields as `timeline-kinds.md` gives them. The rows are landing's whole memory: read
 them before anything else, and a judgement exists once its row does. Never a comment stamp on the
 pull request.
 
@@ -70,7 +70,7 @@ its `demo` rows with `outcome: fail`. A Sight `verdict` (written by you, « sigh
 (§ 7): **the round limit** is three, plus one per ruling asking a change. **The judged head:** the `subject` sha of the latest of those rows.
 
 What GitHub already says is read live, never copied into a row: checks, mergeability, whether the
-pull request is enqueued or merged, the timeline of enqueue events.
+pull request is enqueued or merged, the GitHub timeline of enqueue events.
 
 **Whose rows count.** Before writing `verdict`, `go` or `check-run`, read the issue's
 `leaseHolder`, the `holder` of its latest `attempt` and the latest `leaseHolder` in its activity:
@@ -94,7 +94,8 @@ target branch's values, never its own. Then route on the rows first, the head se
 - **`fixing`** inside the fixing window: another run owns it; skip.
 - **a person asked for a change:** a person's review (changes requested, or a comment asking for a
   change) or a `ruling` asking one (« Change », « Fix »), newer than the latest `go` or `verdict` on
-  this head or, with none on this head, the pull request's latest `verdict`. It beats a `go`: the
+  this head or, with none on this head, the pull request's latest `verdict`. It beats a `go`: update `## Plan` of `body` with the person's words, quoted and attributed, once
+  per review or ruling (change that section alone, `working-on-issues` § Two layers), before dispatching the fixer. The
   fixer goes first with the person's words, quoted, as its brief, then a juror judges them as in
   rounds 2 and 3 (§ 4). At its round limit, § 7 « Three rounds » wins instead: the maintainer's
   Décision cites the review.
@@ -254,7 +255,7 @@ Standard fits Standard.
 ### Round 1
 
 One independent juror per head, run as `evaluating-changes` `SOLO.md` with the tier's counts on
-the pinned sha. Its dossier adds the issue's `acceptance` and rulings, and every review a person
+the pinned sha. Its dossier adds the issue's `## Acceptance` and rulings, and every review a person
 left on the pull request. It writes the `verdict` row with its entries (`blocking`, `to fix`,
 `noted`, and the counts that found nothing).
 
@@ -407,7 +408,7 @@ whose Décision named the withheld paths and their risk is also an approval.
 | `queue` | mark ready, enable auto-merge with `method` (the merge queue batches); in the sweep, every go of the run in the same pass |
 | `human` | merge nothing. Mark ready, then ask the project's first active maintainer with `asking-for-decisions` one Décision per head, naming any withheld path and its risk: **Merge it** (you merge it on GitHub; recommended), **Change** (say what), **Close it**, **I take it**. Open no wait and leave the issue `in_review`: the merge itself is the answer the Maintenance routine watches. Ask once per head: while a Décision linked to the issue names this head, open, answered or expired, never ask again (no daily re-ask). An expired one left unanswered: write one `signal` (`rule: merge_unanswered`, `subject` the head) and leave the issue `in_review`; a newer head is a new question. The answer's `ruling` is recorded as `asking-for-decisions` § 4 says; a « Change » is read by the next run (§ 1) |
 
-Enqueue a go head only once: when the pull request's timeline shows it was enqueued since its
+Enqueue a go head only once: when the pull request's GitHub timeline shows it was enqueued since its
 `go` row and it is no longer, it was dropped, and re-queuing is the Maintenance routine's.
 
 **Three rounds.** A round-3 verdict short of go, an interaction the demo cannot settle, or a head

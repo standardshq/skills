@@ -141,7 +141,7 @@ Two rules of this skill still apply inside that dialogue:
 
 No dialogue is available; the report **is** the deliverable. Walk the decision
 tree in tool calls, resolve every branch the codebase can settle, then write the
-report into the issue's `plan` section (and point `handoff` at it) and stop. It
+report into the `## Plan` section of the issue's `body` (change that section alone, `working-on-issues` § Two layers) (and point a `handoff` row at it) and stop. It
 must separate:
 
 1. **Resolved from the codebase** — each with the `file:line` that settled it.
@@ -163,8 +163,8 @@ values and error codes the task must produce, before any implementation exists.
 Non-negotiable — it is the entire mechanism this skill relies on.
 
 In `execution` mode the assertions come from the issue: a bug's reproduction
-command and its asserted symptom (in `problem`), the issue's `acceptance`
-section, or, for a task of an umbrella, its own `acceptance` under the
+command and its asserted symptom (in `## Problem`), the issue's `## Acceptance`
+section, or, for a task of an umbrella, its own `## Acceptance` under the
 umbrella's spec. **Copy them verbatim.** Rewriting an assertion at implementation time
 is the exact failure this skill exists to prevent.
 

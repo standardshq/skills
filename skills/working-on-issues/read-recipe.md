@@ -6,17 +6,18 @@ Read an issue in this order before acting on it. Stop reading as soon as you kno
 yours to act on (claimed by another live lease, not your stage, not launched).
 
 1. **The issue:** `title`, `status`, `priority`, `type`, `origin`, `closeReason`.
-2. **Intent**, then the sections: `problem`, `acceptance`, `context`, `plan`, `handoff`. `handoff`
-   is where the last agent stopped; trust it as a lead, verify it as a claim.
+2. **`body`,** its sections when present: `## Request`, `## Problem`, `## Acceptance`, `## Plan`.
+   Then `context`, then the newest `handoff` row of `timeline`: where the last agent stopped; trust
+   it as a lead, verify it as a claim.
 3. **The project:** read `project`, then its `context` (purpose, conventions, how to run and
    check it) and `maintainers`. When your stage acts on a repository (Intake never does), read its facts (`SKILL.md` § Repository
    facts) and its own agent rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) at run time; never
    copy them into the issue.
-4. **Open waits:** `evidence` with `kind: wait` and empty `resolvedAt`: `waitKind`, `target`,
+4. **Open waits:** `timeline` with `kind: wait` and empty `resolvedAt`: `waitKind`, `target`,
    `owner`, `resumeAt`, `data.deadline`. An open wait on an issue that is not `paused` was released
    by a person's move: the Maintenance routine will record it; do not act on it as a hold.
 5. **Rulings:** every `ruling` row, newest first. A ruling outranks the sections it contradicts;
-   update the sections to match. A ruling older than a person's later status move is superseded:
+   update them to match, as `SKILL.md` § Two layers allows. A ruling older than a person's later status move is superseded:
    history, not a ruling.
 6. **What woke it:** the latest `woke` row and the `resolved` rows it lists. For a `task` wait, read
    the Task and what it delivered (its description, comments, attached files, linked records): the

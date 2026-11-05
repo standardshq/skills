@@ -122,28 +122,28 @@ An adopted umbrella (an input issue whose ask is the whole plan) keeps its origi
 tasks get the same `approved` row as any other (§ 6).
 Its living document (the audit log keeps every earlier version):
 
-| Section | Holds |
+| Field | Holds |
 |---|---|
 | `title` | the plan, in a few words |
-| `problem` | the problem sentence of § 2 |
-| `plan` | the approved spec, whole |
-| `acceptance` | « every task done », then the spec's end-to-end assertions, if any |
+| `body`, `## Problem` | the problem sentence of § 2 |
+| `body`, `## Plan` | the approved spec, whole |
+| `body`, `## Acceptance` | « every task done », then the spec's end-to-end assertions, if any |
 | `context` | the tasks in order (§ 6 adds their ids); « Considered and set aside », each rejected option with its reason; the input issues and their § 2 rulings |
 
-Leave `intent` as people wrote it. Set `type` to what the whole plan is
+Leave `## Request` as people wrote it, and add to an adopted umbrella's `context`, never over it. Set `type` to what the whole plan is
 (`screening-issues` § 1).
 
-Then write one `ruling` row on the umbrella transcribing the approval (`evidence-kinds.md`):
+Then write one `ruling` row on the umbrella transcribing the approval (`timeline-kinds.md`):
 decision-maker the maintainer, recorder this session, source this conversation and its date (and
 `tasks:<id>` when you deliver into a spec Task, as `subject`), the question « Ship this spec,
 decomposed into these tasks, in this order? », the approvals quoted verbatim, every earlier ruling
 this one overrides named, and the resume stage « the maintainer's drag of each task to Ready ».
 
-*Done when* the umbrella holds the five sections and its `ruling` row exists.
+*Done when* the umbrella holds the sections of its `body`, its `context` and its `ruling` row.
 
 ## 6. Write the tasks
 
-Rewrite a reused issue the same way (its title for its task; the audit log keeps the original);
+Rewrite a reused issue the same way (its title for its task, its `## Request` kept, its `context` added to; the audit log keeps the original);
 create the others in the umbrella's project. Each task:
 
 | Field | Value |
@@ -152,9 +152,9 @@ create the others in the umbrella's project. Each task:
 | `blockedBy` | the tasks it needs, as the approved table says |
 | `type` | what the task itself is (`screening-issues` § 1) |
 | `origin` | a new task: `human`; a reused issue keeps its own |
-| `problem` | what the task ships, observed against today |
-| `plan` | the spec sections it delivers, and `issues:<umbrella id>` |
-| `acceptance` | its assertions, verbatim from the spec |
+| `body`, `## Problem` | what the task ships, observed against today |
+| `body`, `## Plan` | the spec sections it delivers, and `issues:<umbrella id>` |
+| `body`, `## Acceptance` | its assertions, verbatim from the spec |
 | `context` | at most three paths that anchor it, each existing on the target branch today (name a file the task creates by its role, never by a path: `issue-freshness.mjs` reads a missing path as stale), the `withheld` paths it touches, its approved mockup attached |
 | `status` | a new task: `backlog`. A reused issue keeps its status: you never move a person's gesture or a pause |
 
@@ -162,8 +162,8 @@ Create every task right after the umbrella.
 
 **Feature tasks carry the approval:** on each task whose `type` is `feature` (new or reused), write
 one `assessment` row right after creating or rewriting it: `data: {"verdict": "approved"}`,
-`subject: issues:<umbrella id>` (the approved spec, in the umbrella's `plan`), no `resumeAt`, and a
-`body` naming the umbrella's `ruling` row (`evidence:<id>`) that quotes the maintainer's approval.
+`subject: issues:<umbrella id>` (the approved spec, in the umbrella's `## Plan`), no `resumeAt`, and a
+`body` naming the umbrella's `ruling` row (`timeline:<id>`) that quotes the maintainer's approval.
 It is what screening's `ready` gate reads for a feature; screening leaves a feature task of a
 shaped umbrella alone until the row exists.
 
