@@ -20,8 +20,9 @@ time.
 
 ## 1. Before you start
 
-- The repository has its `repositories` record (`adding-repositories`) and serves the project the
-  issues go to; the project has an active maintainer: the maintainer you sit with.
+- The repository is a `projects` record with a `fullName`, its facts read with `working-on-issues`
+  § Repository facts, and the imported issues are filed on it (`project`); it, or the root above it, has an active
+  maintainer: the maintainer you sit with.
 - Write the project's issues export (`screening-issues` § Scripts): the plan skips every GitHub
   number already imported into the project, so a second run imports only what is new.
 
@@ -75,9 +76,9 @@ How GitHub maps onto the factory (the script applies it; you check it):
 | sub-issue of, blocked by (same repository) | `parent`, `blockedBy`; another repository: a line in `context` |
 | `preview:candidate`, `preview:parked`, `preview:rejected` | an `assessment` row, `verdict` `candidate`, `park`, `reject`, `subject: github:owner/repo@<--sha>`: a ranking, never an approval |
 | `land:` stamps on an open linked pull request | `tier`, `verdict` (`changes`), `go`, `demo` rows, a short sha expanded to the PR head it prefixes; a `go` whose sha prefixes no current head (unmatched), a withheld go and every other stamp are not carried: landing judges the head again. Every imported row carries `data.imported: true`, which keeps it out of the dashboard's first-round measures |
-| `## Decision` comments | quoted in `context` as history. Never a `ruling` row: the `waits` routine would apply an old « I take it » or « Close it » again. Their effect is the status above |
+| `## Decision` comments | quoted in `context` as history. Never a `ruling` row: the Maintenance routine would apply an old « I take it » or « Close it » again. Their effect is the status above |
 | the body; the comments | `problem`, verbatim; `context`, quoted with author, date and link, the oldest beyond the budget linked |
-| `stage:*`, `factory:needs-human-merge` | nothing (listed in `context`): stages are statuses now; the repository's `mode` says who merges |
+| `stage:*`, `factory:needs-human-merge` | nothing (listed in `context`): stages are statuses now; the repository's discovered `mode` says who merges |
 
 **Draft waits** (one per paused issue): `needs-design` is a `task` wait (a Task for the mockup);
 `preview:parked` with `Expires: <date>` a `date` wait on that date, without one a `decision`
@@ -115,7 +116,7 @@ later).
 ## 5. The go
 
 Ask, in one message: « Import <n> issues of owner/repo into <project> now, <p> of them paused on
-the waits you confirmed? ». Ask also that the `screening` routine be switched off for the import
+the waits you confirmed? ». Ask also that the Triage routine be switched off for the import
 (their gesture, in the workspace's routine settings): an issue created while it runs is screened
 before its import is finished. Wait for both. Anything but a clear yes: stop, write nothing.
 
@@ -123,9 +124,11 @@ before its import is finished. Wait for both. Anything but a clear yes: stop, wr
 
 With your record tools, in this order, re-reading each record after you write it:
 
-1. **Issues,** in plan order (umbrellas before their tasks), with the plan's `values` and
-   `createWithStatus`. Keep the map `githubNumber` → record id.
-2. **Relations:** `parent` and `blockedBy`, through that map.
+1. **Issues,** in plan order (umbrellas before their tasks), one `write` per issue, with the
+   plan's `values`, `createWithStatus` and, for a sub-issue, `parent: record:<id>` of its
+   planned `parent` number, through the map below (a record with a parent is created one per call,
+   and the parent is set on create only). Keep the map `githubNumber` → record id.
+2. **Relations:** `blockedBy`, through that map. Never write `parent` again: it is not a relation.
 3. **Evidence:** each planned row on its issue (`kind`, `subject`, `body`, `data` as JSON).
 4. **Waits,** for each issue whose plan `status` is `paused` (`working-on-issues` § Pausing):
    check the target first (a `blocker` whose imported issue is `done` is no wait: leave the issue
@@ -147,10 +150,10 @@ node import.mjs check --open open-numbers.json --existing <issues.json> --eviden
 ```
 
 It must print `clean: true`: every open GitHub issue imported, no imported issue left open whose
-GitHub issue is closed, and no `paused` issue without an open wait (the operator's invariant).
+GitHub issue is closed, and no `paused` issue without an open wait (the Maintenance routine's invariant).
 Anything else: fix it (an issue missed, a wait not written), then check again.
 
-Then hand back to the maintainer, as theirs to do: switch the `screening` routine back on (its
+Then hand back to the maintainer, as theirs to do: switch the Triage routine back on (its
 daily pass screens the imported `backlog`); drag every imported task of an umbrella that sits in
 `ready` out of it and back, for each they want launched (list them: an issue created in `ready` was never moved there by a
 person, and only that move launches a task, `working-on-issues` § Launch); switch the repository's
@@ -176,5 +179,5 @@ failed write, the check's output verbatim, and what is left to the maintainer.
 - a `ruling` row made from an old `## Decision` comment;
 - a `paused` issue whose wait the maintainer did not confirm, or with no open wait;
 - a wait whose owner was guessed instead of confirmed;
-- an issue created while the `screening` routine is on;
+- an issue created while the Triage routine is on;
 - the check run on an export older than the apply.

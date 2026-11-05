@@ -15,7 +15,8 @@
  * The bar is looser than `issue-duplicates.mjs`: two duplicates describe the
  * same work, two members of a family describe different work under one plan,
  * and what makes them kin is what the duplicate pass refuses to count alone:
- * one citing the other, or both citing a third. One shared file still needs a
+ * one citing the other, or both citing a third; an umbrella and its tasks are
+ * kin by construction. One shared file still needs a
  * related title. Families are connected components, so a chain of edges joins
  * issues that share nothing directly; that is why the agent rules.
  *
@@ -25,7 +26,7 @@
  */
 import { fileURLToPath } from "node:url";
 import { describe, signals } from "./issue-duplicates.mjs";
-import { byAge, idsOf, isOpen, parseArgs, readIssues, valuesOf } from "./standards.mjs";
+import { byAge, idsOf, isOpen, parentOf, parseArgs, readIssues, valuesOf } from "./standards.mjs";
 
 const TITLE_FAMILY = 0.5;
 const TITLE_SUPPORT = 0.2;
@@ -59,6 +60,7 @@ export function verticalOf(paths) {
 function familyEdge(a, b) {
   const s = signals(a, b);
   const names = [];
+  if (a.parent === b.id || b.parent === a.id) names.push("parent");
   if (s.cites) names.push("cites");
   if (s.ref.length > 0) names.push(`ref ${s.ref.join(" ")}`);
   if (s.path.length > 0 && s.title >= TITLE_SUPPORT) names.push("path+title");
@@ -77,6 +79,8 @@ function find(parent, id) {
 
 /** Every family of two or more open issues, oldest member first. */
 export function families(issues) {
+  // An umbrella is read from its tasks: `childIds` holds six ids at most, so it is never listed from there.
+  const umbrellas = new Set(issues.map(parentOf).filter(Boolean));
   const described = issues
     .filter(isOpen)
     .map((issue) => {
@@ -84,9 +88,11 @@ export function families(issues) {
       return {
         ...describe(issue),
         status: values.status,
-        umbrella: idsOf(values.children).length > 0,
+        parent: parentOf(issue),
+        umbrella: umbrellas.has(String(issue.id)),
         chained:
-          idsOf(values.parent).length > 0 ||
+          parentOf(issue) !== null ||
+          umbrellas.has(String(issue.id)) ||
           idsOf(values.blockedBy).length > 0 ||
           idsOf(values.blocks).length > 0,
       };
@@ -217,6 +223,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     await main();
   } catch (error) {
     console.error(`issue-families: ${error.message}`);
-    process.exitCode = 1;
+    process.exitCode = error.exitCode ?? 1;
   }
 }

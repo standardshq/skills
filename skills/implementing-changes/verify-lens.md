@@ -21,7 +21,7 @@ Review three lenses in one pass.
   error semantics? If so, the matching documentation page (where the
   repository's agent rules say the docs live) must be updated in this same
   batch. Missing it is blocking.
-- Does the diff edit by hand a path the repository record lists as `generated`?
+- Does the diff edit by hand a path the repository's facts list as `generated`?
   Blocking.
 
 ## Correctness

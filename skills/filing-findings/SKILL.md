@@ -1,6 +1,6 @@
 ---
 name: filing-findings
-description: Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind> or as a message to the project's Slack curator. The shared cost, budget, ranking and routing bar every scout obeys.
+description: Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind>. The shared cost, budget and ranking bar every scout obeys.
 ---
 
 # Filing findings
@@ -23,7 +23,7 @@ scout is the filter**: not screening, not the maintainer.
   decision nobody has made. « Small » is not a cost; « one file, no decision » is.
 - **Value:** in the unit your scout defines, measured rather than predicted.
 
-Both go into the issue (or the message) verbatim, where a reader can dispute them.
+Both go into the issue verbatim, where a reader can dispute them.
 
 ## Budget
 
@@ -49,7 +49,7 @@ Nothing about a long pass changes the bar:
 
 ## Search first
 
-Both routes start the same way: search the project's issues, every status, with your record tools
+Before filing, search the issues filed on the record or any record under it, every status, with your record tools
 (its search, then `issue-duplicates.mjs` of `screening-issues` on the issues export). A candidate
 that already exists is never filed twice:
 
@@ -59,15 +59,9 @@ that already exists is never filed twice:
   changed in the code since, and cite the closed issue (`issues:<id>`);
 - an issue closed `done`: a regression is a new issue citing it.
 
-## Route
+## Filing
 
-A scout's own skill says which route it takes. The default is the issue route. The Slack route is
-for codebase passes whose evidence the curator must re-read with access the scout lacks
-(production data, a live service).
-
-### Issue route
-
-One issue per candidate, in the project the finding belongs to:
+File one issue per candidate, in the project the finding belongs to:
 
 | Field | Value |
 |---|---|
@@ -79,29 +73,6 @@ One issue per candidate, in the project the finding belongs to:
 | `status` | `backlog`: screening takes it from there. Never `ready` or any other status |
 
 Leave `intent`, `acceptance` and `priority` to people.
-
-### Slack route
-
-The poster never creates or edits an issue: the curator of the project's intake channel does
-(`curating-requests` § Messages from a scout). You post to Slack; the curator reads the channel on
-its next pass (every 5 minutes), picks up each `[scout:` message once, re-reads the evidence,
-dedupes, and files with `origin: scout:<kind>`. The budget of three is a budget of messages.
-
-- **Search the channel too,** with your Slack tools: an earlier message on the same subject is a
-  duplicate whatever its reaction; one the curator declined is a rejection, posted again only when
-  you can name what changed in the code since.
-- **One message, one candidate, nothing else.** The curator judges every top-level message it
-  reads in the channel: never post a summary, a coverage note, a *found, not filed* list or a
-  follow-up in a thread. Those stay in your report. An empty pass posts nothing.
-- **First line is the marker** the curator reads: `[scout:<kind>] <title>`, the title as an issue
-  title would be.
-- **Body:** your scout's report entry, in its order, in the language of the intake channel, with
-  paths, refs and numbers verbatim; the two lines of this skill last, as *Cost* and *Value*.
-  Mark hypotheses as hypotheses: the curator copies that standing into the issue.
-- **Size:** one Slack message holds 5,000 characters. Cut prose before evidence; never continue
-  in a thread.
-- Post it to the project's `intakeChannel` with your Slack tools and keep the message link for
-  your report.
 
 ## Rationalizations
 

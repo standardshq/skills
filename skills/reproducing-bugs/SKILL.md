@@ -1,6 +1,6 @@
 ---
 name: reproducing-bugs
-description: Use when the execution routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for.
+description: Use when the Build routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for.
 ---
 
 # Reproducing bugs
@@ -10,8 +10,8 @@ take a nearby failure as proof during this step. `executing-issues` runs this sk
 `type: bug`; the red command it produces is the fix's first commit.
 
 Read the issue with `working-on-issues` § read recipe. Run everything in the repository checkout,
-on a branch cut from `repositories.targetBranch`. The repository's own agent rules and its
-`repositories` record (`verify`, `boot`, `apps`, `reset`) say how to run tests and the app.
+on a branch cut from the repository's `targetBranch`. The repository's own agent rules and its
+facts (`working-on-issues` § Repository facts: `verify`, `boot`, `apps`, `reset`) say how to run tests and the app.
 
 ## Establish the red loop
 
@@ -38,9 +38,9 @@ Exactly one, with commands and captured evidence:
 | Outcome | Requirement | Then |
 |---|---|---|
 | `reproduced` | the command, already run, reliably asserts the exact symptom | write the reproduction into `problem` (below); `executing-issues` goes on to the fix |
-| `cannot-reproduce` | the complete reported conditions ran without the symptom | pause on a `decision` wait to the reporter, else the project's first active maintainer: what you ran, and « close it » or the one condition you may have missed |
+| `cannot-reproduce` | the complete reported conditions ran without the symptom | pause on a `decision` wait to the reporter, else the first active maintainer of the issue's project (`maintainers`, read up the tree): what you ran, and « close it » or the one condition you may have missed |
 | `needs-info` | one precise artifact or condition from the reporter is missing | pause on a `task` wait to the person who has it: the exact artifact (a record, a file, a screen recording, a version), and why |
-| `needs-human` | reproducing is unsafe, security-sensitive or needs production access the factory must not have | pause on a `task` wait to the project's first active maintainer |
+| `needs-human` | reproducing is unsafe, security-sensitive or needs production access the factory must not have | pause on a `task` wait to the first active maintainer of the issue's project (`maintainers`, read up the tree) |
 
 Every pause follows `working-on-issues` § Pausing (`resumeAt: execution`), then release the lease.
 None of these is a failed attempt: write no `attempt` row.

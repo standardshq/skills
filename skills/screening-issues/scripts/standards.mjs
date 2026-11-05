@@ -38,6 +38,13 @@ export function idsOf(value) {
 }
 
 export const valuesOf = (record) => record.values ?? {};
+
+/** The id an issue's `parent` points at (`record:<id>`, an object or a bare id), or null. */
+export function parentOf(record) {
+  const values = valuesOf(record);
+  const [parent] = idsOf(values.parent ?? values.parentId);
+  return parent ? parent.replace(/^record:/, "") : null;
+}
 /** A server timestamp as milliseconds; NaN when absent or unreadable. */
 export const timeOf = (value) => (value ? Date.parse(value) : Number.NaN);
 export const createdAtOf = (record) => record.createdAt ?? valuesOf(record).createdAt ?? "";
@@ -65,12 +72,41 @@ export function issueText(issue) {
   return SECTIONS.map((section) => textOf(values[section])).join("\n");
 }
 
+/** The parent of each record of the export's `projects` tree (`record:<id>` or a bare id), by id. */
+function treeOf(projects) {
+  const parents = new Map();
+  for (const record of projects ?? []) {
+    const [parent] = idsOf(record.parent ?? record.parentId ?? record.values?.parent);
+    parents.set(String(record.id), parent ? parent.replace(/^record:/, "") : null);
+  }
+  return parents;
+}
+
+/** Whether `id` is `ancestor` or sits under it in the tree; without a tree, only equality holds. */
+export function isUnder(parents, id, ancestor) {
+  for (let at = id, hops = 0; at != null && hops <= parents.size; hops++) {
+    if (at === ancestor) return true;
+    at = parents.get(at) ?? null;
+  }
+  return false;
+}
+
+/** The root a record sits under: itself when it has no parent in the tree. */
+export function rootOf(parents, id) {
+  let root = id;
+  for (let hops = 0; parents.get(root) != null && hops <= parents.size; hops++) {
+    root = parents.get(root);
+  }
+  return root;
+}
+
 /**
- * The issues of the export, every one of them or one project's. The file is a
- * JSON array of `{ id, createdAt, closedAt?, values }`; a `{ data: [...] }`
- * wrapper is accepted.
+ * The export: its issues, and the `projects` tree it may carry. The file is a
+ * JSON array of `{ id, createdAt, closedAt?, values }` (refused by
+ * `readIssues` when a project filter applies), or a `{ data: [...],
+ * projects: [{ id, parent }] }` wrapper.
  */
-export async function readIssues(path, project) {
+export async function readExport(path, { requireTree = false } = {}) {
   if (typeof path !== "string") throw new Error("pass --input <issues.json>");
   const parsed = JSON.parse(await readFile(path, "utf8"));
   const issues = Array.isArray(parsed) ? parsed : parsed?.data;
@@ -80,8 +116,30 @@ export async function readIssues(path, project) {
       throw new Error(`${path}: every issue needs an id and values`);
     }
   }
+  if (requireTree && !Array.isArray(parsed?.projects)) {
+    throw Object.assign(
+      new Error(
+        `${path} carries no \`projects\`: the export must be { "projects": [...], "data": [...] }, so a root covers its repositories`,
+      ),
+      { exitCode: 2 },
+    );
+  }
+  return {
+    issues,
+    parents: treeOf(Array.isArray(parsed) ? [] : parsed.projects),
+  };
+}
+
+/**
+ * The issues of the export, every one of them or those filed on `project` or
+ * any record under it (a root covers its repositories).
+ */
+export async function readIssues(path, project) {
+  const { issues, parents } = await readExport(path, { requireTree: Boolean(project) });
   return project
-    ? issues.filter((issue) => idsOf(valuesOf(issue).project).includes(project))
+    ? issues.filter((issue) =>
+        idsOf(valuesOf(issue).project).some((each) => isUnder(parents, each, project)),
+      )
     : issues;
 }
 

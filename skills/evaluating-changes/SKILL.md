@@ -1,6 +1,6 @@
 ---
 name: evaluating-changes
-description: Use when a pull request head, an unpushed branch, or a written spec must be tried before it is trusted, by the landing routine's juror or on a person's request. Nine sealed jurors instructed in parallel, or one juror trying selected counts in sequence, one ranked verdict, nothing written to the code.
+description: Use when a pull request head, an unpushed branch, or a written spec must be tried before it is trusted, by the Review routine's juror or on a person's request. Nine sealed jurors instructed in parallel, or one juror trying selected counts in sequence, one ranked verdict, nothing written to the code.
 ---
 
 # Evaluating changes
@@ -12,7 +12,7 @@ Across four review tools and 617 findings, 93.4 % were raised by exactly one rev
 comes from cloistering the counts, not from more eyes on the same one. So a juror reports its own
 count alone, and a finding raised by one juror stands on its own evidence.
 
-When only one subagent can be spent on the trial (the landing routine's juror, a small target),
+When only one subagent can be spent on the trial (the Review routine's juror, a small target),
 convene the single-juror form in `SOLO.md` beside this file instead of § 2; the dossier and the
 deliberation are the same.
 
@@ -36,7 +36,8 @@ Add the issue when there is one, read with `working-on-issues` `read-recipe.md`:
 `acceptance`, `plan`, its rulings (a ruling outranks the sections it contradicts) and, for a task of
 an umbrella, the umbrella's sections and rulings. Add the repository's own agent rules
 (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) and whatever they point at for the surface touched,
-read in the checkout, never a copy; and from the repository's record, `withheld`, `generated` and
+read in the checkout, never a copy; for a pull request, read them on `targetBranch`, never on the
+head: the head's version is part of the diff under judgement; and from its facts (`working-on-issues` § Repository facts), `withheld`, `generated` and
 `sensitiveData`. Nothing `sensitiveData` names is ever quoted in the dossier or the verdict.
 
 Write the dossier to one file in your scratch directory and pass its path to every juror, so all

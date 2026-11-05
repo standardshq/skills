@@ -1,6 +1,6 @@
 ---
 name: executing-issues
-description: Use when the execution routine runs, on an issue a person moved to In progress, a woke row with resumeAt execution, or its 30-minute launch-queue pass. Claims a launched issue under a lease and turns it into a verified pull request with Issue <id> in the body, or into a pause that names what it waits on.
+description: Use when the Build routine runs, on an issue a person moved to In progress, a woke row with resumeAt execution, or its 30-minute launch-queue pass. Claims a launched issue under a lease and turns it into a verified pull request with Issue <id> in the body, or into a pause that names what it waits on.
 ---
 
 # Executing issues
@@ -29,7 +29,7 @@ For each, read it with the read recipe, then check, in order:
 1. **Launched:** the latest move into `in_progress` passes `working-on-issues` § Launch. Written by
    any other agent: write a `signal` (`rule: not_launched`, "moved to In progress by an agent, not
    launched"), leave the status, stop.
-2. **Not an umbrella:** an issue with `children` is never work.
+2. **Not an umbrella:** an issue that has tasks is never work (a leaf has `childIds` empty).
 3. **Its pull request:** a linked pull request still open means the issue belongs to it: never
    start a second implementation. A previous run opened it and stopped before the move: claim,
    then finish § 4 from the move to `in_review`.
@@ -54,11 +54,11 @@ asks is still missing). When the work already landed, or the premise is gone, th
 close: pause on a `decision` wait to the person who launched it (« Close it » recommended, naming
 the change that overtook it), release the lease. Not a failure: no `attempt`.
 
-**The workspace:** the project's `repositories`, checked out in your environment (an issue spanning
-several gets every checkout). Per repository: fetch `targetBranch` (the default branch when empty),
-cut a branch from it, named as the repository's rules say (by default `fix/<slug>`, `feat/<slug>`
+**The workspace:** the repositories of the issue's `project`, checked out in your environment (an issue spanning
+several gets every checkout). Per repository: read its facts (`working-on-issues` § Repository
+facts), fetch `targetBranch`, cut a branch from it, named as the repository's rules say (by default `fix/<slug>`, `feat/<slug>`
 or `chore/<slug>`). Read the repository's own agent
-rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) there, and its record: `verify`, `pathGates`,
+rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) there, and use the facts: `verify`,
 `withheld`, `generated`, `sensitiveData`, `boot`, `apps`, `reset`.
 
 ## 3. Implement
@@ -91,7 +91,7 @@ Paths:
 Each pause: `resumeAt: execution`, handoff, then release the lease. Not a failure: no `attempt`.
 
 *Done when* every acceptance assertion exists in a test and passes, and every command of `verify`
-(plus each `pathGates` command whose path the change touches) is clean on the branch.
+is clean on the branch.
 
 ## 4. Open the pull request
 
@@ -113,13 +113,13 @@ is left), then clear `leaseHolder` and `leaseExpiresAt`, then re-read and check 
 to leave. A write that failed is named in `handoff` and your report; never claim a transition you
 did not verify.
 
-Review, verdicts and merge belong to the landing routine. Never write `verdict`, `go` or
+Review, verdicts and merge belong to the Review routine. Never write `verdict`, `go` or
 `check-run`, never merge, never call your own work done.
 
 ## 5. After the pull request
 
 Once the issue is `in_review` you never take its lease again. Review comments, red checks and
-fixes on its pull request, a person's included, belong to the landing routine (juror and fixer,
+fixes on its pull request, a person's included, belong to the Review routine (juror and fixer,
 `landing-pull-requests`).
 
 ## 6. When it fails

@@ -7,7 +7,7 @@ description: "Use when a factory routine needs a person's answer before an issue
 
 A Décision is a person's answer in a minute. You ask one question, the person rules, you write
 their ruling into the ledger. You never implement, never resolve the wait, never wake the issue:
-the `waits` routine does that when your `ruling` row appears.
+the Maintenance routine does that when your `ruling` row appears.
 
 Read `working-on-issues` first: § Pausing for the wait you open, § Provenance for what counts as a
 ruling, and `evidence-kinds.md` for the `wait` and `ruling` rows.
@@ -69,11 +69,14 @@ Write in the language the person uses in the workspace. No em dash in the text.
 
 | Asker | Its questions | The rows around them |
 |---|---|---|
-| the `waits` routine | a deadline, a failure ceiling, an abandoned target | `waking-issues` § 6 |
-| the operator | everything it asks, except the missing wait of a broken invariant and the budget stop, where its action is the wait | `operating-the-factory` |
-| landing in `human` mode | « Merge it » on a go head: the merge itself is the answer | `landing-pull-requests` § 7 |
+| the Maintenance routine | a deadline, a failure ceiling, an abandoned target | `waking-issues` § 6 |
+| the Maintenance routine | everything it asks, except the missing wait of a broken invariant and the budget stop, where its action is the wait | `operating-the-factory` |
+| Review in `human` mode | « Merge it » on a go head: the merge itself is the answer | `landing-pull-requests` § 7 |
+| Review on a repository whose `gate` is `none` | « Merge it » on a head judged go; the merge itself is the answer | `landing-pull-requests` § 2 and § 7 |
+| Review on a command failing on the target branch too (`rule: target_red`) | the target branch is red: **Repair the target** or **Remove the command with `skipVerify` in `AGENTS.md`**; either moves the target's sha, so the answer itself changes nothing, opens no wait and routes no ruling | `landing-pull-requests` § 2 |
+| any stage on a second exit 3 of discovery (`rule: target_unresolved`) | which branch is the target of the repository | `working-on-issues` § Repository facts |
 
-Their rulings are recorded as § 4 says. « I take it » and « Close it » are applied by the `waits`
+Their rulings are recorded as § 4 says. « I take it » and « Close it » are applied by the Maintenance
 routine like any other; for every other answer the asking routine acts on the answer itself. Every
 other routine asks only to pause, and opens the wait, as follows.
 
@@ -96,7 +99,7 @@ When the answer resumes your run, `read decision:<id>` for the answer, `answered
   defaults taken unasked (one line each, or « none »), and the resume stage;
 - `data`: `{"answeredBy": "<person id>", "answeredAt": "<iso>"}`.
 
-Then stop. Never move a status. The `ruling` row triggers the `waits` routine, which applies
+Then stop. Never move a status. The `ruling` row triggers the Maintenance routine, which applies
 every answer (`waking-issues` § 6): it resolves the wait and wakes the issue, or, for « I take
 it » and « Close it », releases the waits and moves the issue to `mine` or `done` (for « Close
 it » with a linked PR open, `in_review` now and `done` once every linked PR is closed). For « I
@@ -107,7 +110,7 @@ same conversation with the missing context added. Never guess on the person's be
 
 **No answer:** a routine's question expires after 24 hours and your run resumes with « no
 answer ». Write nothing, leave the wait open, and say so in your report. The wait stays in
-Needs you under its owner; nobody asks again before its deadline, when the `waits` routine asks
+Needs you under its owner; nobody asks again before its deadline, when the Maintenance routine asks
 once.
 
 ## Red flags

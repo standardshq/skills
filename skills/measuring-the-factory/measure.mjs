@@ -4,7 +4,7 @@
  *
  *   node measure.mjs --input <export.json> --date <iso> [--weeks <n>] [--project <id>] [--seed <n>]
  *
- * The export is written by the dashboard routine with its own record and
+ * The export is written by the Maintenance routine with its own record and
  * GitHub tools (shape in `measuring-the-factory` § 1). The script
  * never calls the workspace: it prints, on stdout, a JSON array of
  * `factory-snapshots` rows for the routine to upsert, and on stderr one line
@@ -180,24 +180,35 @@ function pausedHoursByKind(issue, waits, from, to) {
  * into `ready` for a task of an umbrella, `working-on-issues` § Launch).
  */
 function interventions(issue, rulings) {
-  const launchTo = idsOf(valuesOf(issue).parent).length > 0 ? "ready" : "in_progress";
+  const launchTo = parentIdOf(valuesOf(issue)) !== null ? "ready" : "in_progress";
   // The first entry is the status the issue was created with: a creation, not a move.
   const personal = issue.history.filter((move, index) => index > 0 && move.byPerson);
   const launch = personal.findIndex((move) => move.to === launchTo);
   return personal.length - (launch === -1 ? 0 : 1) + (rulings.get(issue.id) ?? 0);
 }
 
+/** The id a `parent` points at: `record:<id>`, an object or a bare id. */
+const parentIdOf = (values) => {
+  const [parent] = idsOf(values.parent ?? values.parentId);
+  return parent ? String(parent).replace(/^record:/, "") : null;
+};
+
 /** The repository part of `owner/repo#N`. */
 const repositoryOfRef = (ref) => ref.split("#")[0].toLowerCase();
 
+/**
+ * Every series of one record of the `projects` tree, over the issues filed on
+ * it or on any record below it: a root is recomputed from the merged issues of
+ * its repositories, never averaged from their rows.
+ */
 function measureProject(context, project, period, rows, notes) {
   const { issues, evidence, pullRequests, runs, measuredAt } = context;
   const at = Math.min(period.end, measuredAt);
   const date = isoDate(period.start);
-  const add = (series, value) =>
-    rows.push({ project: project.id, repository: null, date, series, value: round(value) });
+  const add = (series, value) => rows.push({ project: project.id, date, series, value: round(value) });
+  const subtree = context.subtreeOf.get(project.id);
   const leaves = issues.filter(
-    (issue) => issue.project === project.id && !issue.isUmbrella && issue.origin !== "operator",
+    (issue) => subtree.has(issue.project) && !issue.isUmbrella && issue.origin !== "operator",
   );
 
   const live = leaves.filter((issue) => statusAt(issue, at) !== null);
@@ -234,7 +245,6 @@ function measureProject(context, project, period, rows, notes) {
   for (const [waitKind, hours] of paused) {
     rows.push({
       project: project.id,
-      repository: null,
       date,
       series: `paused_hours_${waitKind}`,
       value: round(hours),
@@ -267,7 +277,6 @@ function measureProject(context, project, period, rows, notes) {
   if (period.latest) {
     rows.push({
       project: project.id,
-      repository: null,
       date: isoDate(at),
       series: "not_enough_history",
       value: outlook ? 0 : 1,
@@ -282,7 +291,7 @@ function measureProject(context, project, period, rows, notes) {
   const ownRuns = runs.filter(
     (run) =>
       within(time(run.startedAt), period) &&
-      (idOf(run.project) ?? context.projectOf.get(idOf(run.issue))) === project.id,
+      subtree.has(idOf(run.project) ?? context.projectOf.get(idOf(run.issue))),
   );
   const priced = ownRuns.filter((run) => Number.isFinite(Number.parseFloat(run.cost)));
   if (merged.length === 0) {
@@ -334,22 +343,60 @@ function measureProject(context, project, period, rows, notes) {
   }
 }
 
-function measureRepository(context, repository, period, rows, notes) {
-  const project = idsOf(repository.projects)[0];
-  if (!project) {
-    notes.push(`${repository.fullName}: serves no project, no delivery rows`);
+/** The repositories of a subtree: the records holding a `fullName`. */
+const repositoriesOf = (context, project) =>
+  context.projects.filter(
+    (each) => String(each.fullName ?? "").trim() !== "" && context.subtreeOf.get(project.id).has(each.id),
+  );
+
+/**
+ * A deploy is a run of the repository's deploy workflows on its production
+ * branch. `deployWorkflows` empty: none found; absent or null: discovery
+ * failed, so nothing is known (never read as « does not deploy »).
+ */
+const deployKnown = (repository) => repository.deployWorkflows != null;
+const hasDeployWorkflow = (repository) =>
+  (Array.isArray(repository.deployWorkflows)
+    ? repository.deployWorkflows.join("\n")
+    : String(repository.deployWorkflows ?? "")
+  ).trim() !== "";
+
+/** Delivery rows of one record, from the repositories at or below it. */
+function measureDelivery(context, project, period, rows, notes) {
+  const all = repositoriesOf(context, project);
+  const date = isoDate(period.start);
+  const add = (series, value) => rows.push({ project: project.id, date, series, value: round(value) });
+  if (all.length === 0) {
+    if (period.latest) {
+      rows.push({
+        project: project.id,
+        date: isoDate(Math.min(period.end, context.measuredAt)),
+        series: "no_deploy_data",
+        value: 1,
+        state: true,
+      });
+    }
     return;
   }
-  const date = isoDate(period.start);
-  const add = (series, value) =>
-    rows.push({ project, repository: repository.id, date, series, value: round(value) });
-  const name = String(repository.fullName ?? "").toLowerCase();
+  const repositories = all.filter(deployKnown);
+  if (repositories.length === 0) {
+    if (period.latest) notes.push(`${project.id}: deploy discovery failed, no delivery rows`);
+    return;
+  }
+  const names = new Set(repositories.map((each) => String(each.fullName).toLowerCase()));
 
-  const signalled = String(repository.deploySignal ?? "").trim() !== "";
-  if (period.latest) {
+  const withDeploys = repositories.filter(hasDeployWorkflow);
+  const signalled = withDeploys.length > 0;
+  const excluded = all.length - repositories.length;
+  if (period.latest && excluded > 0) {
+    notes.push(
+      `${project.id}: ${excluded} repositor${excluded === 1 ? "y" : "ies"} with failed deploy discovery left out of its delivery rows`,
+    );
+  }
+  // With a repository unknown, « nothing deploys » is not established: write no state row.
+  if (period.latest && (signalled || excluded === 0)) {
     rows.push({
-      project,
-      repository: repository.id,
+      project: project.id,
       date: isoDate(Math.min(period.end, context.measuredAt)),
       series: "no_deploy_data",
       value: signalled ? 0 : 1,
@@ -357,7 +404,8 @@ function measureRepository(context, repository, period, rows, notes) {
     });
   }
   if (signalled) {
-    const deploys = (repository.deploys ?? [])
+    const deploys = withDeploys
+      .flatMap((repository) => repository.deploys ?? [])
       .map((deploy) => ({ ...deploy, at: time(deploy.at) }))
       .filter((deploy) => !Number.isNaN(deploy.at))
       .sort((a, b) => a.at - b.at);
@@ -381,14 +429,14 @@ function measureRepository(context, repository, period, rows, notes) {
       if (recoveries.length > 0) add("recovery_time", percentile(recoveries, 0.5));
     }
   } else if (period.latest) {
-    notes.push(`${repository.fullName}: no deploy signal, no deploy rows`);
+    notes.push(`${project.id}: no deploy workflow, no deploy rows`);
   }
 
   const served = context.issues.filter(
     (issue) =>
       !issue.isUmbrella &&
       issue.origin !== "operator" &&
-      issue.pullRequests.some((ref) => repositoryOfRef(ref) === name),
+      issue.pullRequests.some((ref) => names.has(repositoryOfRef(ref))),
   );
   const merged = served.filter((issue) => within(issue.doneAt, period) && doneWell(issue));
   const reworked = context.issues.filter((bug) => {
@@ -406,7 +454,7 @@ function measureRepository(context, repository, period, rows, notes) {
   });
   if (merged.length > 0) add("rework_rate", reworked.length / merged.length);
   else if (reworked.length > 0) {
-    notes.push(`${repository.fullName} ${date}: ${reworked.length} rework bugs, nothing merged`);
+    notes.push(`${project.id} ${date}: ${reworked.length} rework bugs, nothing merged`);
   }
 }
 
@@ -438,18 +486,35 @@ export function prepare(input, { date, seed = FORECAST.seed }) {
       project: idOf(values.project),
       type: values.type ?? null,
       origin: String(values.origin ?? ""),
-      isUmbrella: idsOf(values.children).length > 0,
+      isUmbrella: false,
       pullRequests: linesOf(values.pullRequests),
       text: [values.title, values.problem, values.context].map(textOf).join("\n"),
     };
+    issue.parentId = parentIdOf(values);
     issue.history = historyOf(issue);
     issue.doneAt = doneAt(issue);
     return issue;
   });
+  // An umbrella is read from its tasks: `childIds` holds six ids at most.
+  const umbrellas = new Set(issues.map((issue) => issue.parentId).filter(Boolean));
+  for (const issue of issues) issue.isUmbrella = umbrellas.has(issue.id);
+  const projects = (input.projects ?? []).map((record) => ({
+    ...record,
+    ...valuesOf(record),
+    id: String(record.id),
+    parentId: parentIdOf({ ...record, ...valuesOf(record) }),
+  }));
+  const subtreeOf = new Map(projects.map((each) => [each.id, new Set([each.id])]));
+  for (const each of projects) {
+    for (let up = each.parentId, hops = 0; up && hops <= projects.length; hops++) {
+      subtreeOf.get(up)?.add(each.id);
+      up = projects.find((candidate) => candidate.id === up)?.parentId;
+    }
+  }
   return {
     projectOf: new Map(issues.map((issue) => [issue.id, issue.project])),
-    projects: input.projects ?? [],
-    repositories: input.repositories ?? [],
+    projects,
+    subtreeOf,
     pullRequests: input.pullRequests ?? [],
     runs: input.runs ?? [],
     evidence,
@@ -471,12 +536,9 @@ export function measure(input, { date, weeks = 2, project, seed } = {}) {
     const start = current - back * WEEK;
     const period = { start, end: start + WEEK, latest: back === 0 };
     for (const each of context.projects) {
-      if (!project || each.id === project) measureProject(context, each, period, rows, notes);
-    }
-    for (const repository of context.repositories) {
-      if (!project || idsOf(repository.projects)[0] === project) {
-        measureRepository(context, repository, period, rows, notes);
-      }
+      if (project && !context.subtreeOf.get(project)?.has(each.id)) continue;
+      measureProject(context, each, period, rows, notes);
+      measureDelivery(context, each, period, rows, notes);
     }
   }
   return { rows, notes };

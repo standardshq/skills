@@ -1,6 +1,6 @@
 ---
 name: pruning-tests
-description: Use when the scouts routine sweeps a repository's test suite, when a maintainer asks to audit a suite, or when an issue with origin scout:tests is executed. Scouts the tests whose time, flakiness or upkeep outweighs what they alone catch, audits every test of a suite for what it witnesses, or cuts one candidate, folding its lone assertion into a surviving test first.
+description: Use when the Maintenance routine sweeps a repository's test suite, when a maintainer asks to audit a suite, or when an issue with origin scout:tests is executed. Scouts the tests whose time, flakiness or upkeep outweighs what they alone catch, audits every test of a suite for what it witnesses, or cuts one candidate, folding its lone assertion into a surviving test first.
 ---
 
 # Pruning tests
@@ -19,15 +19,15 @@ deletion.
 ## Three branches
 
 - **Scouting** — find candidates, measure them, and file the best few as
-  issues with `filing-findings`. Follow [`SCOUT.md`](SCOUT.md). The scouts
-  routine runs this branch on each repository the project's issues are served
-  by (`repositories`), in a checkout of its `targetBranch`.
+  issues with `filing-findings`. Follow [`SCOUT.md`](SCOUT.md). The Maintenance
+  routine runs this branch on each repository the issues filed on the record or any record
+  under it are served by (the `projects` records with a `fullName`), in a checkout of its `targetBranch` (`working-on-issues` § Repository facts).
 - **Auditing** — give every test of a suite a verdict, and report the whole
   map: what each test witnesses, what is wasted, what nothing witnesses.
   Follow [`AUDIT.md`](AUDIT.md).
 - **Cutting** — take one candidate (an issue with `origin: scout:tests`, a
   name, a file) to a merge-ready change: probe, fold, delete, measure, ledger.
-  Follow [`CUT.md`](CUT.md). The execution routine runs it inside
+  Follow [`CUT.md`](CUT.md). The Build routine runs it inside
   `executing-issues`, which owns the lease, the pull request and the handoff.
 
 A run that was handed a candidate cuts. A run that was handed a suite scouts,

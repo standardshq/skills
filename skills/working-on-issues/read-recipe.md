@@ -7,11 +7,12 @@ yours to act on (claimed by another live lease, not your stage, not launched).
 2. **Intent**, then the sections: `problem`, `acceptance`, `context`, `plan`, `handoff`. `handoff`
    is where the last agent stopped; trust it as a lead, verify it as a claim.
 3. **The project:** read `project`, then its `context` (purpose, conventions, how to run and
-   check it) and `maintainers`. Read the repository's own agent rules (`AGENTS.md`, `CLAUDE.md`,
-   `.cursor/rules`) at run time; never copy them into the issue.
+   check it) and `maintainers`. When your stage acts on a repository (Intake never does), read its facts (`SKILL.md` § Repository
+   facts) and its own agent rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) at run time; never
+   copy them into the issue.
 4. **Open waits:** `evidence` with `kind: wait` and empty `resolvedAt`: `waitKind`, `target`,
    `owner`, `resumeAt`, `data.deadline`. An open wait on an issue that is not `paused` was released
-   by a person's move: the `waits` routine will record it; do not act on it as a hold.
+   by a person's move: the Maintenance routine will record it; do not act on it as a hold.
 5. **Rulings:** every `ruling` row, newest first. A ruling outranks the sections it contradicts;
    update the sections to match. A ruling older than a person's later status move is superseded:
    history, not a ruling.
@@ -23,8 +24,9 @@ yours to act on (claimed by another live lease, not your stage, not launched).
    verdict on an older head is history, not a verdict. If the newest `applied` row carrying
    `closeWhenPullRequestsClose: true` has no person-written status move newer than it (a pending
    close, `waking-issues` § 6), the issue is out of landing: no `verdict`, no `go`, no merge; landing leaves it alone except closing its open PRs.
-8. **Structure:** `blockedBy` (and the status of each), `parent` (read the umbrella's sections and
-   rulings: a task inherits its spec and its approval), `children`.
+8. **Structure:** `blockedBy` (and the status of each), `parent` (`record:<id>`: read the umbrella's sections and
+   rulings, a task inherits its spec and its approval) and `ancestors`. List an umbrella's
+   tasks as `SKILL.md` § Launch says.
 9. **Failures:** `failedAttempts`, and the `attempt` rows: the last 3 in full, a count for the
    earlier ones.
 10. **Who moved it:** the issue's activity for the latest `status` move, and whether a person or an

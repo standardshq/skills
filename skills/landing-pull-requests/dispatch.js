@@ -16,11 +16,11 @@ export const meta = {
 //   skill: 'landing-pull-requests',
 //   solo:  '<path of evaluating-changes/SOLO.md>',
 //   stack: '<the demo checkout>',
-//   repositories: { 'owner/repo': { source, verify, pathGates, generated, withheld, sensitiveData, boot, reset, apps } },
+//   repositories: { 'owner/repo': { targetBranch, gate, verify, generated, withheld, sensitiveData, boot, reset, apps } },
 //   heads: [{ issue, repo, number, branch, head, tier, round, limit, screen: boolean,
 //             ciGreen: boolean,
 //             state: 'red' | 'green' | 'unverified' | 'change' | 'demo',
-//             failure?: '<failed step + log excerpt, the check-run body, or the conflict>',
+//             failure?: '<failed step + log excerpt, the check-run body, the conflict, or the target that moved>',
 //             judged?: '<sha the last juror verdict judged; absent when the PR has none>',
 //             previousVerdict?: '<entries of the last verdict, with the fixer's answers>' }],
 // }
@@ -28,11 +28,16 @@ export const meta = {
 // `check-run` is not a round); `limit` is three plus one per ruling asking a
 // change. `ciGreen`: the required checks are green on `head` now. `state:
 // 'change'` is a person's review or ruling asking a change, quoted in
-// `previousVerdict`. `state: 'demo'` is a go head with a screen and no `demo`
-// row yet. A Sight head comes here only red (for its fixer) or once a fixer
-// committed on its pull request (a `fixing` row on it): a juror then judges it
-// at the Standard counts, never landing alone. An untouched green Sight head
-// never comes here: landing writes its rows itself. Every row is an `evidence`
+// `previousVerdict`. A head whose latest `check-run` carries a target sha that
+// has since moved comes `red`, its failure saying to merge `targetBranch` in and
+// re-run `verify`. `state: 'demo'` is a go head with a screen and no `demo`
+// row yet. A Sight head comes here red (for its fixer), once a fixer committed
+// on its pull request (a `fixing` row on it), or when it touches a `withheld` or
+// `generated` path or a `package.json` `scripts` entry: a juror then
+// judges it at the Standard counts, never landing alone. An untouched green
+// Sight head that touches none of those never comes here: landing writes its
+// rows itself. A fixer that returns the head unchanged ends the chain
+// `with-maintainer`. Every row is an `evidence`
 // row on `issue` whose `subject` is `github:<repo>#<number>@<sha>`; no comment
 // on the pull request is state.
 
@@ -52,7 +57,7 @@ const GATE = {
   type: "object",
   properties: {
     head: { type: "string" },
-    gate: { type: "string", enum: ["passed", "failed", "error"] },
+    gate: { type: "string", enum: ["passed", "failed", "error", "target-red"] },
     report: { type: "string" },
   },
   required: ["head", "gate", "report"],
@@ -90,8 +95,8 @@ function rowRule() {
 }
 
 function factoryGate(pr) {
-  const source = args.repositories[pr.repo]?.source;
-  return source === "factory" || source === "both";
+  const gate = args.repositories[pr.repo]?.gate;
+  return gate === "verify" || gate === "both";
 }
 
 function verifier(pr, head) {
@@ -99,11 +104,12 @@ function verifier(pr, head) {
     `You are the verifier of pull request ${pr.repo}#${pr.number}, issue ${
       pr.issue
     }, pinned head \`${head}\`.
-Read § 2 of the ${args.skill} skill and obey it: commit status \`Standards Factory / verify\` pending, a fresh clone of that head in the repository's environment (never another checkout), every \`verify\` line, then the \`pathGates\` lines whose path the diff touches, the \`generated\` path check.
+Read § 2 of the ${args.skill} skill and obey it: commit status \`Standards Factory / verify\` pending, a fresh clone of that head in the routine's own environment (never another checkout), the \`scripts\` check of § 2 "Paths" (the \`scripts\` block of every \`package.json\` between the merge-base and that head), every \`verify\` line, the \`generated\` path check.
 ${rowRule()}
-Write the \`check-run\` row (subject \`${subject(pr, head)}\`): a \`generated\` path edited (not reproduced by the repository's own generator) makes it fail, the paths named in its body. Then the final commit status. A command that cannot start is \`error\`: no \`check-run\`, a \`signal\` with rule environment_broken.
-Repository: ${JSON.stringify(args.repositories[pr.repo])}
-Return the head, passed / failed / error, and the failing output in a few lines.`,
+Write the \`check-run\` row (subject \`${subject(pr, head)}\`): a \`generated\` path edited (not reproduced by the repository's own generator) or a changed script that a \`verify\` line runs ("verify command redefined") makes it fail, the paths or scripts named in its body. Then the final commit status. A command that cannot start is \`error\`: no \`check-run\`, a \`signal\` with rule environment_broken.
+When a command fails, run it on a fresh clone of the repository's \`targetBranch\` too: when every failing command fails there as well, the \`check-run\` is failed with those commands and the target's sha in its body, and you return \`target-red\` (write no signal and no Décision: the landing run does). A command failing only on the head, or a redefined script, is \`failed\`.
+Repository facts: ${JSON.stringify(args.repositories[pr.repo])}
+Return the head, passed / failed / error / target-red, and the failing output in a few lines.`,
     { label: `verify:${pr.repo}#${pr.number}`, phase: "Verify", schema: GATE },
   );
 }
@@ -113,8 +119,9 @@ function fixer(pr, brief, phase) {
     `You are the fixer of pull request ${pr.repo}#${pr.number} (branch \`${
       pr.branch
     }\`, pinned head \`${pr.head}\`), issue ${pr.issue}.
-Read § 3 of the ${args.skill} skill and obey it: a checkout of the branch, reproduce first, red-proven fix, conflict resolved in a merge commit, \`verify\` and the matching \`pathGates\` before pushing, never a \`generated\` path by hand, nothing \`sensitiveData\` names quoted.
+Read § 3 of the ${args.skill} skill and obey it: a checkout of the branch, reproduce first, red-proven fix, conflict resolved in a merge commit, \`verify\` before pushing, never a \`generated\` path by hand, nothing \`sensitiveData\` names quoted.
 ${rowRule()}
+Repository facts: ${JSON.stringify(args.repositories[pr.repo])}
 Write the \`fixing\` row (subject \`${subject(pr, pr.head)}\`) before touching a line.
 
 Your brief:
@@ -152,6 +159,7 @@ ${pr.previousVerdict}`;
     `You are the juror of pull request ${pr.repo}#${pr.number}, issue ${pr.issue}, pinned head \`${
       pr.head
     }\`. Read the ${args.skill} skill § 4 first. Never judge a head other than the pinned one.
+Repository facts: ${JSON.stringify(args.repositories[pr.repo])}
 ${brief}${paths}
 ${rowRule()}
 Write the \`verdict\` row (subject \`${subject(pr, pr.head)}\`, outcome go or changes, the entries in the body). On go, write the \`go\` row on the same subject right after.
@@ -181,7 +189,7 @@ function demonstrator(batch, n) {
 The batch:
 ${list}
 
-Demo checkout: ${args.stack}. Work there and only there. Repository records: ${JSON.stringify(
+Demo checkout: ${args.stack}. Work there and only there. Repository facts: ${JSON.stringify(
       args.repositories,
     )}.
 
@@ -234,8 +242,8 @@ function flush(force) {
 // A `ci` or `both` head is demonstrated only once its required checks are green;
 // a head pushed in this run has none yet: the next run offers it.
 function offer(pr, original) {
-  const source = args.repositories[pr.repo]?.source;
-  const ciReady = source === "factory" || (original.ciGreen && pr.head === original.head);
+  const gate = args.repositories[pr.repo]?.gate;
+  const ciReady = gate === "verify" || gate === "none" || (original.ciGreen && pr.head === original.head);
   if (pr.screen && ciReady) pending.push(pr);
   flush(false);
 }
@@ -252,6 +260,7 @@ async function gate(pr, head) {
   const g = await verifier(pr, head);
   if (g.gate === "passed") return null;
   if (g.gate === "error") return { number: pr.number, head, outcome: "gate-error", note: g.report };
+  if (g.gate === "target-red") return { number: pr.number, head, outcome: "target-red", note: g.report };
   return { number: pr.number, head, outcome: "red", note: g.report };
 }
 
@@ -261,12 +270,15 @@ async function chain(given) {
     let state = pr.state;
     if (state === "unverified") {
       const stop = await gate(pr, pr.head);
-      if (stop?.outcome === "gate-error") return stop;
+      if (stop?.outcome === "gate-error" || stop?.outcome === "target-red") return stop;
       state = stop ? "red" : "green";
       if (stop) pr = { ...pr, failure: stop.note };
     }
     if (state === "red") {
       const push = await fixer(pr, pr.failure, "Fix");
+      // A head the fixer could not move (a conflict it cannot resolve) must not come back every run.
+      if (push.head === pr.head)
+        return { number: pr.number, head: push.head, outcome: "with-maintainer", note: push.summary };
       return { number: pr.number, head: push.head, outcome: "fixed", note: push.summary };
     }
     if (state === "demo") {

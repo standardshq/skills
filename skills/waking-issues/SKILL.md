@@ -1,11 +1,11 @@
 ---
 name: waking-issues
-description: Use when the waits routine runs, on an issue set Done, a ruling recorded, or its hourly pass, which also reads every Task done or deleted and every merged or closed pull request. It is the only skill that resolves waits, applies a person's answers, wakes paused issues, and closes issues from their pull requests.
+description: Use when the Maintenance routine runs, on an issue set Done, a ruling recorded, or its hourly pass, which also reads every Task done or deleted and every merged or closed pull request. It is the only skill that resolves waits, applies a person's answers, wakes paused issues, and closes issues from their pull requests.
 ---
 
 # Waking issues
 
-You are the `waits` routine: the only routine that resolves a wait, applies a person's answer,
+You are the Maintenance routine: the only routine that resolves a wait, applies a person's answer,
 wakes an issue, and moves an issue on its pull requests. Every other routine writes waits and
 asks; you end them and apply the answers.
 
@@ -91,7 +91,7 @@ In this order:
 2. **Released waits:** an open wait on an issue that is no longer `paused` gets a `released` row
    (`data.by` = the person who moved it) and its `resolvedAt`, **only when** the activity shows a
    person's move out of `paused` newer than the wait row. An agent's move out of `paused` is the
-   operator's to revert: leave the wait open. Otherwise, if the wait is more than 5 minutes
+   Maintenance routine's to revert: leave the wait open. Otherwise, if the wait is more than 5 minutes
    old, write a `signal` (`rule: wait_without_pause`) and leave the wait; a younger one is a pause
    being written (wait first, then status): leave it. No `woke`: the person's move already decided
    what happens next.
@@ -101,7 +101,7 @@ In this order:
    (§ 6) gets applied there now.
 5. **Wake:** § 7 for every `paused` issue.
 6. **Pull requests:** § 4 for every `in_review` issue.
-7. **Umbrellas:** an issue with `children`, not `done`, `mine` or `paused`, with no linked PR
+7. **Umbrellas:** an issue with tasks (listed as `working-on-issues` § Launch says), not `done`, `mine` or `paused`, with no linked PR
    open, whose every child is `done`: `done`, the body of the move naming each child and its
    `closeReason`. Its `closeReason`: `done` when at least one child closed `done`; else the
    `closeReason` every child shares; else `wont_do`. A move on a person's behalf: the children's status is its
@@ -150,7 +150,7 @@ status move. A ruling is done on an issue once that issue holds its `applied` ro
 reaches without one is applied again by the next pass. Applying is idempotent: skip every row
 already written and every move already made, and finish each issue with its `applied` row.
 
-**One Décision, several issues.** The operator groups its questions (one Décision per person per
+**One Décision, several issues.** The Maintenance routine groups its questions (one Décision per person per
 run), so one Décision can be the `target` of open waits on several issues. The ruling is recorded
 on one of them. The issues it reaches are the ruling's own issue and every issue holding an open
 `decision` or `approval` wait whose `target` equals the ruling's `subject`. Apply it on each, one
@@ -176,8 +176,8 @@ First, **any other `ruling`** on an issue newer than its latest `attempt` row re
 | **Wait on something else** (escalation) | write the new `wait` the answer names (check its target first, `working-on-issues` § Pausing), then `resolved` on the escalation's own wait |
 | **Retry** (failure ceiling) | `resolved` on the wait; the reset above already applied |
 | anything else, on a `decision` or `approval` wait | `resolved` on the wait whose `target` is the ruling's `subject` |
-| anything else, on a ruling that answers no wait and no escalation (a Décision from the operator or from landing in `human` mode, `asking-for-decisions` § 3) | nothing: the `applied` row with `data.skipped: "no_wait"`; the asking routine acts on the answer itself |
-| a free answer to an escalation that fits no option | leave everything open, write a `signal` (`rule: unapplied_ruling`) for the operator, and the `applied` row with `data.skipped: "unmapped"` |
+| anything else, on a ruling that answers no wait and no escalation (a Décision from the Maintenance routine, from Review in `human` mode, on a `none` gate or on a red target branch, or from any stage on an unresolved target, `asking-for-decisions` § 3) | nothing: the `applied` row with `data.skipped: "no_wait"`; the asking routine acts on the answer itself (a red target needs none: the target's sha moving is its answer) |
+| a free answer to an escalation that fits no option | leave everything open, write a `signal` (`rule: unapplied_ruling`) for the Maintenance routine, and the `applied` row with `data.skipped: "unmapped"` |
 
 Then the `applied` row, last. « I take it » and « Close it » are moves on a person's behalf: the
 `ruling` is their evidence (`working-on-issues` § Moves on a person's behalf). They never wake
@@ -185,7 +185,7 @@ the issue.
 
 **Pending close:** the newest `applied` row carrying `data.closeWhenPullRequestsClose: true`, with
 no person-written status move newer than it. A person's move cancels it. While it holds,
-the issue is out of landing: no `verdict`, no `go`, no merge; landing's only action is to close its open PRs, each with a comment linking the ruling (`landing-pull-requests`), then `waits` closes the issue.
+the issue is out of Review: no `verdict`, no `go`, no merge; Review's only action is to close its open PRs, each with a comment linking the ruling (`landing-pull-requests`), then Maintenance closes the issue.
 
 ## 7. Wake
 

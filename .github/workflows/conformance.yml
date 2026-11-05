@@ -24,6 +24,8 @@ jobs:
           python-version: "3.12"
       - name: Index is up to date
         run: uv run --no-project --with pyyaml python scripts/build-index.py --check
+      - name: Discovery script tests
+        run: node --test
       - name: Install skills-ref
         run: |
           git init --quiet "$RUNNER_TEMP/agentskills"

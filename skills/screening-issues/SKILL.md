@@ -1,12 +1,12 @@
 ---
 name: screening-issues
-description: Use when the screening routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait.
+description: Use when the Triage routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait.
 ---
 
 # Screening issues
 
 An issue is a photograph. A pull request it calls open, a `file:line` it quotes, a gap it says
-nobody closed: all true when written, all claims now. A stale issue costs an execution run, and it
+nobody closed: all true when written, all claims now. A stale issue costs a Build run, and it
 costs it before anyone can tell: the claim reads as well as the day it was filed.
 
 Screening resolves those claims **by command, not by reading**. Reading is a perceptual task done
@@ -25,41 +25,45 @@ checkout. Never hand-assemble what a script prints.
 
 | Script | Prints | Exit |
 |---|---|---|
-| `issue-freshness.mjs <issue-id> --input <file> --checkout <dir> --branch <targetBranch>` | every `issues:<id>`, `#N`, `owner/repo#N` and path the issue cites, resolved on the branch: `STALE`, `MISSING`, `UNDATED`, `SHORT` or `ok` | 0 all hold; 1 a claim no longer holds; 2 usage or input error |
-| `issue-duplicates.mjs --input <file> --project <id> [--issue <id>]` | candidate duplicate pairs: open issues each pair once, or one issue against every other, closed ones included | 0 printed; 1 usage or input error |
+| `issue-freshness.mjs <issue-id> --input <file> --checkout <dir> --branch <targetBranch>` | every `issues:<id>`, `#N`, `owner/repo#N` and path the issue cites, resolved on the branch: `STALE`, `MISSING`, `UNDATED`, `SHORT` or `ok` | 0 all hold; 1 a claim no longer holds; 2 usage or input error, or the export lacks `projects` |
+| `issue-duplicates.mjs --input <file> --project <id> [--issue <id>]` | candidate duplicate pairs: open issues each pair once, or one issue against every other, closed ones included | 0 printed; 1 usage or input error; 2 the export lacks `projects` |
 | `saga-scan.mjs --checkout <dir> --branch <targetBranch>` | files corrected by three or more fixes (sagas), names three or more fixes had to add across modules (bindings) | 0 printed; 1 git failed |
-| `issue-families.mjs --input <file> --project <id> [--issue <id>]` | families of open issues that may ship under one plan; used by `assessing-features` | 0 printed; 1 usage or input error |
+| `issue-families.mjs --input <file> --project <id> [--issue <id>]` | families of open issues that may ship under one plan; used by `assessing-features` | 0 printed; 1 usage or input error; 2 the export lacks `projects` |
 
 A usage or input error is not a finding: fix the call or the export and run it again.
 
 **The export** (`--input`): one JSON file per run, in your scratch directory, holding every issue
-of the project, every status:
+filed on the project record or any record under it, every status, with the `projects` records of
+that tree, so a root covers its repositories. `issue-freshness.mjs`, and every script run with `--project`, exit 2 on an export without `projects` (a bare array, or a `data` wrapper alone).
 
 ```json
-[
+{
+  "projects": [{ "id": "<id>", "parent": "record:<id>" }],
+  "data": [
   {
     "id": "<record id>",
     "createdAt": "<iso>",
     "closedAt": "<iso, done issues the screened issue cites>",
     "values": {
       "title": "…", "status": "…", "closeReason": "…", "type": "…", "githubNumber": 123,
-      "project": "<id>", "parent": "<id>", "children": ["<id>"], "blockedBy": ["<id>"],
+      "project": "<id>", "parent": "record:<id>", "blockedBy": ["<id>"],
       "blocks": ["<id>"], "intent": "…", "problem": "…", "acceptance": "…", "context": "…",
       "plan": "…", "handoff": "…"
     }
   }
-]
+  ]
+}
 ```
 
-1. Query the `issues` object for the project with your record tools, all statuses, every page.
+1. Query the `issues` object for the issues filed on the project record or any record under it, with your record tools, all statuses, every page.
 2. Write each record as above; the sections as text (markdown), relations as ids.
 3. For each `done` issue the screened issue cites (`issues:<id>`, or `#N` matching an imported
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to
    `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
 
-**The checkout:** the project's `repositories`, each checked out in your environment. Per
-repository: `git -C <dir> fetch origin <targetBranch>` (the repository's default branch when
-`targetBranch` is empty), then `git -C <dir> rev-parse origin/<targetBranch>` for the sha your
+**The checkout:** the repositories of the issue's `project`, each checked out in your environment. Per
+repository: read its facts (`working-on-issues` § Repository facts), which leaves the checkout on
+`targetBranch`, then `git -C <dir> rev-parse origin/<targetBranch>` for the sha your
 `screening` row names. Read the repository's own agent rules (`AGENTS.md`, `CLAUDE.md`,
 `.cursor/rules`) there, never a copy.
 
@@ -67,16 +71,16 @@ repository: `git -C <dir> fetch origin <targetBranch>` (the repository's default
 
 | Run | Issues |
 |---|---|
-| an issue created | that issue, unless it is already `done` (the operator's « Factory operations log » is created closed and never screened) |
+| an issue created | that issue, unless it is already `done` (the « Factory operations log », created closed by any routine, is never screened) |
 | a `woke` row with `resumeAt: screening` | that issue; any other `resumeAt`: stop |
 | an `assessment` row with `resumeAt: screening` (`verdict: approved`) | that issue: the maintainer approved the feature |
-| the daily pass | every `backlog` issue that needs screening (below), oldest first |
+| the daily pass | every `backlog` issue that needs screening (below), oldest first; then every `backlog` feature whose latest `screening` row is `assess` with no newer `assessment` row: run `assessing-features` on it |
 | the daily pass on a Monday | the same, then § Weekly sweep |
 
 **Needs screening:** status `backlog`, not an umbrella, and one of: no `screening` row yet; a
 `woke` row or a person-written status move newer than its latest `screening` row; an `assessment`
 row `verdict: approved` newer than its latest `screening` row `verdict: assess`. Otherwise a
-feature whose latest verdict is `assess` belongs to assessment: leave it.
+feature whose latest verdict is `assess` belongs to assessment: do not screen it again.
 
 An empty list is a correct outcome: report it and stop. Never widen the search.
 
@@ -90,9 +94,9 @@ claim the lease (`working-on-issues` § Claiming, « Screening holds it too »).
 |---|---|
 | `mine` | stop: write nothing |
 | `paused`, `ready`, `in_progress`, `in_review`, `done` | not yours outside § Weekly sweep: stop |
-| has `children` (an umbrella) | a container, never work: screen its tasks, not it; never close it |
-| `origin: shaping` and no `children` yet | an umbrella `shaping-features` is still writing: stop, write nothing |
-| `origin: release`, no `parent` and no `children` | a release umbrella `releasing-downstream` is still writing: stop, write nothing |
+| has tasks (an umbrella: some issue has it as `parent`) | a container, never work: screen its tasks, not it; never close it |
+| `origin: shaping` and no task yet | an umbrella `shaping-features` is still writing: stop, write nothing |
+| `origin: release`, no `parent` and no task yet | a release umbrella `releasing-downstream` is still writing: stop, write nothing |
 | `type: feature`, its `parent` has `origin: shaping`, and no `assessment` row `verdict: approved` on it yet | a task `shaping-features` is still writing: stop, write nothing; the daily pass takes it once the row exists |
 
 Screening closes on repository evidence alone. These stay open whatever the scripts print, because
@@ -176,21 +180,21 @@ only for `assess`), then act:
 | `hold` | beyond one change (§ 5) | pause: `task` wait to the project's first active maintainer for a spec (`shaping-features`), `resumeAt: screening`. Propose the split into one-change issues in the Task |
 | `hold` | the right fix changes a public contract, a security posture or an agent's authority | pause: `decision` wait, the one question that forks the work |
 | `hold` | it needs something not yet done: another issue, a pull request, a date, a person's artifact | pause on that `blocker`, `date` or `task` wait |
-| `assess` | `type: feature`, no `assessment` row `approved` since its last `assess` verdict | status stays `backlog`; the row carries `resumeAt: assessment`, which hands it to the assessment routine, so it is written last (below) |
+| `assess` | `type: feature`, no `assessment` row `approved` since its last `assess` verdict | status stays `backlog`; the row carries `resumeAt: assessment`, which marks where the same Triage run continues into `assessing-features` (no trigger fires), so it is written last (below) |
 | `ready` | every claim resolves, no family owns it, it fits one change, and for a feature an `assessment` row with `verdict: approved` | status `ready`; for a task of an umbrella (it has a `parent`), leave the status `backlog`: the person's drag to `ready` is its launch |
 
 Every pause follows `working-on-issues` § Pausing: check the target first, make it exist, the
 `wait` row, then `paused`. A hold is never a free-text "revisit later": it names its wait.
 
-Closing a stale, overtaken or symptomatic issue here costs minutes instead of an execution run:
+Closing a stale, overtaken or symptomatic issue here costs minutes instead of a Build run:
 **closing is the point.** The body of a `close` row states the command that produced the finding
 and quotes the line of the issue that no longer holds, so the next reader re-runs it rather than
 re-litigates it.
 
 Then rewrite `handoff` (verdict, the evidence, what the next stage needs), release the lease,
 re-read the issue and check the state you meant to leave. **The one exception to that order:** an
-`assess` verdict's row carries `resumeAt: assessment` and hands the issue over the moment it is
-created, so write it **last**, after `handoff` and the lease release (`working-on-issues`
+`assess` verdict's row carries `resumeAt: assessment` and marks where this run continues into
+assessment (it triggers nothing), so write it **last**, after `handoff` and the lease release (`working-on-issues`
 § Finish).
 
 ## Weekly sweep

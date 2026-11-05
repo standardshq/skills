@@ -102,7 +102,7 @@ behind each other.
 An alive input issue whose ask one task fully carries **becomes** that task. For each task, give:
 its title (the platform behaviour), the spec sections it delivers, its acceptance assertions
 copied from the spec, the issue it reuses or `new`, what blocks it, and the `withheld` paths of
-its repository (`repositories`) it touches, since those wait for a person's approval before merge.
+its repository (`working-on-issues` § Repository facts) it touches, since those wait for a person's approval before merge.
 
 A task that adds new chrome, a new layout or a new interaction gets its mockup now, drawn with the
 maintainer and stored as a file, so execution never pauses on it.
@@ -116,8 +116,8 @@ a mockup has one the maintainer approved, and the maintainer approved the table.
 ## 5. Write the umbrella
 
 The umbrella is an input issue only when its own ask is the whole plan; otherwise create one, in
-the project the work belongs to, with `origin: shaping`: screening never screens an issue with that
-origin until it has children (`screening-issues` § The fence), so it is never mistaken for a leaf.
+the `projects` record the work belongs to (the root when it spans several repositories), with `origin: shaping`: screening never screens an issue with that
+origin until it has tasks (`screening-issues` § The fence), so it is never mistaken for a leaf.
 An adopted umbrella (an input issue whose ask is the whole plan) keeps its origin; its feature
 tasks get the same `approved` row as any other (§ 6).
 Its living document (the audit log keeps every earlier version):
@@ -148,7 +148,7 @@ create the others in the umbrella's project. Each task:
 
 | Field | Value |
 |---|---|
-| `parent` | the umbrella |
+| `parent` | `record:<umbrella id>`, on creation only: a new task is created with `write`, **one per call**. A reused issue is moved under the umbrella with `organize`, action `file_under` (`write` refuses a parent on update) |
 | `blockedBy` | the tasks it needs, as the approved table says |
 | `type` | what the task itself is (`screening-issues` § 1) |
 | `origin` | a new task: `human`; a reused issue keeps its own |
@@ -171,11 +171,11 @@ shaped umbrella alone until the row exists.
 where its ask went (`issues:<id>` of the task, or the umbrella's « Considered and set aside »),
 and list them in § 7. You never close them: closing is a person's move (they may close them in the
 session), or screening's, which closes a `backlog` duplicate on its next pass. A `paused` one is
-the `waits` routine's: its wait ends, it wakes, and screening closes it. A live ask an input issue
+the Maintenance routine's: its wait ends, it wakes, and screening closes it. A live ask an input issue
 carried beside the plan gets its own issue, as `curating-requests` writes one; an input that was
 `mine` keeps that ask in the maintainer's lane.
 
-*Done when* the umbrella's `children` lists every task in order, each task's `blockedBy` matches
+*Done when* every task is listed under the umbrella (`working-on-issues` § Launch says how), each task's `blockedBy` matches
 the table, the umbrella's `context` names every task, and every input issue says where its ask
 went.
 
@@ -184,7 +184,7 @@ went.
 **Delivering into a spec Task:** write in the Task's description (or attach) the umbrella
 (`record:issues:<id>`) and one line per task, then ask the maintainer to mark the Task done: that
 is their approval reaching the paused issue. When they ask you to mark it done, do it and quote
-their words in the Task. The `waits` routine then resolves the wait and wakes the issue
+their words in the Task. The Maintenance routine then resolves the wait and wakes the issue
 (`waking-issues`): assessment records the approval, or screening finds the umbrella and screens its
 tasks.
 
