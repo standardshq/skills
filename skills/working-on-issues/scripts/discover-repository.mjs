@@ -330,9 +330,6 @@ export async function discover({ checkout, github, listed = [] }) {
   });
   const resetScript = RESET_SCRIPTS.find((name) => scripts[name]);
   const envFiles = [...files].filter((path) => /(^|\/)\.env(\.[\w-]+)?$/.test(path));
-  const deploySignal = workflows.deploy.length
-    ? `GitHub workflow ${workflows.deploy.join(", ")} on ${repo.default_branch}`
-    : "";
 
   const facts = {
     fullName: repo.full_name,
@@ -354,7 +351,7 @@ export async function discover({ checkout, github, listed = [] }) {
     ...(await bootFacts({ checkout, scripts, pm })),
     reset: resetScript ? `${pm} run ${resetScript}` : "",
     consumes: (await consumedRepositories({ checkout, files, listed, fullName: repo.full_name })).join("\n"),
-    deploySignal,
+    deployWorkflows: workflows.deploy.join("\n"),
     gate: gateOf({ checks, verify }),
   };
   return { facts, onTarget: head === facts.targetBranch };

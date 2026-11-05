@@ -32,7 +32,7 @@ its tag, when the repository tags releases) is the key: a release is opened once
 
 | The repository | Its candidate release |
 |---|---|
-| has a deploy workflow (its discovered `deploySignal`) | the commit of the latest successful run of that workflow on its `productionBranch`, read with the GitHub tools: a merge alone is not its release |
+| has a deploy workflow (its discovered `deployWorkflows`) | the commit of the latest successful run of that workflow on its `productionBranch`, read with the GitHub tools: a merge alone is not its release |
 | has none | the head of its `productionBranch`, read with the GitHub tools (the newest tag on it, when the repository tags releases) |
 
 Then stop for that repository, writing nothing, when any holds:
@@ -58,7 +58,7 @@ one of them.
 
 ## 3. The release umbrella
 
-One issue, in the first project the released repository serves:
+One issue, filed on the released repository's own `projects` record:
 
 | Field | Value |
 |---|---|
@@ -70,12 +70,11 @@ One issue, in the first project the released repository serves:
 | `acceptance` | every consuming repository runs <version> |
 | `status` | `backlog` |
 
-It is a container (it gets children): screening never screens it, nobody launches it, and the
+It is a container (it gets tasks): screening never screens it, nobody launches it, and the
 Maintenance routine closes it once every bump is `done` (`waking-issues` § 5).
 
-Create the bumps of § 4 right after it, before anything else. Until it has children, screening
-leaves it alone (`screening-issues` § The fence: `origin: release`, no `parent`, no `children`). When no consumer can get a bump (none serves a project, § 4), create nothing and name each
-consumer in your report.
+Create the bumps of § 4 right after it, before anything else. Until it has tasks, screening
+leaves it alone (`screening-issues` § The fence: `origin: release`, no `parent`, no task yet).
 
 ## 4. One bump issue per consumed package
 
@@ -90,8 +89,8 @@ For each package kept, one bump issue:
 | `title` | « Bump <package> to <version> in consumer/repo » |
 | `type` | `chore` |
 | `origin` | `release` |
-| `project` | the first project the consuming repository serves; it serves none: no bump, a `signal` (`rule: consumer_without_project`, `subject: repositories:<id>`) on the umbrella |
-| `parent` | the release umbrella |
+| `project` | the consuming repository's own `projects` record |
+| `parent` | `record:<release umbrella id>`, set on creation: a bump is created with `write`, one per call |
 | `problem` | the consumer depends on <the package> at <its current version>; <version> carries the released issues |
 | `acceptance` | the consumer's dependency on <the package> is <version>, its lockfile matches, and its `verify` passes on the bump's pull request |
 | `context` | the release umbrella, the released pull requests, and every issue § 5 puts behind this bump |
@@ -100,7 +99,7 @@ For each package kept, one bump issue:
 A bump is a task of an umbrella: screening screens it, and a person's drag to `ready` launches it
 (`working-on-issues` § Launch). You never move it further. An open bump issue for an older version
 of the same package in that consumer, not yet launched: append the new version to its `context`
-instead of a second bump, and make it a child of this umbrella too only if it has no parent.
+instead of a second bump, and file it under this umbrella too (`organize`, action `file_under`) only if it has no parent.
 
 ## 5. Issues waiting on the release
 
@@ -110,7 +109,7 @@ An issue waits on this release when its work in a consuming repository needs a r
   `issues:<id>` of a released issue or `github:owner/repo#N` of a released pull request; or
 - one of its `blockedBy` issues is a released issue.
 
-Read each such issue in a project the consumer serves with the read recipe, then:
+Read each such issue (filed on the consumer's record or under it) with the read recipe, then:
 
 | Its status | Do |
 |---|---|

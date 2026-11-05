@@ -142,7 +142,9 @@ umbrellas to stop launching when the budget is spent), is launched. The launch q
 is `ready`): the Build routine's 30-minute pass also reads `ready` issues with a `parent`,
 checks those conditions, moves each one to `in_progress` itself, then claims it as below.
 
-An umbrella (an issue with `children`) is a container, never work: never claim it.
+An umbrella (an issue that has tasks) is a container, never work: never claim it. A leaf is an
+issue whose `childIds` is empty: filter on that to find leaves, and on `parentId` to list an
+umbrella's tasks (`childIds` holds six at most and is not returned to you).
 
 ## Claiming: the lease
 
@@ -150,7 +152,7 @@ The launch queue view lists `in_progress` leaves under the failure ceiling. It d
 lease or blockers; you do. Before claiming, re-read the issue and check all of:
 
 1. `status` is `in_progress` and the issue is launched (above).
-2. It has no `children`.
+2. It is a leaf (`childIds` empty).
 3. `leaseExpiresAt` is empty or in the past.
 4. Every `blockedBy` issue is `done`. If one is open: leave the issue, write nothing, take the next.
 5. `failedAttempts` < 3, after the reset below.

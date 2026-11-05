@@ -101,7 +101,7 @@ In this order:
    (§ 6) gets applied there now.
 5. **Wake:** § 7 for every `paused` issue.
 6. **Pull requests:** § 4 for every `in_review` issue.
-7. **Umbrellas:** an issue with `children`, not `done`, `mine` or `paused`, with no linked PR
+7. **Umbrellas:** an issue with tasks (list them by filtering `issues` on `parentId`, never from `childIds`), not `done`, `mine` or `paused`, with no linked PR
    open, whose every child is `done`: `done`, the body of the move naming each child and its
    `closeReason`. Its `closeReason`: `done` when at least one child closed `done`; else the
    `closeReason` every child shares; else `wont_do`. A move on a person's behalf: the children's status is its

@@ -29,7 +29,7 @@ For each, read it with the read recipe, then check, in order:
 1. **Launched:** the latest move into `in_progress` passes `working-on-issues` § Launch. Written by
    any other agent: write a `signal` (`rule: not_launched`, "moved to In progress by an agent, not
    launched"), leave the status, stop.
-2. **Not an umbrella:** an issue with `children` is never work.
+2. **Not an umbrella:** an issue that has tasks is never work (a leaf has `childIds` empty).
 3. **Its pull request:** a linked pull request still open means the issue belongs to it: never
    start a second implementation. A previous run opened it and stopped before the move: claim,
    then finish § 4 from the move to `in_review`.
@@ -54,7 +54,7 @@ asks is still missing). When the work already landed, or the premise is gone, th
 close: pause on a `decision` wait to the person who launched it (« Close it » recommended, naming
 the change that overtook it), release the lease. Not a failure: no `attempt`.
 
-**The workspace:** the project's `repositories`, checked out in your environment (an issue spanning
+**The workspace:** the repositories of the issue's `project` (the `projects` records with a `fullName` at or under it), checked out in your environment (an issue spanning
 several gets every checkout). Per repository: read its facts (`working-on-issues` § Repository
 facts), fetch `targetBranch`, cut a branch from it, named as the repository's rules say (by default `fix/<slug>`, `feat/<slug>`
 or `chore/<slug>`). Read the repository's own agent

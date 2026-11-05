@@ -21,8 +21,8 @@ time.
 ## 1. Before you start
 
 - The repository is a `projects` record with a `fullName`, its facts read with `working-on-issues`
-  § Repository facts, and it serves the project the
-  issues go to; the project has an active maintainer: the maintainer you sit with.
+  § Repository facts, and the imported issues are filed on it (`project`); it, or the root above it, has an active
+  maintainer: the maintainer you sit with.
 - Write the project's issues export (`screening-issues` § Scripts): the plan skips every GitHub
   number already imported into the project, so a second run imports only what is new.
 
@@ -124,9 +124,11 @@ before its import is finished. Wait for both. Anything but a clear yes: stop, wr
 
 With your record tools, in this order, re-reading each record after you write it:
 
-1. **Issues,** in plan order (umbrellas before their tasks), with the plan's `values` and
-   `createWithStatus`. Keep the map `githubNumber` → record id.
-2. **Relations:** `parent` and `blockedBy`, through that map.
+1. **Issues,** in plan order (umbrellas before their tasks), one `write` per issue, with the
+   plan's `values`, `createWithStatus` and, for a sub-issue, `parent: record:<id>` of its
+   planned `parent` number, through the map below (a record with a parent is created one per call,
+   and the parent is set on create only). Keep the map `githubNumber` → record id.
+2. **Relations:** `blockedBy`, through that map. Never write `parent` again: it is not a relation.
 3. **Evidence:** each planned row on its issue (`kind`, `subject`, `body`, `data` as JSON).
 4. **Waits,** for each issue whose plan `status` is `paused` (`working-on-issues` § Pausing):
    check the target first (a `blocker` whose imported issue is `done` is no wait: leave the issue

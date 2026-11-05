@@ -148,7 +148,7 @@ For each repository: the latest commit on `targetBranch` fails a required check 
 and at least two open pull requests fail the same check. Find the open issue for it (`origin:
 operator`, title « Target branch red: owner/repo »): one exists, the `signal` on it (`rule:
 target_red`, `subject: github:owner/repo@<sha>`), and a Décision when it is `paused` or has
-not moved in 24 hours. None: **open it** in the first project the repository serves (`type: bug`,
+not moved in 24 hours. None: **open it** on the repository's own `projects` record (`type: bug`,
 `origin: operator`, `problem` the failing check and its run, `acceptance` the check green on
 `targetBranch`), then the `signal`. You never wake it: screening picks it up, a person launches it.
 
@@ -188,7 +188,7 @@ switched off is noticed by nobody.
 
 ### 11. Delivery chain
 
-A release a repository published whose bump issue in a consuming repository (a child of the
+A release a repository published whose bump issue in a consuming repository (a task of the
 release umbrella) is not `done` 48 hours later: the `signal` on the bump issue
 (`rule: delivery_stalled`), then a Décision. You never wake it: a `paused` bump issue wakes through
 its waits, a `backlog` or `ready` one moves on a person's gesture.

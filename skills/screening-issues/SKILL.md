@@ -43,7 +43,7 @@ of the project, every status:
     "closedAt": "<iso, done issues the screened issue cites>",
     "values": {
       "title": "…", "status": "…", "closeReason": "…", "type": "…", "githubNumber": 123,
-      "project": "<id>", "parent": "<id>", "children": ["<id>"], "blockedBy": ["<id>"],
+      "project": "<id>", "parent": "record:<id>", "blockedBy": ["<id>"],
       "blocks": ["<id>"], "intent": "…", "problem": "…", "acceptance": "…", "context": "…",
       "plan": "…", "handoff": "…"
     }
@@ -57,7 +57,7 @@ of the project, every status:
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to
    `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
 
-**The checkout:** the project's `repositories`, each checked out in your environment. Per
+**The checkout:** the repositories of the project (the `projects` records with a `fullName` at or under the issue's `project`), each checked out in your environment. Per
 repository: read its facts (`working-on-issues` § Repository facts), which leaves the checkout on
 `targetBranch`, then `git -C <dir> rev-parse origin/<targetBranch>` for the sha your
 `screening` row names. Read the repository's own agent rules (`AGENTS.md`, `CLAUDE.md`,
@@ -90,9 +90,9 @@ claim the lease (`working-on-issues` § Claiming, « Screening holds it too »).
 |---|---|
 | `mine` | stop: write nothing |
 | `paused`, `ready`, `in_progress`, `in_review`, `done` | not yours outside § Weekly sweep: stop |
-| has `children` (an umbrella) | a container, never work: screen its tasks, not it; never close it |
-| `origin: shaping` and no `children` yet | an umbrella `shaping-features` is still writing: stop, write nothing |
-| `origin: release`, no `parent` and no `children` | a release umbrella `releasing-downstream` is still writing: stop, write nothing |
+| has tasks (an umbrella: some issue has it as `parent`) | a container, never work: screen its tasks, not it; never close it |
+| `origin: shaping` and no task yet | an umbrella `shaping-features` is still writing: stop, write nothing |
+| `origin: release`, no `parent` and no task yet | a release umbrella `releasing-downstream` is still writing: stop, write nothing |
 | `type: feature`, its `parent` has `origin: shaping`, and no `assessment` row `verdict: approved` on it yet | a task `shaping-features` is still writing: stop, write nothing; the daily pass takes it once the row exists |
 
 Screening closes on repository evidence alone. These stay open whatever the scripts print, because

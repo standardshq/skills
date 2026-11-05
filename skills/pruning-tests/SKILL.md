@@ -21,7 +21,7 @@ deletion.
 - **Scouting** — find candidates, measure them, and file the best few as
   issues with `filing-findings`. Follow [`SCOUT.md`](SCOUT.md). The Maintenance
   routine runs this branch on each repository the project's issues are served
-  by (`repositories`), in a checkout of its `targetBranch` (`working-on-issues` § Repository facts).
+  by (the `projects` records with a `fullName`), in a checkout of its `targetBranch` (`working-on-issues` § Repository facts).
 - **Auditing** — give every test of a suite a verdict, and report the whole
   map: what each test witnesses, what is wasted, what nothing witnesses.
   Follow [`AUDIT.md`](AUDIT.md).

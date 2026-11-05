@@ -51,7 +51,7 @@ so all three modes run in a routine with no host-specific setup:
 | `brainstorming` | Step 1 | `full` mode, always — its checklist verbatim |
 | `writing-plans` | Step 1 → 2 | `full` mode, as brainstorming's terminal handoff |
 | `reproducing-bugs` | Step 2 | any bug fix, before the assertion is written |
-| the repository's UI skills, when its agent rules or the project's `context` name any | Step 3 | any UI task |
+| the repository's UI skills, when its agent rules or the project's `context` (read up the tree) name any | Step 3 | any UI task |
 
 `brainstorming` and `writing-plans` are vendored from superpowers (their
 `LICENSE.superpowers`). The review lenses are two read-only subagents whose
@@ -197,7 +197,7 @@ repository's own rules win wherever they say otherwise)
 - **Error paths are first-class**: invalid input, unauthorized, not found.
 
 > The DNA is a summary. The repository's agent rules (`AGENTS.md`,
-> `CLAUDE.md`, `.cursor/rules`), the project's `context` and the repository's
+> `CLAUDE.md`, `.cursor/rules`), the project's `context` (read up the tree) and the repository's
 > own skills are the source of truth.
 
 ### This repository's code rules

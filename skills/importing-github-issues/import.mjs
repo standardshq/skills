@@ -424,21 +424,24 @@ export function plan(issues, options) {
         context,
         pullRequests: pullRequests.join("\n"),
       },
-      relations: { parent, blockedBy },
+      // The parent is set on creation only (`write` with `parent`); it is never a relation to write after.
+      parent,
+      relations: { blockedBy },
       evidence,
       wait,
     });
   }
 
-  // Parents before their tasks, so a task's parent exists when it is created.
-  const children = new Set(
-    entries.filter((entry) => entry.relations.parent != null).map((entry) => entry.githubNumber),
-  );
-  entries.sort(
-    (a, b) =>
-      Number(children.has(a.githubNumber)) - Number(children.has(b.githubNumber)) ||
-      a.githubNumber - b.githubNumber,
-  );
+  // Parents before their tasks, so a task's parent exists when it is created, at any depth.
+  const parentOfNumber = new Map(entries.map((entry) => [entry.githubNumber, entry.parent]));
+  function depth(number) {
+    let levels = 0;
+    for (let next = parentOfNumber.get(number); next != null; next = parentOfNumber.get(next)) {
+      if (++levels > entries.length) break;
+    }
+    return levels;
+  }
+  entries.sort((a, b) => depth(a.githubNumber) - depth(b.githubNumber) || a.githubNumber - b.githubNumber);
 
   const count = (predicate) => entries.filter(predicate).length;
   const summary = {

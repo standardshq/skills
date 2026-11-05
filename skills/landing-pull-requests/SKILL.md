@@ -35,7 +35,7 @@ with `Issue: <id>` (or `Closes #<githubNumber>` for an imported issue). Read it 
 recipe, then leave the pull request alone, with one line in your report, when any of these holds:
 
 - no issue: the pull request is not the factory's;
-- the repository is not in `repositories`;
+- no `projects` record carries the repository's `fullName`;
 - the issue is not `in_review` (`paused`, `mine`, `done`, or `in_progress` while an executor still
   holds it);
 

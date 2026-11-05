@@ -151,7 +151,7 @@ builds it.
 - a question asked about a joke instead of a decline;
 - filing when gate 1 only "probably" passed;
 - `intent` in your words instead of the reporter's;
-- asking which project when the `context` and repositories already say;
+- asking which project when the `context` and repositories (the `projects` tree) already say;
 - writing a routing answer to a project's `context` instead of your memory;
 - a second issue, duplicate line or reply for a message whose permalink an issue already holds;
 - setting `status`, `priority` or writing an evidence row.

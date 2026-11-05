@@ -38,6 +38,13 @@ export function idsOf(value) {
 }
 
 export const valuesOf = (record) => record.values ?? {};
+
+/** The id an issue's `parent` points at (`record:<id>`, an object or a bare id), or null. */
+export function parentOf(record) {
+  const values = valuesOf(record);
+  const [parent] = idsOf(values.parent ?? values.parentId);
+  return parent ? parent.replace(/^record:/, "") : null;
+}
 /** A server timestamp as milliseconds; NaN when absent or unreadable. */
 export const timeOf = (value) => (value ? Date.parse(value) : Number.NaN);
 export const createdAtOf = (record) => record.createdAt ?? valuesOf(record).createdAt ?? "";
