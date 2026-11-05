@@ -202,7 +202,7 @@ const repositoryOfRef = (ref) => ref.split("#")[0].toLowerCase();
  * its repositories, never averaged from their rows.
  */
 function measureProject(context, project, period, rows, notes) {
-  const { issues, evidence, pullRequests, runs, measuredAt } = context;
+  const { issues, timeline, pullRequests, runs, measuredAt } = context;
   const at = Math.min(period.end, measuredAt);
   const date = isoDate(period.start);
   const add = (series, value) => rows.push({ project: project.id, date, series, value: round(value) });
@@ -312,7 +312,7 @@ function measureProject(context, project, period, rows, notes) {
   const judged = merged
     .map(
       (pr) =>
-        evidence
+        timeline
           .filter(
             (row) =>
               row.kind === "verdict" &&
@@ -463,10 +463,10 @@ export function prepare(input, { date, seed = FORECAST.seed }) {
   const measuredAt = time(date);
   if (Number.isNaN(measuredAt)) throw new Error(`--date is not a date: ${date}`);
   // A row may come back flat or as a record with `values`; relations as an id or an object.
-  const evidence = (input.evidence ?? []).map((row) => ({ ...row, ...(row.values ?? {}) }));
+  const timeline = (input.timeline ?? []).map((row) => ({ ...row, ...(row.values ?? {}) }));
   const rulings = new Map();
   const waitsOf = new Map();
-  for (const row of evidence) {
+  for (const row of timeline) {
     const issue = idOf(row.issue);
     if (row.kind === "ruling") rulings.set(issue, (rulings.get(issue) ?? 0) + 1);
     if (row.kind === "wait" && row.waitKind) {
@@ -488,7 +488,7 @@ export function prepare(input, { date, seed = FORECAST.seed }) {
       origin: String(values.origin ?? ""),
       isUmbrella: false,
       pullRequests: linesOf(values.pullRequests),
-      text: [values.title, values.problem, values.context].map(textOf).join("\n"),
+      text: [values.title, values.body, values.context].map(textOf).join("\n"),
     };
     issue.parentId = parentIdOf(values);
     issue.history = historyOf(issue);
@@ -517,7 +517,7 @@ export function prepare(input, { date, seed = FORECAST.seed }) {
     subtreeOf,
     pullRequests: input.pullRequests ?? [],
     runs: input.runs ?? [],
-    evidence,
+    timeline,
     issues,
     rulings,
     waitsOf,

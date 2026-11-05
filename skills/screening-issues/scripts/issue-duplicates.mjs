@@ -23,9 +23,9 @@ import {
   byAge,
   createdAtOf,
   isOpen,
-  issueText,
   parseArgs,
   readIssues,
+  textOf,
   valuesOf,
 } from "./standards.mjs";
 
@@ -50,10 +50,9 @@ function intersect(left, right) {
   return [...left].filter((value) => right.has(value));
 }
 
-/** What a pair is compared on. Citations are `issues:<id>` and `#N` keys. */
-export function describe(issue) {
+/** What an issue is compared on, reading `text`. Citations are `issues:<id>` and `#N` keys. */
+export function describeText(issue, text) {
   const values = valuesOf(issue);
-  const text = issueText(issue);
   return {
     id: issue.id,
     createdAt: createdAtOf(issue),
@@ -69,6 +68,12 @@ export function describe(issue) {
     tokens: tokens(values.title),
   };
 }
+
+/**
+ * A duplicate is compared on `title` and `body`, never `context`, which holds
+ * what is known around an issue rather than what to do.
+ */
+const describe = (issue) => describeText(issue, textOf(valuesOf(issue).body));
 
 const keysOf = (issue) => [
   `issues:${issue.id}`,

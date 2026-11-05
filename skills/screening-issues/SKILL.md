@@ -13,7 +13,7 @@ Screening resolves those claims **by command, not by reading**. Reading is a per
 under the pull of a plausible claim; a lookup is not. Every screening ends in one verdict:
 **close**, **hold**, **assess** or **ready**, and only `ready` work can be launched.
 
-Read `working-on-issues` first, with `read-recipe.md` and `evidence-kinds.md`: statuses, who
+Read `working-on-issues` first, with `read-recipe.md` and `timeline-kinds.md`: statuses, who
 moves them, pausing, the `screening` row. Ask people with `asking-for-decisions`. You own
 `backlog` → `ready`, `backlog` → `done` (refuted, overtaken, duplicate) and pauses; nothing else.
 
@@ -47,8 +47,7 @@ that tree, so a root covers its repositories. `issue-freshness.mjs`, and every s
     "values": {
       "title": "…", "status": "…", "closeReason": "…", "type": "…", "githubNumber": 123,
       "project": "<id>", "parent": "record:<id>", "blockedBy": ["<id>"],
-      "blocks": ["<id>"], "intent": "…", "problem": "…", "acceptance": "…", "context": "…",
-      "plan": "…", "handoff": "…"
+      "blocks": ["<id>"], "body": "…", "context": "…"
     }
   }
   ]
@@ -56,7 +55,7 @@ that tree, so a root covers its repositories. `issue-freshness.mjs`, and every s
 ```
 
 1. Query the `issues` object for the issues filed on the project record or any record under it, with your record tools, all statuses, every page.
-2. Write each record as above; the sections as text (markdown), relations as ids.
+2. Write each record as above; `body` and `context` as text (markdown), relations as ids.
 3. For each `done` issue the screened issue cites (`issues:<id>`, or `#N` matching an imported
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to
    `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
@@ -107,7 +106,7 @@ recommended when the evidence says so.
 
 ## 1. Classify the type
 
-When `type` is empty, set it from the issue's text alone: title, sections, origin. Do not read code
+When `type` is empty, set it from the issue's text alone: title, `body`, origin. Do not read code
 to classify; a plausible cause invented here is carried by every stage after it.
 
 | `type` | Test |
@@ -191,10 +190,10 @@ Closing a stale, overtaken or symptomatic issue here costs minutes instead of a 
 and quotes the line of the issue that no longer holds, so the next reader re-runs it rather than
 re-litigates it.
 
-Then rewrite `handoff` (verdict, the evidence, what the next stage needs), release the lease,
+Then write a `handoff` row (verdict, the evidence, what the next stage needs), release the lease,
 re-read the issue and check the state you meant to leave. **The one exception to that order:** an
 `assess` verdict's row carries `resumeAt: assessment` and marks where this run continues into
-assessment (it triggers nothing), so write it **last**, after `handoff` and the lease release (`working-on-issues`
+assessment (it triggers nothing), so write it **last**, after the `handoff` row and the lease release (`working-on-issues`
 § Finish).
 
 ## Weekly sweep
@@ -233,5 +232,5 @@ issue you asked about instead of closing.
 - a hold with no `wait` row, or a wait on a target already resolved;
 - closing an issue with a ruling, one a person edited, or one whose only defect is age;
 - moving an issue out of `ready`, `in_progress` or `in_review` other than by a pause;
-- ending a run with your lease set or `handoff` stale;
+- ending a run with your lease set or with no `handoff` row saying where it stands;
 - growing this skill with a rule a script could compute instead.

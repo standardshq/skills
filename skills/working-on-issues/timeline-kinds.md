@@ -1,4 +1,4 @@
-# Evidence kinds
+# Timeline kinds
 
 Every row: `issue` (required), `kind` (required), `body` (markdown a person reads). The other
 fields are used only where the table says. `data` is JSON text holding what a routine reads back
@@ -13,9 +13,9 @@ Rows are never edited or deleted. The one exception: the Maintenance routine set
 | `screening` | Triage routine | `subject`: `github:owner/repo@<sha>` of the default branch read; `resumeAt: assessment` when the verdict is `assess` | `{"verdict": "ready" \| "close" \| "hold" \| "assess"}` | what the issue asserts, re-resolved against today's default branch |
 | `assessment` | Triage routine; `shaping-features` for the `approved` row of each feature task of an umbrella it writes | `subject`: `github:owner/repo@<sha>` of the branch read, or `decisions:<id>` / `tasks:<id>` for `approved`, or `issues:<umbrella id>` for a shaped task's `approved`; `resumeAt: screening` when the verdict is `approved` | `{"verdict": "candidate" \| "reject" \| "park" \| "needs-human" \| "approved"}` | a feature's durable value weighed against its durable debt (`assessing-features`): a ranking, never an approval. `approved` records the maintainer's approval (a ruling « Build », or the spec Task done) and hands the feature back to screening |
 | `wait` | any routine pausing the issue; the Maintenance routine writing a missing wait or re-routing one with no active owner | `target`, `waitKind`, `owner`, `resumeAt`; `resolvedAt` set later by the Maintenance routine | `{"deadline": "<iso>"}` plus target details a routine needs (for a `decision`: `"question"`) | the issue is held until the target resolves |
-| `resolved` | Maintenance routine | `target` (the wait's), `subject`: `evidence:<wait row id>` | `{}` | the awaited thing happened |
-| `abandoned` | Maintenance routine | `target`, `subject`: `evidence:<wait row id>` | `{"reason": "pr_closed_unmerged" \| "task_deleted" \| "target_missing"}` | the awaited thing will not happen; a person is asked, nothing wakes |
-| `released` | Maintenance routine | `target`, `subject`: `evidence:<wait row id>` | `{"by": "<actor id>"}` | a person moved the issue out of `paused` (a drag newer than the wait), or answered « I take it », « close it » or « extend » (`by` = the answerer) |
+| `resolved` | Maintenance routine | `target` (the wait's), `subject`: `timeline:<wait row id>` | `{}` | the awaited thing happened |
+| `abandoned` | Maintenance routine | `target`, `subject`: `timeline:<wait row id>` | `{"reason": "pr_closed_unmerged" \| "task_deleted" \| "target_missing"}` | the awaited thing will not happen; a person is asked, nothing wakes |
+| `released` | Maintenance routine | `target`, `subject`: `timeline:<wait row id>` | `{"by": "<actor id>"}` | a person moved the issue out of `paused` (a drag newer than the wait), or answered « I take it », « close it » or « extend » (`by` = the answerer) |
 | `woke` | Maintenance routine | `resumeAt`, derived from the wake status (`waking-issues` § 7) | `{"waits": ["<wait row id>", …]}` | every wait of the pause ended and at least one resolved; the stage in `resumeAt` picks the issue up; the waits' own `resumeAt` are hints quoted in the body |
 | `ruling` | the session that asked (`asking-for-decisions`), the Maintenance routine included for an escalation; applied only by the Maintenance routine | `subject`: `decisions:<id>` (the wait's target when it answers a wait) | `{"answeredBy": "<actor id>", "answeredAt": "<iso>"}` | a person's answer, quoted, with decision-maker, recorder and source |
 | `attempt` | the run that held the lease; the run taking over a lapsed one; the Maintenance routine when every linked PR closed unmerged on a launched issue | `subject`: the PR head when there is one | `{"outcome": "failed" \| "lapsed" \| "timeout", "holder": "<actor id>"}`; `holder` is the run that held the lease, or the last lease holder when another routine writes the row | a failed execution: what was tried, why it failed, what to try next. Every `attempt` increments `failedAttempts`, whoever writes it |
@@ -26,16 +26,21 @@ Rows are never edited or deleted. The one exception: the Maintenance routine set
 | `demo` | Review routine (its demonstrator) | `subject`: `github:owner/repo#N@<sha>` | `{"outcome": "pass" \| "fail" \| "skipped", "reason": "<model \| stack, when skipped>"}` | the gesture a PR promises, performed on the running stack; the video linked in `body` |
 | `check-run` | Review routine, never the lease holder | `subject`: `github:owner/repo#N@<sha>` | `{"passed": true \| false, "commands": ["…"]}` | the factory gate ran `verify` on that head |
 | `escalation` | any routine; the Maintenance routine for deadlines and abandoned targets | `subject`: `decisions:<id>` when a Décision was asked | `{"waits": ["<wait row id>", …]}` when it is about waits | a person is needed beyond an ordinary wait (deadline passed, target abandoned). A wait it cites is never asked about again, except once per « Extend » ruling (`waking-issues` § 6) |
-| `applied` | Maintenance routine | `subject`: `evidence:<ruling id>` | `{"rows": ["<id>", …]}`, or `{"skipped": "superseded" \| "unmapped" \| "no_wait"}`; for « Close it » with a linked PR open, also `"closeReason"` and `"closeWhenPullRequestsClose": true` | the last row of applying a ruling on one issue: its presence on an issue means the ruling is done there. A ruling whose Décision is the target of waits on several issues gets one `applied` row on each (`waking-issues` § 6). With `closeWhenPullRequestsClose`, Maintenance closes the issue with that `closeReason` once every linked PR is closed (`waking-issues` § 4) |
-| `signal` | the Maintenance routine, or any routine noticing a broken rule | `subject` (optional): what it is about, such as a PR head, `evidence:<id>` or `projects:<id>` | `{"rule": "<short name>"}` | something slipped through the structure |
+| `applied` | Maintenance routine | `subject`: `timeline:<ruling id>` | `{"rows": ["<id>", …]}`, or `{"skipped": "superseded" \| "unmapped" \| "no_wait"}`; for « Close it » with a linked PR open, also `"closeReason"` and `"closeWhenPullRequestsClose": true` | the last row of applying a ruling on one issue: its presence on an issue means the ruling is done there. A ruling whose Décision is the target of waits on several issues gets one `applied` row on each (`waking-issues` § 6). With `closeWhenPullRequestsClose`, Maintenance closes the issue with that `closeReason` once every linked PR is closed (`waking-issues` § 4) |
+| `handoff` | any run, before it stops (`working-on-issues` § Finish, § Pausing) | no `resumeAt` | `{}` | where the work stands, the next step, open questions, in `body`. The newest one is the issue's current state: a lead, not proof, and no progress in itself. It wakes nothing |
+| `signal` | the Maintenance routine, or any routine noticing a broken rule | `subject` (optional): what it is about, such as a PR head, `timeline:<id>` or `projects:<id>` | `{"rule": "<short name>"}` | something slipped through the structure |
 
-**Stage hand-offs:** `resumeAt` on an `assessment` row with an approved feature is `screening`,
+**Stage hand-offs** (not the `handoff` kind): `resumeAt` on an `assessment` row with an approved feature is `screening`,
 and creating the row triggers the Triage routine. `resumeAt: assessment` on a `screening` row
 (`verdict: assess`) triggers nothing: it marks the point the same Triage run continues from, into
 `assessing-features`, and the daily pass takes the issue up from it if that run died. Leave
-`resumeAt` empty on every other `screening` and `assessment` row. A hand-off row is the **last** write of its run, after
-`handoff` and the lease release: written earlier, the next stage would start while you still hold
-the issue (`working-on-issues` § Finish).
+`resumeAt` empty on every other `screening` and `assessment` row. A stage hand-off row is the **last** write of its run, after
+the `handoff` row and the lease release: written earlier, the next stage would start while you still
+hold the issue (`working-on-issues` § Finish).
+
+**What wakes a routine:** creating a `woke` row with a `resumeAt`, a `ruling`, or an `assessment`
+row with `resumeAt: screening`. Nothing else, so a `handoff` row, whatever its place in the run,
+starts no run.
 
 ## A `wait` row, filled in
 

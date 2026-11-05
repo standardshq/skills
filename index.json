@@ -5,7 +5,7 @@
   },
   {
     "name": "assessing-features",
-    "description": "Use when the Triage routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as assessment evidence, and asks the maintainer, or parks the feature on a typed wait."
+    "description": "Use when the Triage routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as an assessment timeline row, and asks the maintainer, or parks the feature on a typed wait."
   },
   {
     "name": "brainstorming",
@@ -33,15 +33,15 @@
   },
   {
     "name": "importing-github-issues",
-    "description": "Use once per repository at its cutover to the factory, with the maintainer. Reads the repository's GitHub issues once and maps the legacy pipeline's label vocabulary (factory:*, preview:*, scout:*, intake origins) onto factory issues (open ones, plus closed ones carrying a preview label or an intake origin) with their evidence and draft waits, holds a sitting where the maintainer confirms every pause, and imports only on the maintainer's explicit go."
+    "description": "Use once per repository at its cutover to the factory, with the maintainer. Reads the repository's GitHub issues once and maps the legacy pipeline's label vocabulary (factory:*, preview:*, scout:*, intake origins) onto factory issues (open ones, plus closed ones carrying a preview label or an intake origin) with their timeline rows and draft waits, holds a sitting where the maintainer confirms every pause, and imports only on the maintainer's explicit go."
   },
   {
     "name": "landing-pull-requests",
-    "description": "Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its evidence rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says."
+    "description": "Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its timeline rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says."
   },
   {
     "name": "measuring-the-factory",
-    "description": "Use when the Maintenance routine runs, nightly. Exports issues, status history, evidence, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself."
+    "description": "Use when the Maintenance routine runs, nightly. Exports issues, status history, timeline rows, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself."
   },
   {
     "name": "operating-the-factory",
@@ -77,7 +77,7 @@
   },
   {
     "name": "working-on-issues",
-    "description": "Use when any factory routine reads an issue, changes its status, claims or releases it, pauses it, or writes evidence on it. Holds the statuses and who may move them, the lease, the evidence ledger, the shape of a wait and the read recipe."
+    "description": "Use when any factory routine reads an issue, changes its status, claims or releases it, pauses it, or writes a timeline row on it. Holds the statuses and who may move them, the lease, the timeline ledger, the shape of a wait and the read recipe."
   },
   {
     "name": "writing-plans",

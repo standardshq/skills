@@ -47,7 +47,7 @@ until the queue is empty or your run's time is spent.
 |---|---|
 | `bug` | `reproducing-bugs` first: its red command, failing on the unmodified branch, is the first commit. Any outcome but `reproduced` ends the run there |
 | `feature` | the approved slice is the scope: the ruling « Build » (or the spec) after the `assessment` row. Nothing beyond it |
-| any, with a `parent` | the umbrella's sections and rulings are your spec; the task's `acceptance` is its assertions |
+| any, with a `parent` | the umbrella's sections and rulings are your spec; the task's `## Acceptance` is its assertions |
 
 Check the premise is still true on the target branch (what the issue cites still exists, what it
 asks is still missing). When the work already landed, or the premise is gone, that is not yours to
@@ -88,7 +88,7 @@ Paths:
 | it needs new chrome, a new layout or a new interaction nobody approved | draw the smallest mockup that decides it and ask with `asking-for-decisions` (approve, change, no mockup needed); when you cannot draw it, a `task` wait to the maintainer. Restyling what exists is not a stop: build it |
 | it is several changes, not one | pause on a `task` wait to the maintainer for a spec (`shaping-features`) |
 
-Each pause: `resumeAt: execution`, handoff, then release the lease. Not a failure: no `attempt`.
+Each pause: `resumeAt: execution`, a `handoff` row, then release the lease. Not a failure: no `attempt`.
 
 *Done when* every acceptance assertion exists in a test and passes, and every command of `verify`
 is clean on the branch.
@@ -108,9 +108,9 @@ Per repository changed, in this order:
 2. Add `owner/repo#N` to `pullRequests`, one per line, keeping the lines already there.
 
 Then finish as `working-on-issues` § Claiming says: the links are the evidence, then status
-`in_review`, then `handoff` (what the pull request does, what a reviewer should look at first, what
+`in_review`, then a `handoff` row (what the pull request does, what a reviewer should look at first, what
 is left), then clear `leaseHolder` and `leaseExpiresAt`, then re-read and check the state you meant
-to leave. A write that failed is named in `handoff` and your report; never claim a transition you
+to leave. A write that failed is named in a new `handoff` row and your report; never claim a transition you
 did not verify.
 
 Review, verdicts and merge belong to the Review routine. Never write `verdict`, `go` or
@@ -126,7 +126,7 @@ fixes on its pull request, a person's included, belong to the Review routine (ju
 
 A run that cannot deliver: write the `attempt` row first (`outcome: failed` or `timeout`, `holder`
 = you, `subject` the branch head when there is one, `body`: what was tried, why it failed, what to
-try next), increment `failedAttempts`, rewrite `handoff`, release the lease. At 3: the failure
+try next), increment `failedAttempts`, write a `handoff` row, release the lease. At 3: the failure
 ceiling of `working-on-issues` § Claiming instead.
 
 Both endings count: a verified pull request **or** a pause that names exactly what is missing. A
@@ -143,5 +143,5 @@ nothing.
 - inventing chrome, a layout or an interaction instead of stopping for the mockup;
 - a pull request without `Issue: <id>`, against a branch other than `targetBranch`, or not
   linked in `pullRequests`;
-- editing a `generated` path by hand, or editing `acceptance` while you hold the lease;
-- ending a run with the lease set or `handoff` stale.
+- editing a `generated` path by hand, or editing `## Acceptance` while you hold the lease;
+- ending a run with the lease set or with no `handoff` row saying where it stands.

@@ -10,7 +10,7 @@ their ruling into the ledger. You never implement, never resolve the wait, never
 the Maintenance routine does that when your `ruling` row appears.
 
 Read `working-on-issues` first: § Pausing for the wait you open, § Provenance for what counts as a
-ruling, and `evidence-kinds.md` for the `wait` and `ruling` rows.
+ruling, and `timeline-kinds.md` for the `wait` and `ruling` rows.
 
 **Décision or Task?** Something the person answers by choosing: a Décision. Something they must
 produce over a sitting (a spec, a repro, a measurement, a mockup they draw): a Task
@@ -19,7 +19,7 @@ produce over a sitting (a spec, a repro, a measurement, a mockup they draw): a T
 ## 1. Re-resolve before asking
 
 A question written days ago is a photograph. Before asking, check against today's default branch,
-the issue's evidence and its linked PRs that the question is still open:
+the issue's timeline and its linked PRs that the question is still open:
 
 - the work may have landed: then ask « close it or keep it open », and say which PR or commit
   moved it;
@@ -103,7 +103,7 @@ Then stop. Never move a status. The `ruling` row triggers the Maintenance routin
 every answer (`waking-issues` § 6): it resolves the wait and wakes the issue, or, for « I take
 it » and « Close it », releases the waits and moves the issue to `mine` or `done` (for « Close
 it » with a linked PR open, `in_review` now and `done` once every linked PR is closed). For « I
-take it », write the person's direction into `handoff` before you stop: it is their brief.
+take it », write the person's direction into `## Plan` of `body` before you stop: it is their brief.
 
 **Answered with a question:** answer it from the codebase and the evidence, then ask again in the
 same conversation with the missing context added. Never guess on the person's behalf.

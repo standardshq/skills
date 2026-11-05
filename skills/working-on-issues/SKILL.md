@@ -1,6 +1,6 @@
 ---
 name: working-on-issues
-description: Use when any factory routine reads an issue, changes its status, claims or releases it, pauses it, or writes evidence on it. Holds the statuses and who may move them, the lease, the evidence ledger, the shape of a wait and the read recipe.
+description: Use when any factory routine reads an issue, changes its status, claims or releases it, pauses it, or writes a timeline row on it. Holds the statuses and who may move them, the lease, the timeline ledger, the shape of a wait and the read recipe.
 ---
 
 # Working on issues
@@ -12,7 +12,7 @@ skill and this one disagree on state, this one wins.
 Companion files, read when you need them:
 
 - `read-recipe.md`: how to read an issue before acting on it. Read it at the start of every run.
-- `evidence-kinds.md`: every evidence kind, who writes it, and its fields.
+- `timeline-kinds.md`: every timeline kind, who writes it, and its fields.
 - `environments.md`: which tools and paths you have on Standards or on a harness. Read it first.
 
 **Where a skill's files are.** Loading a skill writes its folder into your sandbox:
@@ -65,17 +65,26 @@ What `gate: "none"` means for a head: `landing-pull-requests` § 2.
 
 | Layer | Where | Rule |
 |---|---|---|
-| Living document | the issue's richtext sections: `intent`, `problem`, `acceptance`, `context`, `plan`, `handoff` | rewrite freely; the audit log keeps every version |
-| Ledger | `evidence` records linked by `issue` | append only. Never edit or delete a row; a correction is a new row |
+| Living document | the issue's two richtext fields: `body` (what to do) and `context` (what we know: evidence, Slack permalinks, cited paths) | rewrite `body` freely, section by section; add to `context`; the audit log keeps every version |
+| Ledger | `timeline` records linked by `issue`; the newest `handoff` row is the issue's current state | append only. Never edit or delete a row; a correction is a new row |
 
 The one sanctioned ledger edit: the Maintenance routine sets `resolvedAt` on a `wait` row.
 
-Section rules:
+`body` holds these sections, as Markdown headings, when they apply; a section with nothing to say
+is left out: `## Request` (the reporter's words, quoted and attributed), `## Problem`,
+`## Acceptance`, `## Plan`.
 
-- `intent` is written by people. Do not rewrite it.
-- `acceptance`: never edit it while you hold the lease.
-- `handoff`: rewrite it before you stop, every time: where the work stands, the next step, open
-  questions.
+Rules (no code enforces them):
+
+- `## Request` is written by people. Never rewrite it.
+- `## Acceptance`: never edit it while you hold the lease.
+- To change a section, re-read `body`, change that section alone, and write the others back word
+  for word.
+- A person's reply or a ruling that changes what to do goes into `body`, written by the routine
+  that acts on it.
+- `context` is added to, never rewritten: the permalinks in it stop a message being handled twice.
+- A `handoff` row (`timeline-kinds.md`): write a new one before you stop, every time: where the
+  work stands, the next step, open questions. It wakes nothing.
 
 ## Statuses and who moves them
 
@@ -194,15 +203,18 @@ timeout`).
 
 1. Write the evidence first (`attempt` on failure, the PR link on success).
 2. Then the transition, if any.
-3. Rewrite `handoff`.
+3. Write a `handoff` row.
 4. Clear `leaseHolder` and `leaseExpiresAt`.
 5. Re-read the issue and check the state you meant to leave. If a write failed, say exactly which
-   state is left in `handoff` and in your report; never claim a transition you did not verify.
+   state is left in a new `handoff` row and in your report; never claim a transition you did not
+   verify.
 
 **The one exception:** a stage hand-off row (an `assessment` row carrying `resumeAt: screening`,
-`evidence-kinds.md` § Stage hand-offs) starts Triage the moment it exists. A `screening` row's
+`timeline-kinds.md` § Stage hand-offs) starts Triage the moment it exists. A `screening` row's
 `resumeAt: assessment` starts nothing: the run continues into assessment itself.
-Write it **after** steps 3 and 4, as the run's last write, then re-read.
+Write it **after** steps 3 and 4, as the run's last write, then re-read. It is not a `handoff` row:
+a `handoff` row starts nothing, so it comes before this one, and a correction after the re-read is
+safe.
 
 **Failure:** write an `attempt` row, increment `failedAttempts`. At 3: apply the failure ceiling.
 
@@ -215,14 +227,14 @@ Maintenance routine applies the answer.
 
 - Never write `go`, `verdict` or `check-run` on an issue whose `leaseHolder`, current or last
   (the `holder` of its latest `attempt`, or the latest `leaseHolder` in its activity), is you.
-- Never edit `acceptance` while you hold the lease.
+- Never edit `## Acceptance` while you hold the lease.
 - Never call your own work done: `done` comes from merged PRs through the Maintenance routine.
 
 ## Pausing
 
 A pause is `status: paused` and one open `wait` row per condition. Never `paused` without one.
 
-Never pause an issue in `mine`: it is a person's own lane. Note what you found in `handoff` and stop.
+Never pause an issue in `mine`: it is a person's own lane. Note what you found in a `handoff` row and stop.
 
 1. **Check the target first.** If what you would wait on is already resolved (issue `done`, PR
    merged, Task done, Décision answered, date past), it is not a pause: carry on.
@@ -232,13 +244,13 @@ Never pause an issue in `mine`: it is a person's own lane. Note what you found i
      at the deadline, whose description says what is needed, why, and names the issue.
    - `approval`: a Décision asking a person to approve a withheld change, asked with
      `asking-for-decisions`.
-3. **Write the `wait` row** (fields in `evidence-kinds.md`): `target`, `waitKind`, `owner`,
+3. **Write the `wait` row** (fields in `timeline-kinds.md`): `target`, `waitKind`, `owner`,
    `resumeAt`, and `data` with the `deadline`. The `owner` is an active person; when the person
    you would name is deactivated, name the project's first active maintainer; when the project
    has none, write a `signal` (`rule: no_owner`) and do not pause.
    `resumeAt` is a hint: the stage that paused. On wake, the Maintenance routine derives the stage
    from the status the issue wakes to (`waking-issues` § 7) and keeps your hint in the `woke` body.
-4. **Then** set `status: paused`, rewrite `handoff`, and release your lease if you hold one.
+4. **Then** set `status: paused`, write a `handoff` row, and release your lease if you hold one.
 
 | `waitKind` | `target` | `owner` | Default `deadline` | `resumeAt` hint |
 |---|---|---|---|---|
@@ -293,5 +305,5 @@ waited for.
 - Claiming without re-reading the lease and blockers after the queue listed the issue.
 - Writing a gesture a person owns; trusting an `in_progress` an agent wrote.
 - Writing `go`, `verdict` or `check-run` on work you held.
-- Editing or deleting an evidence row; setting `resolvedAt` yourself.
-- Ending a run with your lease still set, or with `handoff` stale.
+- Editing or deleting a timeline row; setting `resolvedAt` yourself.
+- Ending a run with your lease still set, or with no `handoff` row saying where it stands.

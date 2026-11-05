@@ -32,8 +32,8 @@ how the dossier is assembled:
   the commit list.
 - **A spec or plan:** the document, plus the code it claims to change, read at `targetBranch`.
 
-Add the issue when there is one, read with `working-on-issues` `read-recipe.md`: its `intent`,
-`acceptance`, `plan`, its rulings (a ruling outranks the sections it contradicts) and, for a task of
+Add the issue when there is one, read with `working-on-issues` `read-recipe.md`: its `body`
+(`## Request`, `## Acceptance`, `## Plan`), its rulings (a ruling outranks the sections it contradicts) and, for a task of
 an umbrella, the umbrella's sections and rulings. Add the repository's own agent rules
 (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) and whatever they point at for the surface touched,
 read in the checkout, never a copy; for a pull request, read them on `targetBranch`, never on the

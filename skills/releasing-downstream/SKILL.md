@@ -9,7 +9,7 @@ A repository others consume ships a release; the repositories that consume it do
 The release is delivered when each consumer has bumped to it, and every issue that was waiting on
 the upstream change waits on its consumer's bump, not on the upstream merge.
 
-Read `working-on-issues` first: § Pausing for the waits you write, `evidence-kinds.md` for their
+Read `working-on-issues` first: § Pausing for the waits you write, `timeline-kinds.md` for their
 fields, `read-recipe.md` before you touch an issue. You create issues and waits; you never wake an
 issue, resolve a wait, claim a lease or write code. Promotion (`develop` → `main`) is not yours:
 it is an ordinary issue of the repository.
@@ -65,9 +65,9 @@ One issue, filed on the released repository's own `projects` record:
 | `title` | « Release owner/repo <version> » |
 | `type` | `chore` |
 | `origin` | `release` |
-| `problem` | what shipped: the released pull requests and issues, one line each, `issues:<id>` |
+| `body`, `## Problem` | what shipped: the released pull requests and issues, one line each, `issues:<id>` |
 | `context` | the commit sha (and tag), the previous release's sha, and what found it (the hourly pass, or its deploy workflow run) |
-| `acceptance` | every consuming repository runs <version> |
+| `body`, `## Acceptance` | every consuming repository runs <version> |
 | `status` | `backlog` |
 
 It is a container (it gets tasks): screening never screens it, nobody launches it, and the
@@ -91,8 +91,8 @@ For each package kept, one bump issue:
 | `origin` | `release` |
 | `project` | the consuming repository's own `projects` record |
 | `parent` | `record:<release umbrella id>`, set on creation: a bump is created with `write`, one per call |
-| `problem` | the consumer depends on <the package> at <its current version>; <version> carries the released issues |
-| `acceptance` | the consumer's dependency on <the package> is <version>, its lockfile matches, and its `verify` passes on the bump's pull request |
+| `body`, `## Problem` | the consumer depends on <the package> at <its current version>; <version> carries the released issues |
+| `body`, `## Acceptance` | the consumer's dependency on <the package> is <version>, its lockfile matches, and its `verify` passes on the bump's pull request |
 | `context` | the release umbrella, the released pull requests, and every issue § 5 puts behind this bump |
 | `status` | `backlog` |
 
@@ -114,7 +114,7 @@ Read each such issue (filed on the consumer's record or under it) with the read 
 | Its status | Do |
 |---|---|
 | `paused` | write a `blocker` wait (`target: issues:<bump id>`, `owner` the person who owns its current wait, else the project's first active maintainer, `resumeAt` the hint of its current wait, deadline + 14 days, body naming the release and the bump). It stays `paused`: the Maintenance routine wakes it once every wait of the pause ends |
-| `backlog`, or `ready` without a `parent` | pause it on that `blocker` wait (`working-on-issues` § Pausing: the wait first, then `paused`, `handoff` rewritten), `resumeAt: screening` |
+| `backlog`, or `ready` without a `parent` | pause it on that `blocker` wait (`working-on-issues` § Pausing: the wait first, then `paused`, a `handoff` row), `resumeAt: screening` |
 | `ready` under an umbrella (it has a `parent`) | never pause it: the person's drag to `ready` was its launch. A `signal` (`rule: awaits_release`, `subject: issues:<bump id>`) on it asking the project's first active maintainer whether to add the bump to its `blockedBy`, saying which bump brings what it needs |
 | `mine`, `in_progress`, `in_review` | never pause it: a `signal` (`rule: awaits_release`, `subject: issues:<bump id>`) on it, saying which bump brings what it needs |
 | `done` | nothing |

@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 const skills = join(dirname(fileURLToPath(import.meta.url)), "..", "skills");
 const { families } = await import(join(skills, "screening-issues/scripts/issue-families.mjs"));
 const { measure } = await import(join(skills, "measuring-the-factory/measure.mjs"));
-const { plan } = await import(join(skills, "importing-github-issues/import.mjs"));
+const { plan, check } = await import(join(skills, "importing-github-issues/import.mjs"));
 
 const DAY = 86_400_000;
 const T0 = Date.parse("2026-10-05T00:00:00Z"); // a Monday
@@ -227,4 +227,119 @@ test("an export without a projects tree exits 2 in every script that reads one",
   const freshness = spawn("issue-freshness.mjs", "i1", "--input", bare, "--checkout", dir);
   assert.equal(freshness.status, 2);
   assert.match(freshness.stderr, /carries no `projects`/);
+});
+
+test("measure counts a ruling from the timeline as an intervention", () => {
+  const { rows } = run([finishedThisWeek("a1", "A", 1)], {
+    timeline: [{ id: "t1", issue: "a1", kind: "ruling", createdAt: at(28) }],
+  });
+  assert.equal(valueOf(rows, "A", "interventions_per_issue"), 1);
+  assert.equal(valueOf(rows, "A", "autonomy_rate"), 0);
+});
+
+test("measure reads a bug's body for the issue it reworks", () => {
+  const origin = finishedThisWeek("a1", "A", 1);
+  origin.values.pullRequests = "org/a#1";
+  const bug = (id, values) => ({
+    id,
+    createdAt: at(31),
+    values: { project: "A", type: "bug", status: "backlog", origin: "slack", ...values },
+  });
+  const cited = run([origin, bug("b1", { body: "## Problem\nBroke after issues:a1." })]);
+  assert.equal(valueOf(cited.rows, "A", "rework_rate"), 1);
+  const uncited = run([origin, bug("b1", { body: "## Problem\nSomething else." })]);
+  assert.equal(valueOf(uncited.rows, "A", "rework_rate"), 0);
+});
+
+test("import writes an issue's text to body and its rows to timeline", () => {
+  const { entries, summary } = plan(
+    [github({ number: 7, body: "It broke.", labels: { nodes: [{ name: "preview:candidate" }] } })],
+    { repository: "org/app", project: "p", maintainer: "m", sha: "abc" },
+  );
+  const [entry] = entries;
+  assert.equal(entry.values.body, "It broke.");
+  assert.equal("problem" in entry.values, false);
+  assert.equal("evidence" in entry, false);
+  assert.equal(entry.timeline.length, 1);
+  assert.equal(summary.timelineRows, 1);
+});
+
+test("import check reads open waits from the timeline", () => {
+  const paused = { id: "i1", values: { project: "p", status: "paused", githubNumber: 1 } };
+  const clean = check({
+    open: [1],
+    existing: [paused],
+    timeline: [{ kind: "wait", issue: "i1" }],
+    project: "p",
+  });
+  assert.deepEqual(clean.pausedWithoutWait, []);
+  const held = check({ open: [1], existing: [paused], timeline: [], project: "p" });
+  assert.deepEqual(held.pausedWithoutWait, ["i1"]);
+});
+
+test("the screening scripts read an issue's body and context, no other field", async () => {
+  const { issueText } = await import(join(skills, "screening-issues/scripts/standards.mjs"));
+  const text = issueText({
+    id: "i",
+    values: { body: "in body", context: "in context", problem: "gone", handoff: "gone" },
+  });
+  assert.equal(text, "in body\nin context");
+});
+
+test("issue-duplicates compares title and body, never context", async () => {
+  const { candidatePairs } = await import(join(skills, "screening-issues/scripts/issue-duplicates.mjs"));
+  const row = (id, values) => ({ id, createdAt: at(0), values: { title: `zebra${id}`, status: "backlog", ...values } });
+  const paths = "src/one/a.ts and src/two/b.ts";
+  const inBody = candidatePairs([row("a", { body: paths }), row("b", { body: paths })]);
+  assert.deepEqual(inBody.map((pair) => [pair.a.id, pair.b.id]), [["a", "b"]]);
+  const inContext = candidatePairs([row("a", { context: paths }), row("b", { context: paths })]);
+  assert.deepEqual(inContext, []);
+  const sameTitle = candidatePairs([
+    row("a", { title: "the export drops rows" }),
+    row("b", { title: "the export drops rows" }),
+  ]);
+  assert.equal(sameTitle.length, 1);
+});
+
+test("issue-families joins issues that cite each other in context", () => {
+  const row = (id, values) => ({ id, createdAt: at(0), values: { title: `zebra${id}`, status: "backlog", ...values } });
+  const found = families([row("first1"), row("second", { context: "Follows issues:first1." })]);
+  assert.deepEqual(found.map((family) => family.members.map((m) => m.id).sort()), [["first1", "second"]]);
+});
+
+test("issue-families prints an issue with no family", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const { writeFileSync, mkdtempSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const file = join(mkdtempSync(join(tmpdir(), "single-")), "issues.json");
+  const data = [{ id: "lone01", createdAt: at(0), values: { title: "zebra", status: "backlog", project: "R" } }];
+  writeFileSync(file, JSON.stringify({ projects: [{ id: "R" }], data }));
+  const run = spawnSync(
+    process.execPath,
+    [join(skills, "screening-issues/scripts/issue-families.mjs"), "--input", file, "--project", "R"],
+    { encoding: "utf8" },
+  );
+  assert.equal(run.status, 0);
+  assert.match(run.stdout, /issues:lone01/);
+});
+
+test("issue-freshness flags a stale path cited in body or in context", async () => {
+  const { spawnSync, execFileSync } = await import("node:child_process");
+  const { writeFileSync, mkdtempSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const dir = mkdtempSync(join(tmpdir(), "fresh-"));
+  execFileSync("git", ["init", "-q", "-b", "main", dir]);
+  execFileSync("git", ["-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "x"]);
+  const freshness = (id, values) => {
+    const file = join(dir, `${id}.json`);
+    writeFileSync(file, JSON.stringify({ projects: [], data: [{ id, createdAt: at(0), values: { title: "t", status: "backlog", ...values } }] }));
+    return spawnSync(
+      process.execPath,
+      [join(skills, "screening-issues/scripts/issue-freshness.mjs"), id, "--input", file, "--checkout", dir, "--branch", "main"],
+      { encoding: "utf8" },
+    ).stdout;
+  };
+  assert.match(freshness("i1", { body: "see src/gone/a.ts" }), /src\/gone\/a\.ts/);
+  assert.match(freshness("i2", { context: "see src/gone/b.ts" }), /src\/gone\/b\.ts/);
+  assert.doesNotMatch(freshness("i3", { problem: "see src/gone/c.ts" }), /src\/gone\/c\.ts/);
 });

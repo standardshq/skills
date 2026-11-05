@@ -1,6 +1,6 @@
 ---
 name: importing-github-issues
-description: Use once per repository at its cutover to the factory, with the maintainer. Reads the repository's GitHub issues once and maps the legacy pipeline's label vocabulary (factory:*, preview:*, scout:*, intake origins) onto factory issues (open ones, plus closed ones carrying a preview label or an intake origin) with their evidence and draft waits, holds a sitting where the maintainer confirms every pause, and imports only on the maintainer's explicit go.
+description: Use once per repository at its cutover to the factory, with the maintainer. Reads the repository's GitHub issues once and maps the legacy pipeline's label vocabulary (factory:*, preview:*, scout:*, intake origins) onto factory issues (open ones, plus closed ones carrying a preview label or an intake origin) with their timeline rows and draft waits, holds a sitting where the maintainer confirms every pause, and imports only on the maintainer's explicit go.
 ---
 
 # Importing GitHub issues
@@ -12,7 +12,7 @@ references keep resolving through `githubNumber`.
 
 This is the one skill that reads GitHub issues, once, by design. It never writes to GitHub: no
 comment, label, close, project field or setting. Read `working-on-issues` (statuses, § Pausing,
-the wait shape), `evidence-kinds.md` and `asking-for-decisions` before you apply anything.
+the wait shape), `timeline-kinds.md` and `asking-for-decisions` before you apply anything.
 
 **A dry run by default.** § 1 to § 5 write nothing anywhere. § 6 runs only after the maintainer's
 explicit go for that repository, in their own words, in this conversation. One repository at a
@@ -77,7 +77,7 @@ How GitHub maps onto the factory (the script applies it; you check it):
 | `preview:candidate`, `preview:parked`, `preview:rejected` | an `assessment` row, `verdict` `candidate`, `park`, `reject`, `subject: github:owner/repo@<--sha>`: a ranking, never an approval |
 | `land:` stamps on an open linked pull request | `tier`, `verdict` (`changes`), `go`, `demo` rows, a short sha expanded to the PR head it prefixes; a `go` whose sha prefixes no current head (unmatched), a withheld go and every other stamp are not carried: landing judges the head again. Every imported row carries `data.imported: true`, which keeps it out of the dashboard's first-round measures |
 | `## Decision` comments | quoted in `context` as history. Never a `ruling` row: the Maintenance routine would apply an old « I take it » or « Close it » again. Their effect is the status above |
-| the body; the comments | `problem`, verbatim; `context`, quoted with author, date and link, the oldest beyond the budget linked |
+| the body; the comments | `body`, verbatim; `context`, quoted with author, date and link, the oldest beyond the budget linked |
 | `stage:*`, `factory:needs-human-merge` | nothing (listed in `context`): stages are statuses now; the repository's discovered `mode` says who merges |
 
 **Draft waits** (one per paused issue): `needs-design` is a `task` wait (a Task for the mockup);
@@ -88,7 +88,7 @@ neither a stamp nor a ruling. Each drafts the project's maintainer as owner.
 
 ## 4. The sitting
 
-Present the counts (open, closed by set, by status, evidence rows, draft waits by kind), then one
+Present the counts (open, closed by set, by status, timeline rows, draft waits by kind), then one
 table of every draft wait, in the maintainer's language: the issue by title and `#N`, what it waits
 on (kind, target, the question or the Task in plain words, rewritten as `asking-for-decisions`
 § 2 asks, never a bare id), the proposed owner.
@@ -129,7 +129,7 @@ With your record tools, in this order, re-reading each record after you write it
    planned `parent` number, through the map below (a record with a parent is created one per call,
    and the parent is set on create only). Keep the map `githubNumber` → record id.
 2. **Relations:** `blockedBy`, through that map. Never write `parent` again: it is not a relation.
-3. **Evidence:** each planned row on its issue (`kind`, `subject`, `body`, `data` as JSON).
+3. **Timeline:** each planned row on its issue (`kind`, `subject`, `body`, `data` as JSON).
 4. **Waits,** for each issue whose plan `status` is `paused` (`working-on-issues` § Pausing):
    check the target first (a `blocker` whose imported issue is `done` is no wait: leave the issue
    `backlog` and say so); make it exist (`decision`: ask it with `asking-for-decisions`, the
@@ -146,7 +146,7 @@ exists.
 Write the issues export again, plus every `wait` row of the project, then:
 
 ```bash
-node import.mjs check --open open-numbers.json --existing <issues.json> --evidence <waits.json> --project <id>
+node import.mjs check --open open-numbers.json --existing <issues.json> --timeline <waits.json> --project <id>
 ```
 
 It must print `clean: true`: every open GitHub issue imported, no imported issue left open whose

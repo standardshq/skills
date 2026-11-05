@@ -25,8 +25,8 @@
  * blocked-by chain is `sliced`: someone cut it by hand.
  */
 import { fileURLToPath } from "node:url";
-import { describe, signals } from "./issue-duplicates.mjs";
-import { byAge, idsOf, isOpen, parentOf, parseArgs, readIssues, valuesOf } from "./standards.mjs";
+import { describeText, signals } from "./issue-duplicates.mjs";
+import { byAge, idsOf, isOpen, issueText, parentOf, parseArgs, readIssues, valuesOf } from "./standards.mjs";
 
 const TITLE_FAMILY = 0.5;
 const TITLE_SUPPORT = 0.2;
@@ -76,6 +76,9 @@ function find(parent, id) {
   }
   return root;
 }
+
+/** Kinship also counts what `context` cites: a family is looser than a duplicate. */
+const describe = (issue) => describeText(issue, issueText(issue));
 
 /** Every family of two or more open issues, oldest member first. */
 export function families(issues) {
