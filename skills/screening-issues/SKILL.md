@@ -1,12 +1,12 @@
 ---
 name: screening-issues
-description: Use when the screening routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait.
+description: Use when the Triage routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait.
 ---
 
 # Screening issues
 
 An issue is a photograph. A pull request it calls open, a `file:line` it quotes, a gap it says
-nobody closed: all true when written, all claims now. A stale issue costs an execution run, and it
+nobody closed: all true when written, all claims now. A stale issue costs a Build run, and it
 costs it before anyone can tell: the claim reads as well as the day it was filed.
 
 Screening resolves those claims **by command, not by reading**. Reading is a perceptual task done
@@ -58,8 +58,8 @@ of the project, every status:
    `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
 
 **The checkout:** the project's `repositories`, each checked out in your environment. Per
-repository: `git -C <dir> fetch origin <targetBranch>` (the repository's default branch when
-`targetBranch` is empty), then `git -C <dir> rev-parse origin/<targetBranch>` for the sha your
+repository: read its facts (`working-on-issues` § Repository facts), which leaves the checkout on
+`targetBranch`, then `git -C <dir> rev-parse origin/<targetBranch>` for the sha your
 `screening` row names. Read the repository's own agent rules (`AGENTS.md`, `CLAUDE.md`,
 `.cursor/rules`) there, never a copy.
 
@@ -67,7 +67,7 @@ repository: `git -C <dir> fetch origin <targetBranch>` (the repository's default
 
 | Run | Issues |
 |---|---|
-| an issue created | that issue, unless it is already `done` (the operator's « Factory operations log » is created closed and never screened) |
+| an issue created | that issue, unless it is already `done` (the Maintenance routine's « Factory operations log » is created closed and never screened) |
 | a `woke` row with `resumeAt: screening` | that issue; any other `resumeAt`: stop |
 | an `assessment` row with `resumeAt: screening` (`verdict: approved`) | that issue: the maintainer approved the feature |
 | the daily pass | every `backlog` issue that needs screening (below), oldest first |
@@ -176,21 +176,21 @@ only for `assess`), then act:
 | `hold` | beyond one change (§ 5) | pause: `task` wait to the project's first active maintainer for a spec (`shaping-features`), `resumeAt: screening`. Propose the split into one-change issues in the Task |
 | `hold` | the right fix changes a public contract, a security posture or an agent's authority | pause: `decision` wait, the one question that forks the work |
 | `hold` | it needs something not yet done: another issue, a pull request, a date, a person's artifact | pause on that `blocker`, `date` or `task` wait |
-| `assess` | `type: feature`, no `assessment` row `approved` since its last `assess` verdict | status stays `backlog`; the row carries `resumeAt: assessment`, which hands it to the assessment routine, so it is written last (below) |
+| `assess` | `type: feature`, no `assessment` row `approved` since its last `assess` verdict | status stays `backlog`; the row carries `resumeAt: assessment`, which the same Triage run continues into (`assessing-features`), so it is written last (below) |
 | `ready` | every claim resolves, no family owns it, it fits one change, and for a feature an `assessment` row with `verdict: approved` | status `ready`; for a task of an umbrella (it has a `parent`), leave the status `backlog`: the person's drag to `ready` is its launch |
 
 Every pause follows `working-on-issues` § Pausing: check the target first, make it exist, the
 `wait` row, then `paused`. A hold is never a free-text "revisit later": it names its wait.
 
-Closing a stale, overtaken or symptomatic issue here costs minutes instead of an execution run:
+Closing a stale, overtaken or symptomatic issue here costs minutes instead of a Build run:
 **closing is the point.** The body of a `close` row states the command that produced the finding
 and quotes the line of the issue that no longer holds, so the next reader re-runs it rather than
 re-litigates it.
 
 Then rewrite `handoff` (verdict, the evidence, what the next stage needs), release the lease,
 re-read the issue and check the state you meant to leave. **The one exception to that order:** an
-`assess` verdict's row carries `resumeAt: assessment` and hands the issue over the moment it is
-created, so write it **last**, after `handoff` and the lease release (`working-on-issues`
+`assess` verdict's row carries `resumeAt: assessment` and marks the hand-off to assessment, which
+this run continues into, so write it **last**, after `handoff` and the lease release (`working-on-issues`
 § Finish).
 
 ## Weekly sweep

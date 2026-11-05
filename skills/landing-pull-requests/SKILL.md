@@ -1,6 +1,6 @@
 ---
 name: landing-pull-requests
-description: Use when the landing routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its evidence rows - the gate the repository chose, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says.
+description: Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its evidence rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says.
 ---
 
 # Landing pull requests
@@ -16,7 +16,7 @@ Judge with `evaluating-changes` (`SOLO.md`). Ask people with `asking-for-decisio
 
 **What landing moves:** pull requests, and nothing else. You never take an issue's lease, never
 move an issue's status except to pause it (§ 7), never close an issue: `done` comes from the merged
-pull request through the `waits` routine.
+pull request through the Maintenance routine.
 
 ## Which pull requests
 
@@ -41,7 +41,7 @@ recipe, then leave the pull request alone, with one line in your report, when an
 **A pending close** (read recipe step 7) is the one exception to « leave it »: the person said
 « Close it » while the pull request was open. Your only action is to close each open linked pull
 request with the GitHub tools, with a comment linking the ruling (`decisions:<id>`, quoted in one
-line); no `verdict`, no `go`, no merge, no row. The `waits` routine then closes the issue.
+line); no `verdict`, no `go`, no merge, no row. The Maintenance routine then closes the issue.
 
 A run on one issue (moved to `in_review`, or woken) handles its pull requests with the fixer and
 juror as subagents of this run, and the demo round only when a screen asks for one. The sweep hands every
@@ -82,12 +82,14 @@ did not exist, and its prefix survived the glance.
 ## 1. Read and route
 
 For each pull request, with the GitHub tools: pin the head sha; read the draft flag, mergeability,
-whether it is enqueued, and every check on the head. Read the repository's record: `targetBranch`,
-`mode`, `method`, `source`, `verify`, `pathGates`, `withheld`, `generated`, `sensitiveData`,
-`environment`, `boot`, `apps`, `reset`. Then route on the rows first, the head second:
+whether it is enqueued, and every check on the head. Read the repository's facts
+(`working-on-issues` § Repository facts): `targetBranch`, `mode`, `method`, `gate`, `verify`,
+`pathGates`, `withheld`, `generated`, `sensitiveData`, `boot`, `apps`, `reset`. They come from the
+target branch: a pull request that edits `CODEOWNERS`, a workflow or `## Factory` is judged on the
+target branch's values, never its own. Then route on the rows first, the head second:
 
 - **enqueued** (auto-merge set or in the merge queue): nothing to do. A go head dropped from the
-  queue is the operator's (`operating-the-factory`): leave it.
+  queue is the Maintenance routine's (`operating-the-factory`): leave it.
 - **`fixing`** inside the fixing window: another run owns it; skip.
 - **a person asked for a change:** a person's review (changes requested, or a comment asking for a
   change) or a `ruling` asking one (« Change », « Fix »), newer than the latest `go` or `verdict` on
@@ -100,14 +102,14 @@ whether it is enqueued, and every check on the head. Read the repository's recor
 - **`go` on an older head:** § 4 « A go survives ».
 - **`demo` failed on this head:** a verdict entry: round `n+1`, the `demo` row as the previous
   verdict.
-- **unverified:** a `factory` or `both` repository with no `check-run` row on this head: the
+- **unverified:** a `verify` or `both` repository with no `check-run` row on this head: the
   factory gate runs first (§ 2), then the head routes again.
 - **loud:** a check or the factory gate has no conclusion yet. A pull request with no verdict yet
   waits for the next sweep. One in round 2 or 3 is judged loud: its answers and its delta need no
   gate.
 - **red:** the gate failed (§ 2), or the branch conflicts. Triage (§ 3).
-- **generated paths,** on every head whatever the `source` (§ 2 « Paths »): the verifier checks
-  them with the factory gate for `factory` and `both`; for `ci` the juror checks them first, and a
+- **generated paths,** on every head whatever the `gate` (§ 2 « Paths »): the verifier checks
+  them with the factory gate for `verify` and `both`; for `ci` the juror checks them first, and a
   hit is a `blocking` entry of its verdict.
 - **green, no go:** fix the tier (§ 4), then judge. A Sight head is never dispatched while no fixer
   touched it: you write its rows yourself (§ 4). A Sight head with a `fixing` row on its pull
@@ -118,22 +120,24 @@ Mark a draft pull request ready (GitHub tools) only just before its merge.
 
 ## 2. The gate
 
-`source` on the repository says what proves a head green before a merge:
+`gate` in the repository's facts says what proves a head green before a merge:
 
-| `source` | Green when |
+| `gate` | Green when |
 |---|---|
 | `ci` | every check the repository's ruleset or branch protection requires is green on the head, read live |
-| `factory` | a `check-run` row on that head with `passed: true` |
+| `verify` | a `check-run` row on that head with `passed: true` |
 | `both` | both |
+| `none` | never: nothing proves the change |
 
-A `ci` repository with no required check has no gate: write a `signal`
-(`rule: gate_without_checks`) and merge nothing there.
+**`gate: "none"`:** no head is ever green there, and nothing merges on its own. Ask a person, with
+`asking-for-decisions`, the way `mode: human` asks (§ 7), saying plainly that no required check and
+no `verify` command proves the change, so the juror's judgement is all there is.
 
-**The factory gate** (`factory` or `both`), run on every head that has no `check-run` row:
+**The factory gate** (`verify` or `both`), run on every head that has no `check-run` row:
 
 1. Publish the commit status `Standards Factory / verify` on the sha, state `pending` (GitHub tools,
    the commit statuses API).
-2. In the repository's environment, a fresh clone of the pull request head (fetch the pull
+2. In the routine's own environment, if it has one, a fresh clone of the pull request head (fetch the pull
    request's head ref, check out the pinned sha); never the fixer's checkout.
 3. Run every line of `verify`, then each line of `pathGates` (`path: command`) whose path matches a
    file the diff touches against the merge-base with `targetBranch`.
@@ -144,13 +148,18 @@ A `ci` repository with no required check has no gate: write a `signal`
 
 A command that cannot start (a tool missing from the environment, the environment failing to
 build) proves nothing about the change: no `check-run`, status `error`, a `signal`
-(`rule: environment_broken`) for the operator.
+(`rule: environment_broken`) for the Maintenance routine.
 
-**Paths,** on every head whatever the `source`, from the diff against the merge-base:
+A command that fails on the target branch too proves nothing against the pull request either:
+when a head fails one, run it on a fresh clone of `targetBranch`. It fails there as well: no fixer
+round, one `signal` (`rule: target_red`, `subject` the target branch's sha) and one Décision to
+the project's first active maintainer, once per sha; the head waits.
+
+**Paths,** on every head whatever the `gate`, from the diff against the merge-base:
 
 - **`generated`:** a file matching a `generated` glob is refused at verification, unless the
   repository's own generator for it (named in its own files or scripts), run on a fresh clone,
-  leaves it unchanged: then it is regenerated output, not an edit. Refused, for `factory` and
+  leaves it unchanged: then it is regenerated output, not an edit. Refused, for `verify` and
   `both`: a failed `check-run` (the paths and « generated path edited » in `body`) and the status
   `failure`, run by the verifier; for `ci`: a `blocking` entry of the juror's `verdict`. Neither is
   a round of its own beyond that verdict. The fixer's brief: regenerate with the repository's
@@ -310,7 +319,7 @@ dispatched in a single message, following the script as the plan.
 { "skill": "landing-pull-requests",
   "solo": "<path of evaluating-changes/SOLO.md in your skills>",
   "stack": "<the demo checkout>",
-  "repositories": { "owner/repo": { "source": "factory", "verify": "…", "pathGates": "…" } },
+  "repositories": { "owner/repo": { "gate": "verify", "verify": "…", "pathGates": "…" } },
   "heads": [ { "issue": "<issue id>", "repo": "owner/repo", "number": 4004, "branch": "fix/…",
                "head": "<sha>", "tier": "full", "round": 1, "limit": 3, "state": "green",
                "screen": true, "ciGreen": true,
@@ -331,7 +340,7 @@ dispatch, and an untouched green Sight head never goes to it. Every row is writt
 verifier or demonstrator inside its chain, so a chain that dies leaves the ledger true up to its
 last row. Then act on each outcome: `go` → § 7, `with-maintainer` → § 7 « Three rounds »,
 `fixed` → the next run re-reads the head, `red` → the next run triages the failed `check-run`
-(§ 3), `gate-error` → nothing merges; the `environment_broken` signal is the operator's,
+(§ 3), `gate-error` → nothing merges; the `environment_broken` signal is the Maintenance routine's,
 `demo-skipped` → merge when the reason is a model, wait when it is the stack.
 
 ## 7. Merge, approve, or ask
@@ -355,11 +364,10 @@ whose Décision named the withheld paths and their risk is also an approval.
 | `mode` | Do |
 |---|---|
 | `queue` | mark ready, enable auto-merge with `method` (the merge queue batches); in the sweep, every go of the run in the same pass |
-| `direct` | mark ready, merge with `method` |
-| `human` | merge nothing. Mark ready, then ask the project's first active maintainer with `asking-for-decisions` one Décision per head, naming any withheld path and its risk: **Merge it** (you merge it on GitHub; recommended), **Change** (say what), **Close it**, **I take it**. Open no wait and leave the issue `in_review`: the merge itself is the answer the `waits` routine watches. Ask once per head: while a Décision linked to the issue names this head, open, answered or expired, never ask again (no daily re-ask). An expired one left unanswered: write one `signal` (`rule: merge_unanswered`, `subject` the head) and leave the issue `in_review`; a newer head is a new question. The answer's `ruling` is recorded as `asking-for-decisions` § 4 says; a « Change » is read by the next run (§ 1) |
+| `human` | merge nothing. Mark ready, then ask the project's first active maintainer with `asking-for-decisions` one Décision per head, naming any withheld path and its risk: **Merge it** (you merge it on GitHub; recommended), **Change** (say what), **Close it**, **I take it**. Open no wait and leave the issue `in_review`: the merge itself is the answer the Maintenance routine watches. Ask once per head: while a Décision linked to the issue names this head, open, answered or expired, never ask again (no daily re-ask). An expired one left unanswered: write one `signal` (`rule: merge_unanswered`, `subject` the head) and leave the issue `in_review`; a newer head is a new question. The answer's `ruling` is recorded as `asking-for-decisions` § 4 says; a « Change » is read by the next run (§ 1) |
 
 Enqueue a go head only once: when the pull request's timeline shows it was enqueued since its
-`go` row and it is no longer, it was dropped, and re-queuing is the operator's.
+`go` row and it is no longer, it was dropped, and re-queuing is the Maintenance routine's.
 
 **Three rounds.** A round-3 verdict short of go, or an interaction the demo cannot settle: ask the
 project's first active maintainer with `asking-for-decisions`, the open entries named, options
@@ -370,7 +378,7 @@ stands » is a `go` row on that head citing the ruling, then this section from t
 one round: the fixer first with the person's words as its brief, then one juror on them as in
 rounds 2 and 3, and short of go again, ask again.
 
-« Close it » and « I take it » are the `waits` routine's to apply; after « I take it » you leave the
+« Close it » and « I take it » are the Maintenance routine's to apply; after « I take it » you leave the
 issue alone, after « Close it » you close its pull requests (§ Which pull requests).
 
 ## Report

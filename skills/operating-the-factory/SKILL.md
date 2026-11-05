@@ -1,29 +1,29 @@
 ---
 name: operating-the-factory
-description: Use when the operator routine runs, every 15 minutes. Catches what slipped through the structure - broken invariants, gestures or sensitive repository fields written by an agent, waits with no active owner, double or looping leases, self-verification, idle or dropped pull requests, a red target branch, piled-up Décisions, failing routines, unhealthy repositories, a stalled delivery chain, a blown budget - and answers each with one listed action or a Décision.
+description: Use when the Maintenance routine runs, every 15 minutes. Catches what slipped through the structure - broken invariants, gestures or a repository's `notes` written by an agent, waits with no active owner, double or looping leases, self-verification, idle or dropped pull requests, a red target branch, piled-up Décisions, failing routines, unhealthy repositories, a stalled delivery chain, a blown budget - and answers each with one listed action or a Décision.
 ---
 
 # Operating the factory
 
 The structure makes stuck work unlikely; you catch what slips. Every 15 minutes you look, write a
 `signal` for what you notice, take at most the one action the table allows for it, and otherwise
-ask a person. You are a safety net, not a stage: you never do another routine's work.
+ask a person. You are a safety net, not a stage: you never do another skill's work.
 
 Read `working-on-issues` first, with `evidence-kinds.md` and `read-recipe.md`: the statuses, who
 moves them, the moves an agent may make on a person's behalf and the evidence each needs, the
-lease, the wait shape. Read `waking-issues` to know what the `waits` routine owns, so you leave it
-to it. Ask people with `asking-for-decisions`.
+lease, the wait shape. Read `waking-issues` to know what that skill owns, so you leave it to it: a Maintenance
+run does both, as separate passes, and this one never wakes an issue. Ask people with `asking-for-decisions`.
 
 ## What you never do
 
 - Wake an issue, resolve or release a wait, apply a ruling: never write `woke`, `resolved`,
   `abandoned`, `released` or `applied`, never set `resolvedAt`, never run `waking-issues` logic,
-  even when the answer looks obvious. A wait on a resolved target is the `waits` routine's to end.
+  even when the answer looks obvious. A wait on a resolved target is the Maintenance routine's to end.
 - Claim a lease, write code, judge or merge a pull request, write `verdict`, `go`, `check-run` or
   `attempt`.
 - Edit or delete an evidence row. Every correction you make is a new row.
 - Re-ask a question: deadlines and their one question, Extend's one re-ask included, are the
-  `waits` routine's (`waking-issues` § 6).
+  Maintenance routine's (`waking-issues` § 6).
 - Take an action the table below does not list. When the right move is not on it, do not take it:
   write a `signal` (`rule: refused_action`) saying what you would have done and why, and ask the
   person the table names with a Décision.
@@ -31,7 +31,7 @@ to it. Ask people with `asking-for-decisions`.
 ## How every action is written
 
 1. **Notice first:** a `signal` row on the issue (`data.rule`, `subject` naming what it is about:
-   a pull request head, `evidence:<id>`, `repositories:<id>`), `body` saying what you saw, with
+   a pull request head, `evidence:<id>`, `projects:<id>`), `body` saying what you saw, with
    dates from the records' server timestamps. You noticed it already when a `signal` with the same
    `rule` and `subject` is newer than the condition's start: do not write it again, and take only
    the next step the table allows (a Décision after a re-queue, for instance).
@@ -43,11 +43,11 @@ to it. Ask people with `asking-for-decisions`.
    When an answer comes back, record its `ruling` as that skill says, on the issue it is about,
    and act on it only within the table.
 
-**No issue to hang it on** (a repository field, a routine, an environment, a repository's
+**No issue to hang it on** (a repository's `notes`, a routine, a repository's
 health): write the `signal` on the project's **« Factory operations log »** issue, and link the
-record in the Décision (`record:repositories:<id>`). One per project, found by its title and
+record in the Décision (`record:projects:<id>`). One per project, found by its title and
 `origin: operator`; on first need, create it with `status: done`, `closeReason: done`, `type:
-chore`, `origin: operator`, and an `intent` saying it only carries the operator's signals. It is
+chore`, `origin: operator`, and an `intent` saying it only carries the Maintenance routine's signals. It is
 never screened, launched or reopened; the dashboard's Health block reads the signals on it. A
 repository serving several projects: the log of each.
 
@@ -66,12 +66,12 @@ the end of the pass.
 | Broken | Act |
 |---|---|
 | an issue `paused` with no open `wait` row, its move to `paused` more than 5 minutes old (younger: a pause being written) | write the missing wait: ask the first active maintainer « paused, waiting on nothing » with **Resume it**, **Close it**, **I take it**, then a `decision` `wait` on that Décision (`owner` the maintainer, `resumeAt` the stage the status before the pause implies, `waking-issues` § 7, deadline per § Thresholds, `data.question`). The status stays `paused`. Then the factory-bug issue |
-| an open `wait` whose target resolved (`evidence-kinds.md` § Targets) more than 90 minutes ago (the `waits` routine's hourly pass missed it) | nothing to the wait: the `signal`, the factory-bug issue, and a Décision naming the issues |
+| an open `wait` whose target resolved (`evidence-kinds.md` § Targets) more than 90 minutes ago (the Maintenance routine's hourly pass missed it) | nothing to the wait: the `signal`, the factory-bug issue, and a Décision naming the issues |
 | an open `wait` on an issue that is not `paused`, with no person's move out of `paused` newer than it (an agent's move is § 2's to revert, as `waking-issues` § 5 leaves it), more than 90 minutes old | the same: `signal`, factory-bug issue, Décision |
 
 **The factory-bug issue:** one open issue per broken rule, in the project of the issue that broke
 it: `type: bug`, `origin: operator`, title « Factory: <rule> », `problem` naming each case (issue,
-row ids, times) and what you did, `acceptance` « the invariant holds on the next operator pass ».
+row ids, times) and what you did, `acceptance` « the invariant holds on the next Maintenance pass ».
 One already open for that rule: add a dated line to its `context` instead.
 
 ### 2. Moves an agent wrote
@@ -95,26 +95,16 @@ A record created directly at a status (by `importing-github-issues`, `shaping-fe
 `releasing-downstream`, or the « Factory operations log » you create `done`) is a creation, not an
 agent status move: its first status is never reverted. A move to `paused` with no
 wait is § 1, not a revert. An agent's move into `paused` of an issue that
-was `mine` is reverted. A revert out of `done` cannot undo what the `waits` routine already did on
+was `mine` is reverted. A revert out of `done` cannot undo what the Maintenance routine already did on
 that move (waits on the issue it resolved): name those issues in the Décision.
 
-### 3. Sensitive repository fields
+### 3. Notes written by an agent
 
-On every `repositories` record, the activity since your previous pass on `mode`, `method`,
-`source`, `verify`, `pathGates`, `withheld`, `generated` and `environment`. A person's write
-stands. An agent's write stands only when an approval Décision about that repository (linked to
-`record:repositories:<id>`, the way `adding-repositories` asks it) was answered by one of its
-projects' maintainers, approving, within the 24 hours before the write: a `signal`
-(`rule: sensitive_field_approved`) on the operations log. Any other agent write: the `signal`
-(`rule: sensitive_field_reverted`) on the operations log, **revert** the field to its previous
-value, then a Décision to the maintainers of the repository's projects naming the field, both
-values and the writer.
-
-A `repositories` record an agent **created** is judged the same way: it stands when an approval
-Décision naming its `fullName` was answered approving by a maintainer of one of its projects within
-the 24 hours before the creation (`signal sensitive_field_approved`); otherwise the
-`repository_created_unapproved` signal and a Décision to those maintainers (a creation is not reverted
-by deleting: ask whether to keep it).
+On every repository (a `projects` record with a `fullName`), the activity since your previous pass
+on `notes`. A person's write stands. An agent's write does not: the `signal`
+(`rule: notes_reverted`) on the operations log, **revert** `notes` to its previous value, then a
+Décision to the maintainers of the repository's projects naming both values and the writer. The
+other facts of a repository are discovered, never stored, so there is nothing else to revert.
 
 ### 4. Waits with no active owner
 
@@ -124,7 +114,7 @@ An open `wait` whose `owner` is empty, an agent, or deactivated:
   it (same `issue`, `target`, `waitKind`, `resumeAt`, `data`, the deadline unchanged) with `owner`
   the first active maintainer and a `body` citing the old row (`evidence:<id>`) and why, then the
   `signal` (`rule: wait_rerouted`, `subject: evidence:<old id>`). The old row stays as it is; the
-  `waits` routine ends both when the target resolves, and asks at the deadline. A wait already
+  Maintenance routine ends both when the target resolves, and asks at the deadline. A wait already
   re-routed (a `wait_rerouted` signal on it) is never re-routed again.
 - no active maintainer: the `signal` (`rule: no_owner`), once.
 
@@ -161,7 +151,7 @@ not moved in 24 hours. None: **open it** in the first project the repository ser
 
 ### 8. Décisions piling up
 
-Deadlines are the `waits` routine's alone: it asks once per wait, and a wait cited in an
+Deadlines are the Maintenance routine's alone: it asks once per wait, and a wait cited in an
 `escalation` is never asked about again (`waking-issues` § 6). You never group, list or re-ask
 waits.
 
@@ -169,24 +159,29 @@ waits.
   Décision listing them, most consequential first, unless a digest of yours to that person is
   still open. No ruling is recorded from a digest; each Décision is answered on its own.
 
-### 9. Routines and environments
+### 9. Routines
 
 From the factory routines' run history:
 
 | Seen | Act |
 |---|---|
 | a routine whose last three runs failed | **retry once**: run it again on the event of its last failed run, `signal` (`rule: routine_failing`) on the issue that run was about; the retry fails too: Décision |
-| an environment that fails to build, or an `environment_broken` signal from a stage | **rebuild once**; fails again: Décision to the maintainers of the projects whose repositories it holds |
+| an `environment_broken` signal from a stage | the routine's own environment, if it has one: **rebuild once**; fails again: Décision to the maintainers of the projects whose repositories it works on |
 
 ### 10. Repository health
 
-Once a day (your first pass after 06:00 UTC), per repository, the health check of
-`adding-repositories`: the repository readable through the GitHub app, its `environment` builds,
-`boot` answers when set, `verify` passes on a fresh clone of `targetBranch`. A failure: the
-`signal` (`rule: repository_unhealthy`, `subject: repositories:<id>`, the failed lines in `body`) on
+Once a day (your first pass after 06:00 UTC), per repository, on its discovered facts
+(`working-on-issues` § Repository facts): the repository readable through the GitHub app, `boot`
+answers when set, the `verify` commands pass on a fresh clone of `targetBranch`. A repository whose
+`gate` is `none` is not unhealthy: nothing proves its changes, which Review already says. A failure:
+the `signal` (`rule: repository_unhealthy`, `subject: projects:<id>`, the failed lines in `body`) on
 the « Factory operations log » of each of its projects, which the Factory economics page's Health
 block lists, then a Décision to the maintainers of its projects, unless one about that repository
 is still open. No other action.
+
+**Its limit:** this check runs inside the Maintenance routine, so it cannot see Maintenance itself
+failing or never firing. A failed Maintenance run gives its owner the failure decision; a routine
+switched off is noticed by nobody.
 
 ### 11. Delivery chain
 
@@ -204,7 +199,7 @@ biggest consumers; **Resume launching**, **Raise the budget** (say to what)), th
 umbrella of the project with a `ready` task not yet launched, neither `mine` nor `paused`, a
 `decision` `wait` on that Décision (`resumeAt: screening`, deadline + 14 days) and the move to
 `paused`. A task of a `paused` umbrella is not launched (`working-on-issues` § Launch). The answer
-ends the waits through the `waits` routine; an unanswered Décision keeps launching stopped until
+ends the waits through the Maintenance routine; an unanswered Décision keeps launching stopped until
 the deadline. An answered budget Décision covers the current period: skip this check until the
 period ends or the budget in the project's `context` changes (its activity shows the edit).
 
@@ -218,7 +213,6 @@ default.
 | a pause being written (§ 1) | 5 minutes after the move to `paused` | activity |
 | a wait on a resolved target, an open wait on an issue not `paused` (§ 1) | 90 minutes | the target's state, the wait's `createdAt` |
 | the activity window of a pass (§ 2, § 3) | since the previous pass, 15-minute overlap | activity |
-| an approval covering a sensitive-field write (§ 3) | answered within 24 hours before the write | the Décision's `completedAt` |
 | a lease looping (§ 5) | held > 2 hours after its claim, or 4 renewals with no commit and no row | activity, the branch |
 | a pull request idle (§ 6) | 24 hours with no row, commit, review or check | evidence, GitHub |
 | a wait's deadline when you write one (§ 1, § 12) | created + 14 days | `working-on-issues` § Pausing |
@@ -236,7 +230,7 @@ Exactly these, all reversible; for any of them you may choose the Décision inst
 | Signal | On its own | Otherwise |
 |---|---|---|
 | invariant broken (`paused` without an open wait; an open wait on a resolved target) | write the missing wait as a `decision` to the maintainer | a factory-bug issue |
-| a gesture, or a sensitive `repositories` field, written by an agent | revert to the previous value | Décision |
+| a gesture, or a repository's `notes`, written by an agent | revert to the previous value | Décision |
 | a wait with no active owner | re-route it to the first active maintainer, once | `signal` `no_owner` |
 | pull request dropped from the merge queue (idle or not; only a head enqueued then dropped) | re-queue once | Décision; an idle head never enqueued: Décision |
 | target branch red, blocking every pull request | open that repository's issue, or signal the open one | Décision |

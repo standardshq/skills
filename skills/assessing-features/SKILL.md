@@ -1,6 +1,6 @@
 ---
 name: assessing-features
-description: Use when the assessment routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as assessment evidence, and asks the maintainer, or parks the feature on a typed wait.
+description: Use when the Triage routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as assessment evidence, and asks the maintainer, or parks the feature on a typed wait.
 ---
 
 # Assessing features
@@ -11,13 +11,13 @@ no feature is built on your verdict alone.
 
 Read `working-on-issues` first, with `read-recipe.md` and `evidence-kinds.md` (the `assessment`
 row). Ask with `asking-for-decisions`. You never move an issue to `ready` (screening does, once the
-maintainer approved) and never close one (the `waits` routine applies « Close it »).
+maintainer approved) and never close one (the Maintenance routine applies « Close it »).
 
 ## Which issues
 
 | Run | Do |
 |---|---|
-| a `screening` row with `resumeAt: assessment` (`verdict: assess`) | assess that issue |
+| a `screening` row with `resumeAt: assessment` (`verdict: assess`), written by this same Triage run or an earlier one | assess that issue |
 | a `woke` row with `resumeAt: assessment` | § After the answer; any other `resumeAt`: stop |
 
 Only `type: feature` belongs here: an enhancement is screened and built without a product ruling.
@@ -123,7 +123,7 @@ your question, or what the park's wait delivered:
 Write `handoff`, release the lease, then the `approved` row **last**: it hands the issue to
 screening the moment it exists (`working-on-issues` § Finish, the one exception).
 
-« Close it » and « I take it » never wake the issue: the `waits` routine already applied them.
+« Close it » and « I take it » never wake the issue: the Maintenance routine already applied them.
 
 ## Red flags
 

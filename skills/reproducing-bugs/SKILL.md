@@ -1,6 +1,6 @@
 ---
 name: reproducing-bugs
-description: Use when the execution routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for.
+description: Use when the Build routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for.
 ---
 
 # Reproducing bugs
@@ -10,8 +10,8 @@ take a nearby failure as proof during this step. `executing-issues` runs this sk
 `type: bug`; the red command it produces is the fix's first commit.
 
 Read the issue with `working-on-issues` § read recipe. Run everything in the repository checkout,
-on a branch cut from `repositories.targetBranch`. The repository's own agent rules and its
-`repositories` record (`verify`, `boot`, `apps`, `reset`) say how to run tests and the app.
+on a branch cut from the repository's `targetBranch`. The repository's own agent rules and its
+facts (`working-on-issues` § Repository facts: `verify`, `boot`, `apps`, `reset`) say how to run tests and the app.
 
 ## Establish the red loop
 

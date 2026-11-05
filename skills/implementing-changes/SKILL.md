@@ -1,6 +1,6 @@
 ---
 name: implementing-changes
-description: Use when a change is designed and implemented in the same pass (a feature, component, refactor or behaviour change), and whenever the execution routine implements a launched issue. Acceptance assertions stated before any code, independent tasks in parallel, one blocking review of the batch, a green gate, then one final elegance and DRY check on the largest model.
+description: Use when a change is designed and implemented in the same pass (a feature, component, refactor or behaviour change), and whenever the Build routine implements a launched issue. Acceptance assertions stated before any code, independent tasks in parallel, one blocking review of the batch, a green gate, then one final elegance and DRY check on the largest model.
 ---
 
 # Implementing changes
@@ -279,7 +279,7 @@ git diff --cached -U0 | grep -nE 'toBeDefined\(\)|not\.toThrow\(\)'
 Then grep the diff for every construct the repository's agent rules forbid (an
 untyped error, a raw console call, a generic filename…), and run the lint
 command of the repository's `verify` on the changed files. Check no path the
-repository record lists as `generated` was edited by hand.
+repository's facts list as `generated` was edited by hand.
 
 Any hit is a defect. Fix it before dispatching anything.
 
@@ -311,7 +311,7 @@ listed in the PR body. Re-run only the failing lens.
 
 - Targeted tests for what changed: the test command of the repository's
   `verify`, narrowed to the changed files. Not the full suite — that is CI's
-  job, or the landing routine's.
+  job, or the Review routine's.
 - The other commands of `verify` (typecheck, lint), filtered to the changed
   package when the tool allows it, and each `pathGates` command whose path the
   change touches.
@@ -336,7 +336,7 @@ change invisible to users (types, logging, internal refactor), and a bug fix
 whose reproduction already drove the real path are all already proven.
 
 When it applies, drive the real system rather than a test double, with the
-repository record's `boot` (the command and what answers when it is up),
+repository's discovered `boot` (the command and what answers when it is up),
 `apps` (name, port, entry) and `reset` (seeded data):
 
 - API-reachable: the app running, then direct calls on the path the change

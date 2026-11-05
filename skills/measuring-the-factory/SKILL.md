@@ -1,6 +1,6 @@
 ---
 name: measuring-the-factory
-description: Use when the dashboard routine runs, nightly. Exports issues, status history, evidence, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself.
+description: Use when the Maintenance routine runs, nightly. Exports issues, status history, evidence, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself.
 ---
 
 # Measuring the factory

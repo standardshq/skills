@@ -16,7 +16,7 @@ export const meta = {
 //   skill: 'landing-pull-requests',
 //   solo:  '<path of evaluating-changes/SOLO.md>',
 //   stack: '<the demo checkout>',
-//   repositories: { 'owner/repo': { source, verify, pathGates, generated, withheld, sensitiveData, boot, reset, apps } },
+//   repositories: { 'owner/repo': { gate, verify, pathGates, generated, withheld, sensitiveData, boot, reset, apps } },
 //   heads: [{ issue, repo, number, branch, head, tier, round, limit, screen: boolean,
 //             ciGreen: boolean,
 //             state: 'red' | 'green' | 'unverified' | 'change' | 'demo',
@@ -90,8 +90,8 @@ function rowRule() {
 }
 
 function factoryGate(pr) {
-  const source = args.repositories[pr.repo]?.source;
-  return source === "factory" || source === "both";
+  const gate = args.repositories[pr.repo]?.gate;
+  return gate === "verify" || gate === "both";
 }
 
 function verifier(pr, head) {
@@ -99,7 +99,7 @@ function verifier(pr, head) {
     `You are the verifier of pull request ${pr.repo}#${pr.number}, issue ${
       pr.issue
     }, pinned head \`${head}\`.
-Read § 2 of the ${args.skill} skill and obey it: commit status \`Standards Factory / verify\` pending, a fresh clone of that head in the repository's environment (never another checkout), every \`verify\` line, then the \`pathGates\` lines whose path the diff touches, the \`generated\` path check.
+Read § 2 of the ${args.skill} skill and obey it: commit status \`Standards Factory / verify\` pending, a fresh clone of that head in the routine's own environment (never another checkout), every \`verify\` line, then the \`pathGates\` lines whose path the diff touches, the \`generated\` path check.
 ${rowRule()}
 Write the \`check-run\` row (subject \`${subject(pr, head)}\`): a \`generated\` path edited (not reproduced by the repository's own generator) makes it fail, the paths named in its body. Then the final commit status. A command that cannot start is \`error\`: no \`check-run\`, a \`signal\` with rule environment_broken.
 Repository: ${JSON.stringify(args.repositories[pr.repo])}
@@ -234,8 +234,8 @@ function flush(force) {
 // A `ci` or `both` head is demonstrated only once its required checks are green;
 // a head pushed in this run has none yet: the next run offers it.
 function offer(pr, original) {
-  const source = args.repositories[pr.repo]?.source;
-  const ciReady = source === "factory" || (original.ciGreen && pr.head === original.head);
+  const gate = args.repositories[pr.repo]?.gate;
+  const ciReady = gate === "verify" || (original.ciGreen && pr.head === original.head);
   if (pr.screen && ciReady) pending.push(pr);
   flush(false);
 }

@@ -1,7 +1,7 @@
 # Solo
 
 The single-juror form of `evaluating-changes`: one subagent, one ranked verdict. The convener
-chooses the counts; standalone, that is all nine from `SKILL.md` § 2. The landing routine chooses
+chooses the counts; standalone, that is all nine from `SKILL.md` § 2. The Review routine chooses
 them by tier (`landing-pull-requests` § Tier).
 
 The measured fact still holds: findings come from reading each count on its own, not from a

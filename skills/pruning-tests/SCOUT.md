@@ -20,7 +20,7 @@ job in three candidates.
 - Read the project's test conventions — the project's `context`, the
   repository's own agent rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`),
   how suites are split, what runs where, what CI requires (the repository's
-  `verify` and its required checks).
+  `verify`, its `gate` and its required checks).
 
 *Done when:* you know the queue has room, which candidates were already ruled
 on, and how this repository runs its tests.

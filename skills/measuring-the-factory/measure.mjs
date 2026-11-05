@@ -4,7 +4,7 @@
  *
  *   node measure.mjs --input <export.json> --date <iso> [--weeks <n>] [--project <id>] [--seed <n>]
  *
- * The export is written by the dashboard routine with its own record and
+ * The export is written by the Maintenance routine with its own record and
  * GitHub tools (shape in `measuring-the-factory` § 1). The script
  * never calls the workspace: it prints, on stdout, a JSON array of
  * `factory-snapshots` rows for the routine to upsert, and on stderr one line

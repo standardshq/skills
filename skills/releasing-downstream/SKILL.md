@@ -1,6 +1,6 @@
 ---
 name: releasing-downstream
-description: Use when the release routine runs, on its hourly pass over the repositories other repositories consume, or on a deploy signal. Finds a release not yet recorded, idempotent by sha and tag, and opens one release umbrella, one bump issue per consuming repository under it, and blocker waits on those bumps for the issues waiting on that release.
+description: Use when the Maintenance routine runs, on its hourly pass over the repositories other repositories consume. Finds a release not yet recorded, idempotent by sha and tag, and opens one release umbrella, one bump issue per consuming repository under it, and blocker waits on those bumps for the issues waiting on that release.
 ---
 
 # Releasing downstream
@@ -16,10 +16,12 @@ it is an ordinary issue of the repository.
 
 ## 1. Is there a new release?
 
-No event announces a merge to you: you look. **The repositories to check** are the `repositories`
-records something lists in its `consumes` (their `consumedBy` is not empty). A run on a deploy
-signal checks the one repository the signal names; the hourly pass checks every one of them, one
-at a time (a failure on one never stops the next: note it in your report and go on).
+No event announces a merge to you: you look. **The repositories to check** come from discovery
+(`working-on-issues` § Repository facts): run it on every repository of the workspace, with
+`--listed` naming each one's packages, and read its `consumes`. A repository some other one lists
+in `consumes` is released; the repositories listing it are its `consumedBy`. The hourly pass checks
+every released repository, one at a time (a failure on one never stops the next: note it in your
+report and go on).
 
 **The last release you recorded** is the sha in the `context` of the newest release umbrella of
 that repository (title « Release owner/repo <version> »). It is the only cursor, and the sha (and
@@ -27,12 +29,12 @@ its tag, when the repository tags releases) is the key: a release is opened once
 
 | The repository | Its candidate release |
 |---|---|
-| has a `deploySignal` | the commit of a successful production deploy that signal announces, on a run of that signal. The hourly pass skips it: a merge alone is not its release |
+| has a deploy workflow (its discovered `deploySignal`) | the commit of the latest successful run of that workflow on its `productionBranch`, read with the GitHub tools: a merge alone is not its release |
 | has none | the head of its `productionBranch`, read with the GitHub tools (the newest tag on it, when the repository tags releases) |
 
 Then stop for that repository, writing nothing, when any holds:
 
-- no record of `repositories` has that `fullName`, or nothing lists it in `consumes`;
+- no `projects` record has that `fullName`, or no other repository lists it in `consumes`;
 - the candidate's sha is the last release you recorded, or an ancestor of it;
 - a release umbrella for that repository and that sha (or tag) exists: another run already
   opened it;
@@ -62,12 +64,12 @@ One issue, in the first project the released repository serves:
 | `type` | `chore` |
 | `origin` | `release` |
 | `problem` | what shipped: the released pull requests and issues, one line each, `issues:<id>` |
-| `context` | the commit sha (and tag), the previous release's sha, and what found it (the hourly pass, or the deploy signal) |
+| `context` | the commit sha (and tag), the previous release's sha, and what found it (the hourly pass, or its deploy workflow run) |
 | `acceptance` | every consuming repository runs <version> |
 | `status` | `backlog` |
 
 It is a container (it gets children): screening never screens it, nobody launches it, and the
-`waits` routine closes it once every bump is `done` (`waking-issues` § 5).
+Maintenance routine closes it once every bump is `done` (`waking-issues` § 5).
 
 Create the bumps of § 4 right after it, before anything else. Until it has children, screening
 leaves it alone (`screening-issues` § The fence: `origin: release`, no `parent`, no `children`). When no consumer can get a bump (none serves a project, § 4), create nothing and name each
@@ -110,7 +112,7 @@ Read each such issue in a project the consumer serves with the read recipe, then
 
 | Its status | Do |
 |---|---|
-| `paused` | write a `blocker` wait (`target: issues:<bump id>`, `owner` the person who owns its current wait, else the project's first active maintainer, `resumeAt` the hint of its current wait, deadline + 14 days, body naming the release and the bump). It stays `paused`: the `waits` routine wakes it once every wait of the pause ends |
+| `paused` | write a `blocker` wait (`target: issues:<bump id>`, `owner` the person who owns its current wait, else the project's first active maintainer, `resumeAt` the hint of its current wait, deadline + 14 days, body naming the release and the bump). It stays `paused`: the Maintenance routine wakes it once every wait of the pause ends |
 | `backlog`, or `ready` without a `parent` | pause it on that `blocker` wait (`working-on-issues` § Pausing: the wait first, then `paused`, `handoff` rewritten), `resumeAt: screening` |
 | `ready` under an umbrella (it has a `parent`) | never pause it: the person's drag to `ready` was its launch. A `signal` (`rule: awaits_release`, `subject: issues:<bump id>`) on it asking the project's first active maintainer whether to add the bump to its `blockedBy`, saying which bump brings what it needs |
 | `mine`, `in_progress`, `in_review` | never pause it: a `signal` (`rule: awaits_release`, `subject: issues:<bump id>`) on it, saying which bump brings what it needs |
@@ -127,7 +129,7 @@ release: one line saying which rule of § 1 stopped it.
 
 ## Red flags
 
-- a bump opened by the hourly pass for a repository whose releases are its deploy signal;
+- a release opened on a merge alone for a repository that has a deploy workflow;
 - two umbrellas for one release, or two open bumps of one package in one consumer;
 - an issue in `mine`, `in_progress` or `in_review` paused for a release;
 - a bump moved to `ready` or `in_progress` by you;
