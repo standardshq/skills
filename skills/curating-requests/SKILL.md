@@ -18,7 +18,9 @@ and the names of its attachments, the projects' `context`, and the issues alread
 not been shown.
 
 Any person's reply wakes you. Your last reply in its thread is a question: a reply posted after it
-is the answer; judge the thread's message again with it. Your last reply is a link or a decline: stop. You have no
+is the answer; judge the thread's message again with it. Your last reply is a link: a reply posted
+after it goes through Gate 3 when it changes the work or adds proof, otherwise stop silently. Your
+last reply is a decline: stop, unless the reply brings something the decline lacked. You have no
 reply in the thread: judge it only if the reply itself states a request, otherwise stop silently.
 
 ## State first
@@ -27,15 +29,16 @@ reply in the thread: judge it only if the reply itself states a request, otherwi
 delivered twice, or queued behind another. The issue and the thread are the whole state. Before
 deciding, and again right before writing:
 
-1. Search issues (open and closed) whose `context` holds the event's permalink or the thread root's.
+1. Search issues (open and closed) whose `context` holds this event's own permalink.
    Found: the message is handled; skip it. For an answered thread, `context` holds the root's
-   permalink and the answering reply's.
+   permalink and the answering reply's. The root's permalink stops only the root message itself
+   being handled again: a later reply has its own permalink and goes on to step 2.
 2. Read the whole thread. Your own earlier reply decides:
 
    | Your last reply | Do |
    |---|---|
-   | a decline | stop |
-   | a link to an issue | a message posted after it that changes what to do or adds proof, on an open issue: treat it as « an open issue » in Gate 3, on that issue. Any other message: stop |
+   | a decline | a message posted after it that brings something the decline lacked: judge again with it. Any other message: stop |
+   | a link to an issue | a message posted after it that changes the work or adds proof: Gate 3's row for that issue's state, open or `done`, the same as any message. Any other message: stop silently |
    | a question | a message posted after it is the answer, judge again with it; the message it answered, or an older one: stop |
    | none | judge |
 
