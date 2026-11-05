@@ -173,6 +173,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     await main();
   } catch (error) {
     console.error(`issue-duplicates: ${error.message}`);
-    process.exitCode = 1;
+    process.exitCode = error.exitCode ?? 1;
   }
 }

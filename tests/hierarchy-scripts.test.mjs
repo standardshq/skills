@@ -181,3 +181,30 @@ test("readIssues includes issues on records at any depth under the project", asy
   assert.deepEqual((await readIssues(file, "R")).map((each) => each.id), ["i1", "i2", "i3"]);
   assert.deepEqual((await readIssues(file, "A")).map((each) => each.id), ["i2", "i3"]);
 });
+
+test("a mixed root with a failed discovery never reads as not deploying", () => {
+  const mixed = [
+    { id: "R", name: "R" },
+    { id: "A", parentId: "R", fullName: "org/a" },
+    { id: "B", parentId: "R", fullName: "org/b", deployWorkflows: "" },
+  ];
+  const { rows, notes } = measure({ projects: mixed, issues: [] }, { date: DATE, weeks: 1, seed: 7 });
+  assert.equal(valueOf(rows, "R", "no_deploy_data"), undefined);
+  assert.equal(valueOf(rows, "B", "no_deploy_data"), 1);
+  assert.ok(notes.some((note) => note.startsWith("R: 1 repository with failed deploy discovery")));
+});
+
+test("issue-duplicates exits 2 on a bare array with --project", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const { writeFileSync, mkdtempSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const file = join(mkdtempSync(join(tmpdir(), "bare-")), "issues.json");
+  writeFileSync(file, JSON.stringify([{ id: "i1", values: { project: "A" } }]));
+  const run = spawnSync(
+    process.execPath,
+    [join(skills, "screening-issues/scripts/issue-duplicates.mjs"), "--input", file, "--project", "R"],
+    { encoding: "utf8" },
+  );
+  assert.equal(run.status, 2);
+  assert.match(run.stderr, /must carry `projects`/);
+});

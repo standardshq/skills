@@ -223,6 +223,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     await main();
   } catch (error) {
     console.error(`issue-families: ${error.message}`);
-    process.exitCode = 1;
+    process.exitCode = error.exitCode ?? 1;
   }
 }

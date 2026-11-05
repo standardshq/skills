@@ -387,7 +387,14 @@ function measureDelivery(context, project, period, rows, notes) {
 
   const withDeploys = repositories.filter(hasDeployWorkflow);
   const signalled = withDeploys.length > 0;
-  if (period.latest) {
+  const excluded = all.length - repositories.length;
+  if (period.latest && excluded > 0) {
+    notes.push(
+      `${project.id}: ${excluded} repositor${excluded === 1 ? "y" : "ies"} with failed deploy discovery left out of its delivery rows`,
+    );
+  }
+  // With a repository unknown, « nothing deploys » is not established: write no state row.
+  if (period.latest && (signalled || excluded === 0)) {
     rows.push({
       project: project.id,
       date: isoDate(Math.min(period.end, context.measuredAt)),
