@@ -17,8 +17,8 @@ You hold no sandbox and no GitHub, and no repository checkout. Judge on the mess
 and attachments, the projects' `context`, and the issues already filed. Never name a file you have
 not been shown.
 
-Any person's reply wakes you. Your last reply in its thread is a question: the reply is the answer;
-judge the thread's message again with it. Your last reply is a link or a decline: stop. You have no
+Any person's reply wakes you. Your last reply in its thread is a question: a reply posted after it
+is the answer; judge the thread's message again with it. Your last reply is a link or a decline: stop. You have no
 reply in the thread: judge it only if the reply itself states a request, otherwise stop silently.
 
 ## State first
@@ -35,11 +35,8 @@ deciding, and again right before writing:
    | Your last reply | Do |
    |---|---|
    | a link to an issue, or a decline | stop |
-   | a question | the new message is usually the answer: judge again with it |
+   | a question | a message posted after it is the answer, judge again with it; the message it answered, or an older one: stop |
    | none | judge |
-
-   The event is the message your question answered, or is older than your question: stop, it is
-   handled. Only a message posted after your question is an answer.
 
 ## Gate 1: which project owns it
 
