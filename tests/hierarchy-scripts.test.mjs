@@ -146,3 +146,38 @@ test("import plans a sub-issue's parent for its creation", () => {
   assert.deepEqual(child.relations, { blockedBy: [] });
   assert.ok(entries.findIndex((e) => e.githubNumber === 10) < entries.findIndex((e) => e.githubNumber === 12));
 });
+
+test("a root without repositories gets no deploy data, and a failed discovery gets none", () => {
+  const lone = { id: "L", name: "Lone" };
+  const { rows } = measure({ projects: [lone], issues: [] }, { date: DATE, weeks: 1, seed: 7 });
+  assert.equal(valueOf(rows, "L", "no_deploy_data"), 1);
+  const unknown = [
+    { id: "R", name: "R" },
+    { id: "A", parentId: "R", fullName: "org/a" },
+  ];
+  const result = measure({ projects: unknown, issues: [] }, { date: DATE, weeks: 1, seed: 7 });
+  assert.equal(valueOf(result.rows, "A", "no_deploy_data"), undefined);
+  assert.equal(valueOf(result.rows, "R", "no_deploy_data"), undefined);
+});
+
+test("readIssues includes issues on records at any depth under the project", async () => {
+  const { readIssues } = await import(join(skills, "screening-issues/scripts/standards.mjs"));
+  const { writeFileSync, mkdtempSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const file = join(mkdtempSync(join(tmpdir(), "export-")), "issues.json");
+  const issue = (id, project) => ({ id, values: { project } });
+  writeFileSync(
+    file,
+    JSON.stringify({
+      projects: [
+        { id: "R" },
+        { id: "A", parent: "record:R" },
+        { id: "AA", parent: "record:A" },
+        { id: "X" },
+      ],
+      data: [issue("i1", "R"), issue("i2", "A"), issue("i3", "AA"), issue("i4", "X")],
+    }),
+  );
+  assert.deepEqual((await readIssues(file, "R")).map((each) => each.id), ["i1", "i2", "i3"]);
+  assert.deepEqual((await readIssues(file, "A")).map((each) => each.id), ["i2", "i3"]);
+});

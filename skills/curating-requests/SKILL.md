@@ -75,7 +75,7 @@ with your reservations in `problem`.
 
 ## Gate 3: does it already exist
 
-Search the owning project's issues, open **and** closed, with the record search (it matches meaning, not
+Search the issues filed on the owning record or any record under it, open **and** closed, with the record search (it matches meaning, not
 only words), then list the issues with `origin: slack` of the last weeks. Compare the root cause,
 not the wording: two symptoms one change would fix are one issue. Sibling reports from adjacent
 messages are the usual near-miss.

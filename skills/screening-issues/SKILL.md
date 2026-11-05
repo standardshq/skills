@@ -33,10 +33,14 @@ checkout. Never hand-assemble what a script prints.
 A usage or input error is not a finding: fix the call or the export and run it again.
 
 **The export** (`--input`): one JSON file per run, in your scratch directory, holding every issue
-of the project, every status:
+filed on the project record or any record under it, every status, with the `projects` records of
+that tree so a root covers its repositories (a bare array of issues is accepted when the project is
+one record):
 
 ```json
-[
+{
+  "projects": [{ "id": "<id>", "parent": "record:<id>" }],
+  "data": [
   {
     "id": "<record id>",
     "createdAt": "<iso>",
@@ -48,10 +52,11 @@ of the project, every status:
       "plan": "…", "handoff": "…"
     }
   }
-]
+  ]
+}
 ```
 
-1. Query the `issues` object for the project with your record tools, all statuses, every page.
+1. Query the `issues` object for the issues filed on the project record or any record under it, with your record tools, all statuses, every page.
 2. Write each record as above; the sections as text (markdown), relations as ids.
 3. For each `done` issue the screened issue cites (`issues:<id>`, or `#N` matching an imported
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to

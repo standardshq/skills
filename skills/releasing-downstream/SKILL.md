@@ -78,7 +78,7 @@ leaves it alone (`screening-issues` § The fence: `origin: release`, no `parent`
 
 ## 4. One bump issue per consumed package
 
-The released repository may publish several packages. For each repository in `consumedBy`, read
+The released repository may publish several packages. For each repository in `consumedBy`, find its `projects` record by `fullName`: none matches, no record: no bump, name it in your report. Otherwise read
 in its checkout the dependencies of every `package.json` it holds, and keep the released
 repository's packages it depends on at another version than the released one. None: no bump for
 that consumer, and say so in your report.

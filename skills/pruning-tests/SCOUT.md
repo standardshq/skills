@@ -96,7 +96,7 @@ search come first), carrying in `problem` and `context`:
    trade) — labelled as a hypothesis the cut will re-check;
 6. an instruction to cut it with `pruning-tests`, `CUT.md`.
 
-Before filing, search the project's issues, every status, for the same test or
+Before filing, search the issues filed on the record or any record under it, every status, for the same test or
 file; new evidence on an existing issue goes into its `context`
 (`filing-findings` § Search first). Candidates below the line get one line
 each in the report, under *found, not filed*.

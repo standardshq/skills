@@ -26,7 +26,8 @@ import {
   idsOf,
   issueText,
   parseArgs,
-  readIssues,
+  readExport,
+  rootOf,
   repositoryOf,
   resolveRef,
   timeOf,
@@ -129,7 +130,11 @@ async function check(id, options) {
     imported: new Map(
       [...options.byId.values()]
         .filter((other) => valuesOf(other).githubNumber != null)
-        .filter((other) => idsOf(valuesOf(other).project).some((p) => projects.includes(p)))
+        .filter((other) =>
+          idsOf(valuesOf(other).project).some((p) =>
+            projects.some((mine) => rootOf(options.parents, p) === rootOf(options.parents, mine)),
+          ),
+        )
         .map((other) => [String(valuesOf(other).githubNumber), other]),
     ),
   };
@@ -175,9 +180,12 @@ async function main() {
     return;
   }
   const branch = typeof args.branch === "string" ? args.branch : undefined;
-  const byId = new Map((await readIssues(args.input)).map((issue) => [issue.id, issue]));
+  const { issues, parents } = await readExport(args.input);
+  const byId = new Map(issues.map((issue) => [issue.id, issue]));
   let problems = 0;
-  for (const id of args._) problems += await check(id, { checkout: args.checkout, branch, byId });
+  for (const id of args._) {
+    problems += await check(id, { checkout: args.checkout, branch, byId, parents });
+  }
   if (problems > 0) process.exitCode = 1;
 }
 

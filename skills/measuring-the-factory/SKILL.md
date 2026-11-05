@@ -61,7 +61,7 @@ missing from the dashboard. Read with your record tools, every page of every que
 | `pullRequests` | every line of every issue's `pullRequests`, read live with your GitHub tools: state, merge time, close time |
 | `runs` | the run history of the factory's routines (the workspace's agent runs and AI usage): one entry per run with its cost in the workspace's currency, and the issue or project it worked on when the run says so |
 | `projects` | the `projects` object, every record with its `parent` (`record:<id>`; the `parentId` attribute) and, for a repository, its `fullName` |
-| `deployWorkflows` | only for a repository: the deploy workflows its discovery found (`working-on-issues` § Repository facts), one per line; none found: leave it empty |
+| `deployWorkflows` | only for a repository: run `working-on-issues` § Repository facts on it and take `deployWorkflows` as printed (one per line; empty when it found none). A repository whose discovery failed gets no `deployWorkflows` key at all: name it in your report. The script then writes no delivery rows for it, rather than `no_deploy_data` 1, so a failure never reads as « does not deploy » |
 | `deploys` | only for a repository with a deploy workflow: every run of those workflows on its `productionBranch` in the last 14 weeks, `failed` true when the run failed or was rolled back, and the pull requests each deploy shipped (the commits between the previous deploy and this one; for a bump carried by a release, the upstream pull requests the bump brought, `releasing-downstream`) |
 
 Leave `deploys` out of a repository with no deploy workflow: the script then writes « no deploy

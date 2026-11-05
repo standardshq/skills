@@ -49,7 +49,7 @@ Nothing about a long pass changes the bar:
 
 ## Search first
 
-Before filing, search the project's issues, every status, with your record tools
+Before filing, search the issues filed on the record or any record under it, every status, with your record tools
 (its search, then `issue-duplicates.mjs` of `screening-issues` on the issues export). A candidate
 that already exists is never filed twice:
 

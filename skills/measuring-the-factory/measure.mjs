@@ -349,7 +349,12 @@ const repositoriesOf = (context, project) =>
     (each) => String(each.fullName ?? "").trim() !== "" && context.subtreeOf.get(project.id).has(each.id),
   );
 
-/** A deploy is a run of the repository's deploy workflows on its production branch. */
+/**
+ * A deploy is a run of the repository's deploy workflows on its production
+ * branch. `deployWorkflows` empty: none found; absent or null: discovery
+ * failed, so nothing is known (never read as « does not deploy »).
+ */
+const deployKnown = (repository) => repository.deployWorkflows != null;
 const hasDeployWorkflow = (repository) =>
   (Array.isArray(repository.deployWorkflows)
     ? repository.deployWorkflows.join("\n")
@@ -358,10 +363,26 @@ const hasDeployWorkflow = (repository) =>
 
 /** Delivery rows of one record, from the repositories at or below it. */
 function measureDelivery(context, project, period, rows, notes) {
-  const repositories = repositoriesOf(context, project);
-  if (repositories.length === 0) return;
+  const all = repositoriesOf(context, project);
   const date = isoDate(period.start);
   const add = (series, value) => rows.push({ project: project.id, date, series, value: round(value) });
+  if (all.length === 0) {
+    if (period.latest) {
+      rows.push({
+        project: project.id,
+        date: isoDate(Math.min(period.end, context.measuredAt)),
+        series: "no_deploy_data",
+        value: 1,
+        state: true,
+      });
+    }
+    return;
+  }
+  const repositories = all.filter(deployKnown);
+  if (repositories.length === 0) {
+    if (period.latest) notes.push(`${project.id}: deploy discovery failed, no delivery rows`);
+    return;
+  }
   const names = new Set(repositories.map((each) => String(each.fullName).toLowerCase()));
 
   const withDeploys = repositories.filter(hasDeployWorkflow);
