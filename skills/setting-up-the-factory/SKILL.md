@@ -111,16 +111,16 @@ announcements go to; by default, the channel of step 5. Write one line in each r
 `context` naming it with its id, since Review cannot look a channel up: "Announcements:
 #<name> (<channel id>)." A line already there stays, unless they ask to change it.
 
-## 7. What the repositories need
+## 7. The environment
+
+Every setup needs one environment. Tell the person why, in a sentence or two: it is the machine the
+routines work on, prepared once with their repositories and tools, so each run starts ready instead
+of installing everything again. You cannot create it; you give them what to enter.
 
 Read what each listed repository asks for (`engines`, `packageManager`, lockfile, other manifests),
-install it in your sandbox and run the repository's install. If that works, say nothing about
-environments: every run installs what a repository declares.
-
-It needs an environment only when something cannot be installed this way (a service such as Docker
-or a database) or takes too long on each run. Ask whether the **Environment** row of `build` already
-shows `Factory`; if so, skip to attaching or rebuilding. If not, give the values to enter from that
-row, **New environment** (not offered: this instance cannot create one, ask an admin):
+to write the setup script. Ask whether the **Environment** row of `build` already shows `Factory`;
+if so, skip to attaching or rebuilding. If not, give the values to enter from that row,
+**New environment** (not offered: this instance cannot create one, ask an admin):
 
 - name: `Factory`
 - harness: Standards, no API key needed
