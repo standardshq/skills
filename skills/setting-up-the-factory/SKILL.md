@@ -118,17 +118,21 @@ repository asks for (`engines`, `packageManager`, its lockfile).
 
 - **They work:** say nothing is needed. Offer an environment only when a repository needs tools that
   are missing.
-- **They do not:** say plainly that this chat cannot create it, then walk them through it, from the
-  **Environment** row of the `build` routine's page, **New environment**:
+- **They do not:** say plainly that this chat cannot create it, and give the exact values to enter
+  from the **Environment** row of the `build` routine's page, **New environment**:
   - name: `Factory`
-  - visibility: Workspace
-  - Image: Code
+  - harness: Standards, which needs no API key (the image stays Documents)
+  - visibility: Workspace, accepting the shared machine notice
   - repositories: every listed repository
+  - setup script: one you write for them to paste, installing Node and pnpm at the versions the
+    repositories ask for, plus what each repository's facts show it needs (`verify`, `boot`). If you
+    could not read the facts yet, go by its manifests and lockfile. No secret in it: members can
+    read the machine.
 
-  Once it is built, choose it in the **Environment** row of each code routine: `triage`, `build`,
-  `review` and `maintenance`.
+  They choose **Build**. A failed build: read its last lines with them and correct the script. Once
+  built, they choose it in the **Environment** row of `triage`, `build`, `review` and `maintenance`.
 
-Adding a repository later: it joins this environment too.
+Adding a repository later: it joins this environment too, and they build it again.
 
 ## 8. Switch them on
 
