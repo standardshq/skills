@@ -1,5 +1,7 @@
 # Read recipe
 
+First read `environments.md` beside this file: it says which tools and paths you have here.
+
 Read an issue in this order before acting on it. Stop reading as soon as you know the issue is not
 yours to act on (claimed by another live lease, not your stage, not launched).
 

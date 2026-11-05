@@ -13,9 +13,11 @@ Companion files, read when you need them:
 
 - `read-recipe.md`: how to read an issue before acting on it. Read it at the start of every run.
 - `evidence-kinds.md`: every evidence kind, who writes it, and its fields.
+- `environments.md`: which tools and paths you have on Standards or on a harness. Read it first.
 
 **Where a skill's files are.** Loading a skill writes its folder into your sandbox:
-`/workspace/skills/<skill>/`, with its files at their relative paths. A path a skill names, such
+`/workspace/skills/<skill>/` on Standards (on a harness, see `environments.md`), with its files at
+their relative paths. A path a skill names, such
 as `scripts/issue-families.mjs`, is `/workspace/skills/<skill>/scripts/issue-families.mjs`. Load a
 skill before running another skill's script.
 
