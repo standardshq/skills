@@ -29,10 +29,11 @@ Rows are never edited or deleted. The one exception: the Maintenance routine set
 | `applied` | Maintenance routine | `subject`: `evidence:<ruling id>` | `{"rows": ["<id>", …]}`, or `{"skipped": "superseded" \| "unmapped" \| "no_wait"}`; for « Close it » with a linked PR open, also `"closeReason"` and `"closeWhenPullRequestsClose": true` | the last row of applying a ruling on one issue: its presence on an issue means the ruling is done there. A ruling whose Décision is the target of waits on several issues gets one `applied` row on each (`waking-issues` § 6). With `closeWhenPullRequestsClose`, Maintenance closes the issue with that `closeReason` once every linked PR is closed (`waking-issues` § 4) |
 | `signal` | the Maintenance routine, or any routine noticing a broken rule | `subject` (optional): what it is about, such as a PR head, `evidence:<id>` or `repositories:<id>` | `{"rule": "<short name>"}` | something slipped through the structure |
 
-**Stage hand-offs:** `resumeAt` on a `screening` or `assessment` row names the next stage, and
-creating the row triggers that stage's routine: `screening` → `assessment` for a feature to assess,
-`assessment` → `screening` for an approved feature. Leave `resumeAt` empty on every other
-`screening` and `assessment` row. A hand-off row is the **last** write of its run, after
+**Stage hand-offs:** `resumeAt` on an `assessment` row with an approved feature is `screening`,
+and creating the row triggers the Triage routine. `resumeAt: assessment` on a `screening` row
+(`verdict: assess`) triggers nothing: it marks the point the same Triage run continues from, into
+`assessing-features`, and the daily pass takes the issue up from it if that run died. Leave
+`resumeAt` empty on every other `screening` and `assessment` row. A hand-off row is the **last** write of its run, after
 `handoff` and the lease release: written earlier, the next stage would start while you still hold
 the issue (`working-on-issues` § Finish).
 

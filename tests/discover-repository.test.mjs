@@ -100,12 +100,12 @@ describe("gate", () => {
     assert.equal(facts.source, "ci");
     assert.equal(facts.gate, "ci");
   });
-  test("check and verify give both", () => {
+  test("check and verify give ci", () => {
     const { facts } = discover({
       rules: requiredCheck("build"),
       files: { "package.json": { scripts: { test: "x" } } },
     });
-    assert.equal(facts.gate, "both");
+    assert.equal(facts.gate, "ci");
   });
   test("verify alone", () => {
     const { facts } = discover({ files: { "package.json": { scripts: { test: "x" } } } });
@@ -145,6 +145,19 @@ describe("withheld", () => {
     const lines = facts.withheld.split("\n");
     assert.ok(lines.includes("a/**"));
     assert.ok(!lines.includes("b/**"));
+  });
+  test("what judges a pull request is withheld", () => {
+    const lines = discover().facts.withheld.split("\n");
+    for (const path of [
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".cursor/rules/**",
+      "CODEOWNERS",
+      ".github/CODEOWNERS",
+      "docs/CODEOWNERS",
+    ]) {
+      assert.ok(lines.includes(path), path);
+    }
   });
   test("AGENTS.md adds a withheld path", () => {
     const { facts } = discover({ files: { "AGENTS.md": "## Factory\nwithheld: secrets/**\n" } });

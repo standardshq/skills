@@ -176,7 +176,7 @@ First, **any other `ruling`** on an issue newer than its latest `attempt` row re
 | **Wait on something else** (escalation) | write the new `wait` the answer names (check its target first, `working-on-issues` § Pausing), then `resolved` on the escalation's own wait |
 | **Retry** (failure ceiling) | `resolved` on the wait; the reset above already applied |
 | anything else, on a `decision` or `approval` wait | `resolved` on the wait whose `target` is the ruling's `subject` |
-| anything else, on a ruling that answers no wait and no escalation (a Décision from the Maintenance routine or from landing in `human` mode, `asking-for-decisions` § 3) | nothing: the `applied` row with `data.skipped: "no_wait"`; the asking routine acts on the answer itself |
+| anything else, on a ruling that answers no wait and no escalation (a Décision from the Maintenance routine, from Review in `human` mode, on a `none` gate or on a red target branch, or from any stage on an unresolved target, `asking-for-decisions` § 3) | nothing: the `applied` row with `data.skipped: "no_wait"`; the asking routine acts on the answer itself |
 | a free answer to an escalation that fits no option | leave everything open, write a `signal` (`rule: unapplied_ruling`) for the Maintenance routine, and the `applied` row with `data.skipped: "unmapped"` |
 
 Then the `applied` row, last. « I take it » and « Close it » are moves on a person's behalf: the

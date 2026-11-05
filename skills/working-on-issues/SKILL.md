@@ -21,25 +21,34 @@ skill before running another skill's script.
 
 ## Repository facts
 
-A repository is a `projects` record with a `fullName`. Its facts are not stored: read them at the
-start of every pass from the repository itself, never from memory of an earlier pass.
+A repository is a `projects` record with a `fullName`. Its facts are not stored: a stage that acts
+on a repository reads them at the start of every pass from the repository itself, never from
+memory of an earlier pass. Intake never does.
 
 1. Clone the default branch into your sandbox and gather five files with the GitHub tools into one
-   folder: `repo.json`, `branches.json`, `rules.json` (the rulesets that apply to the default
-   branch), `protection.json` (its classic branch protection; absent when there is none) and
-   `pulls.json` (recent merged pull requests).
+   folder: `repo.json`, `branches.json`, `rules.json` (the rulesets that apply to the branch),
+   `protection.json` (its classic branch protection; absent when there is none) and `pulls.json`
+   (recent merged pull requests).
 2. Run `node /workspace/skills/working-on-issues/scripts/discover-repository.mjs --checkout <clone>
-   --github <folder>`. Add `--listed <file>` (`[{ "fullName", "packages": ["<package name>"] }]`
-   for the other repositories you know) only when you need `consumes`.
+   --github <folder>`. Add `--listed <file>` (`[{ "fullName", "packages": ["<package name>"] }]`,
+   the package names read from each repository's manifests) only when you need `consumes`.
 3. It prints one JSON object: `targetBranch`, `productionBranch`, `mode` (`queue` or `human`),
    `method`, `source`, `verify`, `pathGates`, `withheld`, `generated`, `sensitiveData`, `boot`,
-   `apps`, `reset`, `consumes`, and `gate` (`ci`, `verify`, `both` or `none`). Lists are one entry
-   per line. An empty field means nothing was found, never « unlimited ».
-4. Exit 3 means the clone is not on the target branch, and prints `{"targetBranch":"<branch>"}`:
-   clone that branch and run it again. A second exit 3 is not yours to settle: ask a person with
-   `asking-for-decisions`.
-5. Then apply the record's `notes`. They can only tighten what was discovered (a command added, a
-   path withheld), never loosen it.
+   `apps`, `reset`, `consumes`, and `gate` (`ci`, `verify` or `none`). Lists are one entry per
+   line. An empty field means nothing was found, never « unlimited ». `source` is not read by any
+   skill: use `gate`.
+4. Exit 3 means the clone is not on the target branch, and prints `{"targetBranch":"<branch>"}`.
+   Clone that branch, fetch `rules.json` and `protection.json` again for it (they decide `gate` and
+   `mode`), and run the script again. A second exit 3 is not yours to settle: write a `signal`
+   (`rule: target_unresolved`, `subject` the repository) on the project's « Factory operations
+   log », ask one Décision per repository and rule (`asking-for-decisions`), and stop working that
+   repository.
+5. Exit 2, a clone you cannot make, or no sandbox: you have no facts. Touch nothing in that
+   repository, merge nothing, write a `signal` (`rule: environment_broken`) and say so in your
+   report. A skill meant to run without a sandbox never runs this section.
+6. Then apply the record's `notes`. They can only tighten what was discovered: a command added
+   through `notes` turns `none` into `verify` and `ci` into `both`; a path added is withheld.
+   `both` exists only this way; the script never prints it.
 
 The facts are read from the target branch, never from a pull request's head: a pull request that
 edits `CODEOWNERS`, a workflow or the repository's `## Factory` section is judged on the target
@@ -184,8 +193,9 @@ timeout`).
 5. Re-read the issue and check the state you meant to leave. If a write failed, say exactly which
    state is left in `handoff` and in your report; never claim a transition you did not verify.
 
-**The one exception:** a stage hand-off row (a `screening` or `assessment` row carrying
-`resumeAt`, `evidence-kinds.md` § Stage hand-offs) starts the next routine the moment it exists.
+**The one exception:** a stage hand-off row (an `assessment` row carrying `resumeAt: screening`,
+`evidence-kinds.md` § Stage hand-offs) starts Triage the moment it exists. A `screening` row's
+`resumeAt: assessment` starts nothing: the run continues into assessment itself.
 Write it **after** steps 3 and 4, as the run's last write, then re-read.
 
 **Failure:** write an `attempt` row, increment `failedAttempts`. At 3: apply the failure ceiling.

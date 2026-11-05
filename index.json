@@ -9,7 +9,7 @@
   },
   {
     "name": "assessing-features",
-    "description": "Use when the assessment routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as assessment evidence, and asks the maintainer, or parks the feature on a typed wait."
+    "description": "Use when the Triage routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as assessment evidence, and asks the maintainer, or parks the feature on a typed wait."
   },
   {
     "name": "brainstorming",
@@ -17,23 +17,23 @@
   },
   {
     "name": "curating-requests",
-    "description": "Use when the curator routine runs, every 5 minutes, and the new messages of the projects' intake Slack channels, a person's or a scout's `[scout:` message, must be judged before they enter the factory. Turns each into one issue with origin slack in the project that owns it, points it at an existing issue, asks one question, or declines it politely, never twice for one Slack message."
+    "description": "Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Turns it into one issue with origin slack in the project that owns it, points it at an existing issue, asks one question, or declines it politely, never twice for one Slack message."
   },
   {
     "name": "evaluating-changes",
-    "description": "Use when a pull request head, an unpushed branch, or a written spec must be tried before it is trusted, by the landing routine's juror or on a person's request. Nine sealed jurors instructed in parallel, or one juror trying selected counts in sequence, one ranked verdict, nothing written to the code."
+    "description": "Use when a pull request head, an unpushed branch, or a written spec must be tried before it is trusted, by the Review routine's juror or on a person's request. Nine sealed jurors instructed in parallel, or one juror trying selected counts in sequence, one ranked verdict, nothing written to the code."
   },
   {
     "name": "executing-issues",
-    "description": "Use when the execution routine runs, on an issue a person moved to In progress, a woke row with resumeAt execution, or its 30-minute launch-queue pass. Claims a launched issue under a lease and turns it into a verified pull request with Issue <id> in the body, or into a pause that names what it waits on."
+    "description": "Use when the Build routine runs, on an issue a person moved to In progress, a woke row with resumeAt execution, or its 30-minute launch-queue pass. Claims a launched issue under a lease and turns it into a verified pull request with Issue <id> in the body, or into a pause that names what it waits on."
   },
   {
     "name": "filing-findings",
-    "description": "Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind> or as a message to the project's Slack curator. The shared cost, budget, ranking and routing bar every scout obeys."
+    "description": "Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind>. The shared cost, budget and ranking bar every scout obeys."
   },
   {
     "name": "implementing-changes",
-    "description": "Use when a change is designed and implemented in the same pass (a feature, component, refactor or behaviour change), and whenever the execution routine implements a launched issue. Acceptance assertions stated before any code, independent tasks in parallel, one blocking review of the batch, a green gate, then one final elegance and DRY check on the largest model."
+    "description": "Use when a change is designed and implemented in the same pass (a feature, component, refactor or behaviour change), and whenever the Build routine implements a launched issue. Acceptance assertions stated before any code, independent tasks in parallel, one blocking review of the batch, a green gate, then one final elegance and DRY check on the largest model."
   },
   {
     "name": "importing-github-issues",
@@ -41,31 +41,31 @@
   },
   {
     "name": "landing-pull-requests",
-    "description": "Use when the landing routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its evidence rows - the gate the repository chose, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says."
+    "description": "Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its evidence rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says."
   },
   {
     "name": "measuring-the-factory",
-    "description": "Use when the dashboard routine runs, nightly. Exports issues, status history, evidence, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself."
+    "description": "Use when the Maintenance routine runs, nightly. Exports issues, status history, evidence, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself."
   },
   {
     "name": "operating-the-factory",
-    "description": "Use when the operator routine runs, every 15 minutes. Catches what slipped through the structure - broken invariants, gestures or sensitive repository fields written by an agent, waits with no active owner, double or looping leases, self-verification, idle or dropped pull requests, a red target branch, piled-up Décisions, failing routines, unhealthy repositories, a stalled delivery chain, a blown budget - and answers each with one listed action or a Décision."
+    "description": "Use when the Maintenance routine runs, every 15 minutes. Catches what slipped through the structure - broken invariants, gestures or a repository's `notes` written by an agent, waits with no active owner, double or looping leases, self-verification, idle or dropped pull requests, a red target branch, piled-up Décisions, failing routines, unhealthy repositories, a stalled delivery chain, a blown budget - and answers each with one listed action or a Décision."
   },
   {
     "name": "pruning-tests",
-    "description": "Use when the scouts routine sweeps a repository's test suite, when a maintainer asks to audit a suite, or when an issue with origin scout:tests is executed. Scouts the tests whose time, flakiness or upkeep outweighs what they alone catch, audits every test of a suite for what it witnesses, or cuts one candidate, folding its lone assertion into a surviving test first."
+    "description": "Use when the Maintenance routine sweeps a repository's test suite, when a maintainer asks to audit a suite, or when an issue with origin scout:tests is executed. Scouts the tests whose time, flakiness or upkeep outweighs what they alone catch, audits every test of a suite for what it witnesses, or cuts one candidate, folding its lone assertion into a surviving test first."
   },
   {
     "name": "releasing-downstream",
-    "description": "Use when the release routine runs, on its hourly pass over the repositories other repositories consume, or on a deploy signal. Finds a release not yet recorded, idempotent by sha and tag, and opens one release umbrella, one bump issue per consuming repository under it, and blocker waits on those bumps for the issues waiting on that release."
+    "description": "Use when the Maintenance routine runs, on its hourly pass over the repositories other repositories consume. Finds a release not yet recorded, idempotent by sha and tag, and opens one release umbrella, one bump issue per consuming repository under it, and blocker waits on those bumps for the issues waiting on that release."
   },
   {
     "name": "reproducing-bugs",
-    "description": "Use when the execution routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for."
+    "description": "Use when the Build routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for."
   },
   {
     "name": "screening-issues",
-    "description": "Use when the screening routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait."
+    "description": "Use when the Triage routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait."
   },
   {
     "name": "shaping-features",
@@ -73,7 +73,7 @@
   },
   {
     "name": "waking-issues",
-    "description": "Use when the waits routine runs, on an issue set Done, a ruling recorded, or its hourly pass, which also reads every Task done or deleted and every merged or closed pull request. It is the only skill that resolves waits, applies a person's answers, wakes paused issues, and closes issues from their pull requests."
+    "description": "Use when the Maintenance routine runs, on an issue set Done, a ruling recorded, or its hourly pass, which also reads every Task done or deleted and every merged or closed pull request. It is the only skill that resolves waits, applies a person's answers, wakes paused issues, and closes issues from their pull requests."
   },
   {
     "name": "working-on-issues",

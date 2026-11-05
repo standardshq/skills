@@ -18,12 +18,12 @@ run does both, as separate passes, and this one never wakes an issue. Ask people
 
 - Wake an issue, resolve or release a wait, apply a ruling: never write `woke`, `resolved`,
   `abandoned`, `released` or `applied`, never set `resolvedAt`, never run `waking-issues` logic,
-  even when the answer looks obvious. A wait on a resolved target is the Maintenance routine's to end.
+  even when the answer looks obvious. A wait on a resolved target is `waking-issues`' to end.
 - Claim a lease, write code, judge or merge a pull request, write `verdict`, `go`, `check-run` or
   `attempt`.
 - Edit or delete an evidence row. Every correction you make is a new row.
 - Re-ask a question: deadlines and their one question, Extend's one re-ask included, are the
-  Maintenance routine's (`waking-issues` § 6).
+  `waking-issues`' (§ 6).
 - Take an action the table below does not list. When the right move is not on it, do not take it:
   write a `signal` (`rule: refused_action`) saying what you would have done and why, and ask the
   person the table names with a Décision.
@@ -54,7 +54,8 @@ repository serving several projects: the log of each.
 **No active maintainer:** where you would ask, write the `signal` (`rule: no_owner`) instead.
 
 **Your own rows sanction your own moves.** A revert you made is preceded by its `signal`
-(`rule: reverted_move`); a pause you made by its `wait`. Never revert either on the next pass.
+(`rule: reverted_move`); a pause you made by its `wait`; a revert of `notes` by its `signal`
+(`rule: notes_reverted`). Never revert any of them on the next pass.
 
 ## The pass
 
@@ -66,7 +67,7 @@ the end of the pass.
 | Broken | Act |
 |---|---|
 | an issue `paused` with no open `wait` row, its move to `paused` more than 5 minutes old (younger: a pause being written) | write the missing wait: ask the first active maintainer « paused, waiting on nothing » with **Resume it**, **Close it**, **I take it**, then a `decision` `wait` on that Décision (`owner` the maintainer, `resumeAt` the stage the status before the pause implies, `waking-issues` § 7, deadline per § Thresholds, `data.question`). The status stays `paused`. Then the factory-bug issue |
-| an open `wait` whose target resolved (`evidence-kinds.md` § Targets) more than 90 minutes ago (the Maintenance routine's hourly pass missed it) | nothing to the wait: the `signal`, the factory-bug issue, and a Décision naming the issues |
+| an open `wait` whose target resolved (`evidence-kinds.md` § Targets) more than 90 minutes ago (`waking-issues`' hourly pass missed it) | nothing to the wait: the `signal`, the factory-bug issue, and a Décision naming the issues |
 | an open `wait` on an issue that is not `paused`, with no person's move out of `paused` newer than it (an agent's move is § 2's to revert, as `waking-issues` § 5 leaves it), more than 90 minutes old | the same: `signal`, factory-bug issue, Décision |
 
 **The factory-bug issue:** one open issue per broken rule, in the project of the issue that broke
@@ -95,7 +96,7 @@ A record created directly at a status (by `importing-github-issues`, `shaping-fe
 `releasing-downstream`, or the « Factory operations log » you create `done`) is a creation, not an
 agent status move: its first status is never reverted. A move to `paused` with no
 wait is § 1, not a revert. An agent's move into `paused` of an issue that
-was `mine` is reverted. A revert out of `done` cannot undo what the Maintenance routine already did on
+was `mine` is reverted. A revert out of `done` cannot undo what `waking-issues` already did on
 that move (waits on the issue it resolved): name those issues in the Décision.
 
 ### 3. Notes written by an agent
@@ -103,7 +104,9 @@ that move (waits on the issue it resolved): name those issues in the Décision.
 On every repository (a `projects` record with a `fullName`), the activity since your previous pass
 on `notes`. A person's write stands. An agent's write does not: the `signal`
 (`rule: notes_reverted`) on the operations log, **revert** `notes` to its previous value, then a
-Décision to the maintainers of the repository's projects naming both values and the writer. The
+Décision to the maintainers of the repository's projects naming both values and the writer. Your
+own revert is an agent write too, sanctioned by that `signal`: a write to `notes` that a
+`notes_reverted` signal names stands, never reverted again. The
 other facts of a repository are discovered, never stored, so there is nothing else to revert.
 
 ### 4. Waits with no active owner
@@ -114,7 +117,7 @@ An open `wait` whose `owner` is empty, an agent, or deactivated:
   it (same `issue`, `target`, `waitKind`, `resumeAt`, `data`, the deadline unchanged) with `owner`
   the first active maintainer and a `body` citing the old row (`evidence:<id>`) and why, then the
   `signal` (`rule: wait_rerouted`, `subject: evidence:<old id>`). The old row stays as it is; the
-  Maintenance routine ends both when the target resolves, and asks at the deadline. A wait already
+  `waking-issues` ends both when the target resolves, and asks at the deadline. A wait already
   re-routed (a `wait_rerouted` signal on it) is never re-routed again.
 - no active maintainer: the `signal` (`rule: no_owner`), once.
 
@@ -151,7 +154,7 @@ not moved in 24 hours. None: **open it** in the first project the repository ser
 
 ### 8. Décisions piling up
 
-Deadlines are the Maintenance routine's alone: it asks once per wait, and a wait cited in an
+Deadlines are `waking-issues`' alone: it asks once per wait, and a wait cited in an
 `escalation` is never asked about again (`waking-issues` § 6). You never group, list or re-ask
 waits.
 
@@ -199,7 +202,7 @@ biggest consumers; **Resume launching**, **Raise the budget** (say to what)), th
 umbrella of the project with a `ready` task not yet launched, neither `mine` nor `paused`, a
 `decision` `wait` on that Décision (`resumeAt: screening`, deadline + 14 days) and the move to
 `paused`. A task of a `paused` umbrella is not launched (`working-on-issues` § Launch). The answer
-ends the waits through the Maintenance routine; an unanswered Décision keeps launching stopped until
+ends the waits through `waking-issues`; an unanswered Décision keeps launching stopped until
 the deadline. An answered budget Décision covers the current period: skip this check until the
 period ends or the budget in the project's `context` changes (its activity shows the edit).
 

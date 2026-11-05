@@ -70,13 +70,13 @@ repository: read its facts (`working-on-issues` § Repository facts), which leav
 | an issue created | that issue, unless it is already `done` (the Maintenance routine's « Factory operations log » is created closed and never screened) |
 | a `woke` row with `resumeAt: screening` | that issue; any other `resumeAt`: stop |
 | an `assessment` row with `resumeAt: screening` (`verdict: approved`) | that issue: the maintainer approved the feature |
-| the daily pass | every `backlog` issue that needs screening (below), oldest first |
+| the daily pass | every `backlog` issue that needs screening (below), oldest first; then every `backlog` feature whose latest `screening` row is `assess` with no newer `assessment` row: run `assessing-features` on it |
 | the daily pass on a Monday | the same, then § Weekly sweep |
 
 **Needs screening:** status `backlog`, not an umbrella, and one of: no `screening` row yet; a
 `woke` row or a person-written status move newer than its latest `screening` row; an `assessment`
 row `verdict: approved` newer than its latest `screening` row `verdict: assess`. Otherwise a
-feature whose latest verdict is `assess` belongs to assessment: leave it.
+feature whose latest verdict is `assess` belongs to assessment: do not screen it again.
 
 An empty list is a correct outcome: report it and stop. Never widen the search.
 
@@ -176,7 +176,7 @@ only for `assess`), then act:
 | `hold` | beyond one change (§ 5) | pause: `task` wait to the project's first active maintainer for a spec (`shaping-features`), `resumeAt: screening`. Propose the split into one-change issues in the Task |
 | `hold` | the right fix changes a public contract, a security posture or an agent's authority | pause: `decision` wait, the one question that forks the work |
 | `hold` | it needs something not yet done: another issue, a pull request, a date, a person's artifact | pause on that `blocker`, `date` or `task` wait |
-| `assess` | `type: feature`, no `assessment` row `approved` since its last `assess` verdict | status stays `backlog`; the row carries `resumeAt: assessment`, which the same Triage run continues into (`assessing-features`), so it is written last (below) |
+| `assess` | `type: feature`, no `assessment` row `approved` since its last `assess` verdict | status stays `backlog`; the row carries `resumeAt: assessment`, which marks where the same Triage run continues into `assessing-features` (no trigger fires), so it is written last (below) |
 | `ready` | every claim resolves, no family owns it, it fits one change, and for a feature an `assessment` row with `verdict: approved` | status `ready`; for a task of an umbrella (it has a `parent`), leave the status `backlog`: the person's drag to `ready` is its launch |
 
 Every pause follows `working-on-issues` § Pausing: check the target first, make it exist, the
@@ -189,8 +189,8 @@ re-litigates it.
 
 Then rewrite `handoff` (verdict, the evidence, what the next stage needs), release the lease,
 re-read the issue and check the state you meant to leave. **The one exception to that order:** an
-`assess` verdict's row carries `resumeAt: assessment` and marks the hand-off to assessment, which
-this run continues into, so write it **last**, after `handoff` and the lease release (`working-on-issues`
+`assess` verdict's row carries `resumeAt: assessment` and marks where this run continues into
+assessment (it triggers nothing), so write it **last**, after `handoff` and the lease release (`working-on-issues`
 § Finish).
 
 ## Weekly sweep

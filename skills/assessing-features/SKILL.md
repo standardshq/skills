@@ -17,7 +17,7 @@ maintainer approved) and never close one (the Maintenance routine applies « Clo
 
 | Run | Do |
 |---|---|
-| a `screening` row with `resumeAt: assessment` (`verdict: assess`), written by this same Triage run or an earlier one | assess that issue |
+| a `screening` row with `resumeAt: assessment` (`verdict: assess`), written by this same Triage run, which continues here, or by an earlier one that died, taken up by the daily pass | assess that issue |
 | a `woke` row with `resumeAt: assessment` | § After the answer; any other `resumeAt`: stop |
 
 Only `type: feature` belongs here: an enhancement is screened and built without a product ruling.

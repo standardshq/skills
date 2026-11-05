@@ -7,8 +7,9 @@ yours to act on (claimed by another live lease, not your stage, not launched).
 2. **Intent**, then the sections: `problem`, `acceptance`, `context`, `plan`, `handoff`. `handoff`
    is where the last agent stopped; trust it as a lead, verify it as a claim.
 3. **The project:** read `project`, then its `context` (purpose, conventions, how to run and
-   check it) and `maintainers`. Read the repository's facts (`SKILL.md` § Repository facts) and its own agent rules
-   (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) at run time; never copy them into the issue.
+   check it) and `maintainers`. When your stage acts on a repository (Intake never does), read its facts (`SKILL.md` § Repository
+   facts) and its own agent rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) at run time; never
+   copy them into the issue.
 4. **Open waits:** `evidence` with `kind: wait` and empty `resolvedAt`: `waitKind`, `target`,
    `owner`, `resumeAt`, `data.deadline`. An open wait on an issue that is not `paused` was released
    by a person's move: the Maintenance routine will record it; do not act on it as a hold.

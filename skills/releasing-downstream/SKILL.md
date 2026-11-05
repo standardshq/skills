@@ -18,10 +18,12 @@ it is an ordinary issue of the repository.
 
 No event announces a merge to you: you look. **The repositories to check** come from discovery
 (`working-on-issues` § Repository facts): run it on every repository of the workspace, with
-`--listed` naming each one's packages, and read its `consumes`. A repository some other one lists
+`--listed` naming each one's packages (the `name` of every `package.json` its manifests hold,
+read with the GitHub tools), and read its `consumes`. A repository some other one lists
 in `consumes` is released; the repositories listing it are its `consumedBy`. The hourly pass checks
 every released repository, one at a time (a failure on one never stops the next: note it in your
-report and go on).
+report and go on). When any consumer's discovery failed, skip the release pass for the
+repository it consumes: `consumes` is then incomplete, and a bump could be missed.
 
 **The last release you recorded** is the sha in the `context` of the newest release umbrella of
 that repository (title « Release owner/repo <version> »). It is the only cursor, and the sha (and
@@ -39,8 +41,7 @@ Then stop for that repository, writing nothing, when any holds:
 - a release umbrella for that repository and that sha (or tag) exists: another run already
   opened it;
 - every consumer already depends on the candidate's version (read their `package.json` with the
-  GitHub tools, before any checkout): nothing to bump, and nothing to record, so the next pass
-  repeats only this cheap read.
+  GitHub tools, before any checkout): nothing to bump, and nothing to record.
 
 **The version** is what consumers bump to: the `version` of each released package at that commit
 (`package.json`), or the tag on the commit when the repository tags releases. Read it at that

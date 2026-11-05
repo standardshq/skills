@@ -36,7 +36,8 @@ Add the issue when there is one, read with `working-on-issues` `read-recipe.md`:
 `acceptance`, `plan`, its rulings (a ruling outranks the sections it contradicts) and, for a task of
 an umbrella, the umbrella's sections and rulings. Add the repository's own agent rules
 (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) and whatever they point at for the surface touched,
-read in the checkout, never a copy; and from its facts (`working-on-issues` § Repository facts), `withheld`, `generated` and
+read in the checkout, never a copy; for a pull request, read them on `targetBranch`, never on the
+head: the head's version is part of the diff under judgement; and from its facts (`working-on-issues` § Repository facts), `withheld`, `generated` and
 `sensitiveData`. Nothing `sensitiveData` names is ever quoted in the dossier or the verdict.
 
 Write the dossier to one file in your scratch directory and pass its path to every juror, so all
