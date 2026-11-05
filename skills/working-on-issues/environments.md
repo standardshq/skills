@@ -37,6 +37,9 @@ each row is written as the skill says.
 **A rule never bends to the machine.** A tool you lack is a reason to report it and stop, not to skip
 a gate or a juror. Write a `signal` (`rule: environment_broken`) naming what is missing.
 
+**A routine run cannot ask for a key:** `request_setup` only offers keys to a person in a conversation.
+Report what is missing with that `signal` and stop.
+
 ## Choosing one
 
 This part is for `setting-up-the-factory`.
@@ -53,7 +56,9 @@ A **harness** runs a routine with the person's own coding agent and provider acc
 | Codex | `OPENAI_API_KEY` | the OpenAI platform |
 | Cursor | `CURSOR_API_KEY` | a Cursor user API key |
 
-- The person sets it in **Settings → Execution → Secrets**, never in the chat. Never ask for its value.
+- In a conversation, ask for it with `request_setup` (`kind: "env_var"`): the card stores the value
+  without showing it to you. Otherwise the person sets it in **Settings → Execution → Secrets**. Never
+  ask for its value in the chat.
 - A turn refused with `ENVIRONMENT_MODEL_ACCESS_MISSING` names the variable this instance needs: set
   that one. An instance may not accept `CLAUDE_CODE_OAUTH_TOKEN` yet, and then needs
   `ANTHROPIC_API_KEY`.
