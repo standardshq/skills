@@ -25,7 +25,7 @@ checkout. Never hand-assemble what a script prints.
 
 | Script | Prints | Exit |
 |---|---|---|
-| `issue-freshness.mjs <issue-id> --input <file> --checkout <dir> --branch <targetBranch>` | every `issues:<id>`, `#N`, `owner/repo#N` and path the issue cites, resolved on the branch: `STALE`, `MISSING`, `UNDATED`, `SHORT` or `ok` | 0 all hold; 1 a claim no longer holds; 2 usage or input error |
+| `issue-freshness.mjs <issue-id> --input <file> --checkout <dir> --branch <targetBranch>` | every `issues:<id>`, `#N`, `owner/repo#N` and path the issue cites, resolved on the branch: `STALE`, `MISSING`, `UNDATED`, `SHORT` or `ok` | 0 all hold; 1 a claim no longer holds; 2 usage or input error, or the export lacks `projects` |
 | `issue-duplicates.mjs --input <file> --project <id> [--issue <id>]` | candidate duplicate pairs: open issues each pair once, or one issue against every other, closed ones included | 0 printed; 1 usage or input error; 2 the export lacks `projects` |
 | `saga-scan.mjs --checkout <dir> --branch <targetBranch>` | files corrected by three or more fixes (sagas), names three or more fixes had to add across modules (bindings) | 0 printed; 1 git failed |
 | `issue-families.mjs --input <file> --project <id> [--issue <id>]` | families of open issues that may ship under one plan; used by `assessing-features` | 0 printed; 1 usage or input error; 2 the export lacks `projects` |
@@ -34,8 +34,7 @@ A usage or input error is not a finding: fix the call or the export and run it a
 
 **The export** (`--input`): one JSON file per run, in your scratch directory, holding every issue
 filed on the project record or any record under it, every status, with the `projects` records of
-that tree, so a root covers its repositories. A scripted `--project` run on a bare array of issues
-exits 2: the export must carry `projects`.
+that tree, so a root covers its repositories. `issue-freshness.mjs`, and every script run with `--project`, exit 2 on an export without `projects` (a bare array, or a `data` wrapper alone).
 
 ```json
 {

@@ -106,7 +106,7 @@ export function rootOf(parents, id) {
  * `readIssues` when a project filter applies), or a `{ data: [...],
  * projects: [{ id, parent }] }` wrapper.
  */
-export async function readExport(path) {
+export async function readExport(path, { requireTree = false } = {}) {
   if (typeof path !== "string") throw new Error("pass --input <issues.json>");
   const parsed = JSON.parse(await readFile(path, "utf8"));
   const issues = Array.isArray(parsed) ? parsed : parsed?.data;
@@ -116,9 +116,16 @@ export async function readExport(path) {
       throw new Error(`${path}: every issue needs an id and values`);
     }
   }
+  if (requireTree && !Array.isArray(parsed?.projects)) {
+    throw Object.assign(
+      new Error(
+        `${path} carries no \`projects\`: the export must be { "projects": [...], "data": [...] }, so a root covers its repositories`,
+      ),
+      { exitCode: 2 },
+    );
+  }
   return {
     issues,
-    bare: Array.isArray(parsed),
     parents: treeOf(Array.isArray(parsed) ? [] : parsed.projects),
   };
 }
@@ -128,13 +135,7 @@ export async function readExport(path) {
  * any record under it (a root covers its repositories).
  */
 export async function readIssues(path, project) {
-  const { issues, parents, bare } = await readExport(path);
-  if (project && bare) {
-    throw Object.assign(
-      new Error(`${path} is a bare array: with --project the export must carry \`projects\` ({ "projects": [...], "data": [...] })`),
-      { exitCode: 2 },
-    );
-  }
+  const { issues, parents } = await readExport(path, { requireTree: Boolean(project) });
   return project
     ? issues.filter((issue) =>
         idsOf(valuesOf(issue).project).some((each) => isUnder(parents, each, project)),

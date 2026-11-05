@@ -180,7 +180,7 @@ async function main() {
     return;
   }
   const branch = typeof args.branch === "string" ? args.branch : undefined;
-  const { issues, parents } = await readExport(args.input);
+  const { issues, parents } = await readExport(args.input, { requireTree: true });
   const byId = new Map(issues.map((issue) => [issue.id, issue]));
   let problems = 0;
   for (const id of args._) {
