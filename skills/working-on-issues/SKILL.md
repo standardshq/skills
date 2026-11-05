@@ -50,6 +50,9 @@ memory of an earlier pass. Intake never does.
    through `notes` turns `none` into `verify` and `ci` into `both`; a path added is withheld.
    `both` exists only this way; the script never prints it.
 
+Before running a repository's commands, install the package manager it declares (for example
+`sudo npm i -g pnpm@<version>`), once per sandbox.
+
 The facts are read from the target branch, never from a pull request's head: a pull request that
 edits `CODEOWNERS`, a workflow or the repository's `## Factory` section is judged on the target
 branch's values. `context` and `maintainers` are read on the project, walking up to the root.
