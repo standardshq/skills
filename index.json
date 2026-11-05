@@ -1,9 +1,5 @@
 [
   {
-    "name": "adding-repositories",
-    "description": "Use when a maintainer asks to add a repository to the factory, change how one is gated, merged or run, or check that one is healthy. Proposes every repositories field with where it came from, runs the health check, refuses a repository with no gate, and writes the record only after an approval Décision naming the repository."
-  },
-  {
     "name": "asking-for-decisions",
     "description": "Use when a factory routine needs a person's answer before an issue can move: a product or architecture call, an approval, a mockup to approve, a passed deadline. Asks one forking question as a Décision written as a briefing, opens the decision wait, and records the answer as a ruling."
   },
@@ -66,6 +62,10 @@
   {
     "name": "screening-issues",
     "description": "Use when the Triage routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait."
+  },
+  {
+    "name": "setting-up-the-factory",
+    "description": "Use when a person sets up Factory, adds a repository to it, changes its Slack channel, or asks why it skips a repository."
   },
   {
     "name": "shaping-features",
