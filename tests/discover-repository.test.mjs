@@ -129,6 +129,23 @@ describe("withheld", () => {
     const { facts } = discover({ files: { CODEOWNERS: "/billing/ @x\n" } });
     assert.ok(facts.withheld.split("\n").includes("billing/**"));
   });
+  test("a slash-less CODEOWNERS path covers what is inside it", () => {
+    const { facts } = discover({ files: { CODEOWNERS: "/billing @x\n" } });
+    const lines = facts.withheld.split("\n");
+    assert.ok(lines.includes("billing") && lines.includes("billing/**"));
+  });
+  test("an unanchored CODEOWNERS folder matches at any depth", () => {
+    const { facts } = discover({ files: { CODEOWNERS: "docs/ @x\n" } });
+    assert.ok(facts.withheld.split("\n").includes("**/docs/**"));
+  });
+  test(".github/CODEOWNERS wins over the root one", () => {
+    const { facts } = discover({
+      files: { ".github/CODEOWNERS": "/a/ @x\n", CODEOWNERS: "/b/ @x\n" },
+    });
+    const lines = facts.withheld.split("\n");
+    assert.ok(lines.includes("a/**"));
+    assert.ok(!lines.includes("b/**"));
+  });
   test("AGENTS.md adds a withheld path", () => {
     const { facts } = discover({ files: { "AGENTS.md": "## Factory\nwithheld: secrets/**\n" } });
     assert.ok(facts.withheld.split("\n").includes("secrets/**"));
@@ -144,7 +161,24 @@ describe("target branch", () => {
   test("a checkout on another branch is refused", () => {
     const result = discover({ head: "feature/x" });
     assert.equal(result.status, 3);
-    assert.equal(result.stdout.trim(), '{"targetBranch":"main"}');
+    assert.equal(result.stdout, '{"targetBranch":"main"}');
+  });
+  test("an override naming an unknown branch is ignored", () => {
+    const { facts } = discover({ files: { "AGENTS.md": "## Factory\ntargetBranch: ghost\n" } });
+    assert.equal(facts.targetBranch, "main");
+  });
+  test("a feature branch's AGENTS.md cannot name the target", () => {
+    const result = discover({
+      ...developRepo,
+      head: "feature/x",
+      branches: ["main", "develop", "feature/x"],
+      files: { "AGENTS.md": "## Factory\ntargetBranch: main\n" },
+    });
+    assert.equal(result.status, 3);
+    assert.equal(result.stdout, '{"targetBranch":"develop"}');
+  });
+  test("pathGates is empty", () => {
+    assert.equal(discover().facts.pathGates, "");
   });
   test("AGENTS.md names the branch", () => {
     const { facts } = discover({
