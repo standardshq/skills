@@ -293,8 +293,7 @@ every other chain has finished, one batch at a time on one stack:
    ```
 
    No announcement channel named, or an upload that fails: one line in your report; the row
-   stands. Never the project's intake channel: the curator would read the announcement as a
-   request.
+   stands.
 
 A stack that stays down after one retry ends the demos of the run: every batched head gets `demo`
 `skipped` (`reason: "stack"`, the failing step's output) and merges nothing; a second run in a row
