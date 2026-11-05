@@ -96,9 +96,9 @@ the first run after install, pass `--weeks 12` to draw the history the forecast 
 | `first_round_go_rate` | every record | merged pull requests whose first `verdict` said `go`; verdicts imported from GitHub (`data.imported`) are left out |
 | `autonomy_rate`, `interventions_per_issue` | every record | issues closed `done` with no intervention (a `ruling`, or a person's status move other than the launch; the status set at creation is not a move); the mean count |
 | `scout_precision` | every record | issues with a `scout:` origin closed in the week that closed `done` |
-| `no_deploy_data` | a record with a repository at or below it | 1 when none of those repositories has a deploy workflow: no deploy rows then |
-| `deployment_frequency`, `lead_time`, `change_failure_rate`, `recovery_time` | a record with a repository at or below it | deploys in the week; median hours merge → deploy; failed deploys over deploys; median hours from a failed deploy to the next good one |
-| `rework_rate` | a record with a repository at or below it | bugs created in the week citing an issue of those repositories merged less than 30 days before, over the issues merged in the week; written with or without a deploy workflow, since it counts bugs, not deploys |
+| `no_deploy_data` | a record with repositories (`working-on-issues` § Repository facts) | 1 when none of those repositories has a deploy workflow: no deploy rows then |
+| `deployment_frequency`, `lead_time`, `change_failure_rate`, `recovery_time` | a record with repositories | deploys in the week; median hours merge → deploy; failed deploys over deploys; median hours from a failed deploy to the next good one |
+| `rework_rate` | a record with repositories | bugs created in the week citing an issue of those repositories merged less than 30 days before, over the issues merged in the week; written with or without a deploy workflow, since it counts bugs, not deploys |
 
 Umbrellas and every issue with `origin: operator` (the « Factory operations log », factory-bug
 issues, target-branch issues) are left out of every issue measure. The script writes each series

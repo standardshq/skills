@@ -31,7 +31,7 @@ function write(root, path, content) {
 const requiredCheck = (context) => [
   { type: "required_status_checks", parameters: { required_status_checks: [{ context }] } },
 ];
-const pull = (base, head = "feature") => ({ baseRefName: base, headRefName: head });
+const pull = (base) => ({ baseRefName: base });
 
 /** A real git clone and a folder of GitHub JSON, then one run of the script. */
 function discover({
@@ -97,7 +97,6 @@ describe("merge", () => {
 describe("gate", () => {
   test("a required check gives ci", () => {
     const { facts } = discover({ rules: requiredCheck("build") });
-    assert.equal(facts.source, "ci");
     assert.equal(facts.gate, "ci");
   });
   test("check and verify give ci", () => {
@@ -110,13 +109,11 @@ describe("gate", () => {
   test("verify alone", () => {
     const { facts } = discover({ files: { "package.json": { scripts: { test: "x" } } } });
     assert.equal(facts.gate, "verify");
-    assert.equal(facts.source, "factory");
   });
   test("no check and no verify still produces facts", () => {
     const result = discover();
     assert.equal(result.status, 0);
     assert.equal(result.facts.gate, "none");
-    assert.equal(result.facts.source, "factory");
     assert.equal(result.facts.verify, "");
   });
 });
@@ -137,6 +134,12 @@ describe("withheld", () => {
   test("an unanchored CODEOWNERS folder matches at any depth", () => {
     const { facts } = discover({ files: { CODEOWNERS: "docs/ @x\n" } });
     assert.ok(facts.withheld.split("\n").includes("**/docs/**"));
+  });
+  test("an unanchored CODEOWNERS file or name matches at any depth", () => {
+    const { facts } = discover({ files: { CODEOWNERS: "*.js @x\nfoo @x\n" } });
+    const lines = facts.withheld.split("\n");
+    for (const path of ["**/*.js", "**/foo", "**/foo/**"]) assert.ok(lines.includes(path), path);
+    for (const path of ["*.js", "foo", "foo/**"]) assert.ok(!lines.includes(path), path);
   });
   test(".github/CODEOWNERS wins over the root one", () => {
     const { facts } = discover({
@@ -189,9 +192,6 @@ describe("target branch", () => {
     });
     assert.equal(result.status, 3);
     assert.equal(result.stdout, '{"targetBranch":"develop"}');
-  });
-  test("pathGates is empty", () => {
-    assert.equal(discover().facts.pathGates, "");
   });
   test("AGENTS.md names the branch", () => {
     const { facts } = discover({

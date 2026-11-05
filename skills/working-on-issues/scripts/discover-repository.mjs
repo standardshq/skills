@@ -157,8 +157,9 @@ function factoryInstructions(agents) {
 function ownedGlobs(pattern) {
   const body = pattern.replace(/^\//, "");
   const anchored = pattern.startsWith("/") || body.replace(/\/$/, "").includes("/");
-  if (body.endsWith("/")) return [`${anchored ? "" : "**/"}${body}**`];
-  return /[*?[]/.test(body) ? [body] : [body, `${body}/**`];
+  const prefix = anchored ? "" : "**/";
+  if (body.endsWith("/")) return [`${prefix}${body}**`];
+  return /[*?[]/.test(body) ? [`${prefix}${body}`] : [`${prefix}${body}`, `${prefix}${body}/**`];
 }
 
 /** The globs of every path a person owns; the catch-all `*` owns nothing in particular. */
@@ -186,21 +187,7 @@ function branchFacts({ pulls, branches, defaultBranch, head, override }) {
   // The checked-out branch may name the target only from where the work starts.
   const honoured =
     override && branches.includes(override) && [override, defaultBranch].includes(head);
-  const targetBranch = honoured ? override : derived;
-  const promotes = targetBranch !== defaultBranch;
-  const backMerge =
-    promotes &&
-    pulls.some(
-      (pull) =>
-        (pull.headRefName ?? pull.head?.ref) === defaultBranch &&
-        (pull.baseRefName ?? pull.base?.ref) === targetBranch,
-    );
-  return {
-    targetBranch,
-    productionBranch: defaultBranch,
-    promotion: promotes ? "pull-request" : "none",
-    backMerge,
-  };
+  return { targetBranch: honoured ? override : derived, productionBranch: defaultBranch };
 }
 
 function verifyCommands({ scripts, pm, workflowCommands, skipped }) {
@@ -342,9 +329,7 @@ export async function discover({ checkout, github, listed = [] }) {
     }),
     mode: queue ? "queue" : "human",
     method,
-    source: checks.length ? "ci" : "factory",
     verify: verify.join("\n"),
-    pathGates: "",
     withheld: (await withheldGlobs({ checkout, files, extra: instructions.withheld })).join("\n"),
     generated: (await generatedFiles(checkout)).join("\n"),
     sensitiveData: envFiles.length ? `Values of the variables named in ${envFiles.join(", ")}` : "",

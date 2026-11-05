@@ -175,8 +175,7 @@ the Maintenance routine's: its wait ends, it wakes, and screening closes it. A l
 carried beside the plan gets its own issue, as `curating-requests` writes one; an input that was
 `mine` keeps that ask in the maintainer's lane.
 
-*Done when* every task is listed under the umbrella (query `issues` filtered on `parentId`: never read
-`childIds`, which holds six at most), each task's `blockedBy` matches
+*Done when* every task is listed under the umbrella (`working-on-issues` § Launch says how), each task's `blockedBy` matches
 the table, the umbrella's `context` names every task, and every input issue says where its ask
 went.
 

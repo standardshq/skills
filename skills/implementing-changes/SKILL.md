@@ -313,8 +313,7 @@ listed in the PR body. Re-run only the failing lens.
   `verify`, narrowed to the changed files. Not the full suite — that is CI's
   job, or the Review routine's.
 - The other commands of `verify` (typecheck, lint), filtered to the changed
-  package when the tool allows it, and each `pathGates` command whose path the
-  change touches.
+  package when the tool allows it.
 - Every acceptance assertion exists in a test and passes.
 - Then push and let CI run the rest.
 

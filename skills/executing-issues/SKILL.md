@@ -54,11 +54,11 @@ asks is still missing). When the work already landed, or the premise is gone, th
 close: pause on a `decision` wait to the person who launched it (« Close it » recommended, naming
 the change that overtook it), release the lease. Not a failure: no `attempt`.
 
-**The workspace:** the repositories of the issue's `project` (the `projects` records with a `fullName` at or under it), checked out in your environment (an issue spanning
+**The workspace:** the repositories of the issue's `project`, checked out in your environment (an issue spanning
 several gets every checkout). Per repository: read its facts (`working-on-issues` § Repository
 facts), fetch `targetBranch`, cut a branch from it, named as the repository's rules say (by default `fix/<slug>`, `feat/<slug>`
 or `chore/<slug>`). Read the repository's own agent
-rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) there, and use the facts: `verify`, `pathGates`,
+rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) there, and use the facts: `verify`,
 `withheld`, `generated`, `sensitiveData`, `boot`, `apps`, `reset`.
 
 ## 3. Implement
@@ -91,7 +91,7 @@ Paths:
 Each pause: `resumeAt: execution`, handoff, then release the lease. Not a failure: no `attempt`.
 
 *Done when* every acceptance assertion exists in a test and passes, and every command of `verify`
-(plus each `pathGates` command whose path the change touches) is clean on the branch.
+is clean on the branch.
 
 ## 4. Open the pull request
 

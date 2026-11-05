@@ -18,8 +18,8 @@ terms.
 | Asked | Do |
 |---|---|
 | set up Factory | every step, in order |
-| add a repository | steps 1 to 4; ask whether they have a Factory environment, and if so, the end of step 7 |
-| change the Slack channel, or who may raise requests | step 5 |
+| add a repository | steps 1 to 4, then step 7 for the new repository |
+| change the Slack channel, or who may raise requests | step 5, then the announcement line of step 6 if it named that channel |
 | why does it skip this repository | § Why it skips; write nothing |
 
 ## 1. Connections
@@ -97,13 +97,19 @@ private one needs `/invite @Standards` before the card. Read `intake` with `get_
 - A trigger already there (`get_agents` shows its `id`, not its channel): pass that `id`, and ask
   them to confirm the channel on the routine's page.
 
-## 6. GitHub access
+## 6. GitHub and Slack access
 
 Add GitHub to `triage`, `build`, `review` and `maintenance`, one `upsert_agent` card each, grouped in
 one message so they can approve them in a row. `toolGroups` replaces the whole list: read each routine with `get_agents` (`id`) and send its list plus
 `github:<id>` for **every** installation in `resources`, with its `revision`. A routine granted a
 different installation than the person's link gets no token; extra grants are harmless. Skip one
 that already holds them all.
+
+When Slack is connected, add `slack.write:<id>` to `review`'s list on the same card, with the
+installation's `id` from step 1: Review announces finished features in Slack. Ask which channel those
+announcements go to; by default, the channel of step 5. Write one line in each root project's
+`context` naming it with its id, since Review cannot look a channel up: "Announcements:
+#<name> (<channel id>)." A line already there stays, unless they ask to change it.
 
 ## 7. What the repositories need
 

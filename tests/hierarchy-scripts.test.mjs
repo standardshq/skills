@@ -220,9 +220,11 @@ test("an export without a projects tree exits 2 in every script that reads one",
   writeFileSync(bare, JSON.stringify(rows));
   writeFileSync(wrapped, JSON.stringify({ data: rows }));
   const script = (name) => join(skills, "screening-issues/scripts", name);
-  const exit = (name, ...args) =>
-    spawnSync(process.execPath, [script(name), ...args], { encoding: "utf8" }).status;
-  assert.equal(exit("issue-duplicates.mjs", "--input", wrapped, "--project", "R"), 2);
-  assert.equal(exit("issue-families.mjs", "--input", bare, "--project", "R"), 2);
-  assert.equal(exit("issue-freshness.mjs", "i1", "--input", bare, "--checkout", dir), 2);
+  const spawn = (name, ...args) =>
+    spawnSync(process.execPath, [script(name), ...args], { encoding: "utf8" });
+  assert.equal(spawn("issue-duplicates.mjs", "--input", wrapped, "--project", "R").status, 2);
+  assert.equal(spawn("issue-families.mjs", "--input", bare, "--project", "R").status, 2);
+  const freshness = spawn("issue-freshness.mjs", "i1", "--input", bare, "--checkout", dir);
+  assert.equal(freshness.status, 2);
+  assert.match(freshness.stderr, /carries no `projects`/);
 });

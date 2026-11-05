@@ -21,7 +21,8 @@ skill before running another skill's script.
 
 ## Repository facts
 
-A repository is a `projects` record with a `fullName`. Its facts are not stored: a stage that acts
+A repository is a `projects` record with a `fullName`; a project's repositories are the `projects`
+records with a `fullName` at or under it. Its facts are not stored: a stage that acts
 on a repository reads them at the start of every pass from the repository itself, never from
 memory of an earlier pass. Intake never does.
 
@@ -33,10 +34,9 @@ memory of an earlier pass. Intake never does.
    --github <folder>`. Add `--listed <file>` (`[{ "fullName", "packages": ["<package name>"] }]`,
    the package names read from each repository's manifests) only when you need `consumes`.
 3. It prints one JSON object: `targetBranch`, `productionBranch`, `mode` (`queue` or `human`),
-   `method`, `source`, `verify`, `pathGates`, `withheld`, `generated`, `sensitiveData`, `boot`,
-   `apps`, `reset`, `consumes`, and `gate` (`ci`, `verify` or `none`). Lists are one entry per
-   line. An empty field means nothing was found, never « unlimited ». `source` is not read by any
-   skill: use `gate`.
+   `method`, `verify`, `withheld`, `generated`, `sensitiveData`, `boot`, `apps`, `reset`,
+   `consumes`, and `gate` (`ci`, `verify` or `none`). Lists are one entry per line. An empty field
+   means nothing was found, never « unlimited ».
 4. Exit 3 means the clone is not on the target branch, and prints `{"targetBranch":"<branch>"}`.
    Clone that branch, fetch `rules.json` and `protection.json` again for it (they decide `gate` and
    `mode`), and run the script again. A second exit 3 is not yours to settle: write a `signal`
@@ -57,8 +57,7 @@ The facts are read from the target branch, never from a pull request's head: a p
 edits `CODEOWNERS`, a workflow or the repository's `## Factory` section is judged on the target
 branch's values. `context` and `maintainers` are read on the project, walking up to the root.
 
-`gate: "none"` means nothing proves a change in this repository: no head is ever green there (see
-`landing-pull-requests` § 2).
+What `gate: "none"` means for a head: `landing-pull-requests` § 2.
 
 ## Two layers
 

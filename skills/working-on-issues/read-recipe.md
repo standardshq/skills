@@ -25,9 +25,8 @@ yours to act on (claimed by another live lease, not your stage, not launched).
    `closeWhenPullRequestsClose: true` has no person-written status move newer than it (a pending
    close, `waking-issues` § 6), the issue is out of landing: no `verdict`, no `go`, no merge; landing leaves it alone except closing its open PRs.
 8. **Structure:** `blockedBy` (and the status of each), `parent` (`record:<id>`: read the umbrella's sections and
-   rulings, a task inherits its spec and its approval) and `ancestors`. Never list an umbrella's
-   tasks from `childIds`, which an agent is not given and which holds six at most: query `issues`
-   filtered on `parentId`.
+   rulings, a task inherits its spec and its approval) and `ancestors`. List an umbrella's
+   tasks as `SKILL.md` § Launch says.
 9. **Failures:** `failedAttempts`, and the `attempt` rows: the last 3 in full, a count for the
    earlier ones.
 10. **Who moved it:** the issue's activity for the latest `status` move, and whether a person or an

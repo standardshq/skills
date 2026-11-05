@@ -61,7 +61,7 @@ that tree, so a root covers its repositories. `issue-freshness.mjs`, and every s
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to
    `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
 
-**The checkout:** the repositories of the project (the `projects` records with a `fullName` at or under the issue's `project`), each checked out in your environment. Per
+**The checkout:** the repositories of the issue's `project`, each checked out in your environment. Per
 repository: read its facts (`working-on-issues` § Repository facts), which leaves the checkout on
 `targetBranch`, then `git -C <dir> rev-parse origin/<targetBranch>` for the sha your
 `screening` row names. Read the repository's own agent rules (`AGENTS.md`, `CLAUDE.md`,

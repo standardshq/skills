@@ -176,7 +176,7 @@ From the factory routines' run history:
 Once a day (your first pass after 06:00 UTC), per repository, on its discovered facts
 (`working-on-issues` § Repository facts): the repository readable through the GitHub app, `boot`
 answers when set, the `verify` commands pass on a fresh clone of `targetBranch`. A repository whose
-`gate` is `none` is not unhealthy: nothing proves its changes, which Review already says. A failure:
+`gate` is `none` is not unhealthy (`landing-pull-requests` § 2). A failure:
 the `signal` (`rule: repository_unhealthy`, `subject: projects:<id>`, the failed lines in `body`) on
 the « Factory operations log » of each of its projects, which the Factory economics page's Health
 block lists, then a Décision to the maintainers of its projects, unless one about that repository
