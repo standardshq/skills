@@ -73,7 +73,7 @@ Write in the language the person uses in the workspace. No em dash in the text.
 | the Maintenance routine | everything it asks, except the missing wait of a broken invariant and the budget stop, where its action is the wait | `operating-the-factory` |
 | Review in `human` mode | « Merge it » on a go head: the merge itself is the answer | `landing-pull-requests` § 7 |
 | Review on a repository whose `gate` is `none` | « Merge it » on a head judged go, saying nothing proves the change; the merge itself is the answer | `landing-pull-requests` § 2 and § 7 |
-| Review on a command failing on the target branch too (`rule: target_red`) | the target branch is red: **Wait for the repair**, **Run them anyway**, **I take it** | `landing-pull-requests` § 2 |
+| Review on a command failing on the target branch too (`rule: target_red`) | the target branch is red: **Repair the target** or **Remove the command with `skipVerify` in `AGENTS.md`**; either moves the target's sha, so the answer itself changes nothing, opens no wait and routes no ruling | `landing-pull-requests` § 2 |
 | any stage on a second exit 3 of discovery (`rule: target_unresolved`) | which branch is the target of the repository | `working-on-issues` § Repository facts |
 
 Their rulings are recorded as § 4 says. « I take it » and « Close it » are applied by the Maintenance

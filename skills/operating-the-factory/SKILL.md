@@ -93,7 +93,7 @@ person:
 3. a Décision to the first active maintainer naming the agent, the move and the revert.
 
 A record created directly at a status (by `importing-github-issues`, `shaping-features`,
-`releasing-downstream`, or the « Factory operations log » you create `done`) is a creation, not an
+`releasing-downstream`, or the « Factory operations log » created `done`) is a creation, not an
 agent status move: its first status is never reverted. A move to `paused` with no
 wait is § 1, not a revert. An agent's move into `paused` of an issue that
 was `mine` is reverted. A revert out of `done` cannot undo what `waking-issues` already did on

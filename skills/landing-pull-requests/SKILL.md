@@ -5,8 +5,8 @@ description: Use when the Review routine runs, on an issue moved to In review, a
 
 # Landing pull requests
 
-Four actors, never the same subagent: the **landing run** reads, routes, and merges; a **fixer**
-writes code on the branch; a **juror** judges a head; a **demonstrator** performs what a batch of
+Five actors, never the same subagent: the **landing run** reads, routes, and merges; a **merger**
+brings `targetBranch` into a branch when the target moved; a **fixer** writes code on the branch; a **juror** judges a head; a **demonstrator** performs what a batch of
 go heads promises on the running stack, on video. The one who wrote the fix never decides it is
 good.
 
@@ -16,8 +16,8 @@ Judge with `evaluating-changes` (`SOLO.md`). Ask people with `asking-for-decisio
 
 **What landing moves:** pull requests, and nothing else. You never take an issue's lease, never
 move an issue's status except to pause it (§ 7), never close an issue: `done` comes from the merged
-pull request through the Maintenance routine. The one other thing you write is a `signal` or
-Décision about the repository (§ 2), on the operations log when no issue fits.
+pull request through the Maintenance routine. Beside its ledger rows, you write only the signals
+and Décisions of § 2 and § 7, on the operations log when no issue fits.
 
 ## Which pull requests
 
@@ -109,10 +109,11 @@ target branch's values, never its own. Then route on the rows first, the head se
   waits for the next sweep. One in round 2 or 3 is judged loud: its answers and its delta need no
   gate.
 - **target red:** a failed `check-run` on this head whose failing commands (named in its `body`)
-  all fail on `targetBranch` too (and the target's sha has not moved: when it has, merge the target
-  in and re-run the gate, § 2), or a required check failing on the head that fails on the target's
+  all fail on `targetBranch` too (and the target's sha has not moved: when it has, the merger brings the
+  target in and the gate re-runs, a conflict going to a fixer, § 2), or a required check failing on the head that fails on the target's
   latest commit as well (§ 3). The head waits, with no fixer. Write the one `signal` and Décision
-  (§ 2), then re-run the gate once the target's sha moves past the one in the `body`. A command
+  (§ 2), then, once the target's sha moves past the one in the `body`, merge the target in and re-run the
+  gate. A command
   failing only on the head is red, below.
 - **red:** the gate failed (§ 2), or the branch conflicts. Triage (§ 3).
 - **generated paths,** on every head whatever the `gate` (§ 2 « Paths »): the verifier checks
@@ -169,14 +170,18 @@ rule and sha: one `signal` (`rule: target_red`, `subject: github:owner/repo@<sha
 one Décision to the project's first active maintainer, on the « Target branch red: owner/repo »
 issue when one is open (`operating-the-factory` § 7), else on the project's « Factory operations
 log » (created on first need, as `operating-the-factory` says); a `signal` with that rule and
-subject already there means it was done. The Décision asks whether to **Wait for the repair** (the
-heads wait and re-run once the target's sha moves), **Run them anyway** (say which commands to
-skip: the heads go on to a fixer) or **I take it**; it opens no wait. A command failing
-only on the head goes to the fixer as usual.
+subject already there means it was done. The Décision offers the two things a person does in the
+repository: **Repair the target**, or **Remove the command with `skipVerify` in `AGENTS.md`**.
+Either moves the target's sha, which is what sends the waiting heads through the merger and the
+gate again, so answering changes nothing by itself: it opens no wait and no ruling is routed. The
+verifier always runs every line of `verify`, and a command is never skipped for a head: only
+`## Factory` on the target branch removes one. A command failing only on the head goes to the
+fixer as usual.
 
 **A head whose latest `check-run` carries a target sha** is not sent to a fixer when the target
 moves: merge `targetBranch` into it first (a merge commit, which keeps a `go`, § 4 « A go
-survives ») and re-run the gate. It goes to a fixer only if it still fails.
+survives ») and re-run the gate. It goes to a fixer only if it still fails, or if the merge
+conflicts (the conflict is its brief).
 
 **Paths,** on every head whatever the `gate`, from the diff against the merge-base:
 
@@ -367,7 +372,7 @@ and no `demo` row). `round`, `limit` and `judged` are § The ledger's (`judged` 
 checks are green on the head now. A pull request at its round limit goes to § 7, never to the
 dispatch, and an untouched green Sight head that touches no `withheld` or `generated` path never goes to it. Every row is written by the fixer, juror,
 verifier or demonstrator inside its chain, so a chain that dies leaves the ledger true up to its
-last row. Then act on each outcome: `go` → § 7, `with-maintainer` → § 7 « Three rounds »,
+last row. Then act on each outcome: `go` → § 7, `with-maintainer` (also a fixer that returned the head unchanged: an unresolvable conflict, a red it could not move) → § 7 « Three rounds »,
 `fixed` → the next run re-reads the head, `red` → the next run triages the failed `check-run`
 (§ 3), `gate-error` → nothing merges; the `environment_broken` signal is the Maintenance routine's,
 `target-red` → nothing merges and no fixer; write the signal and Décision of § 2, then wait for the
@@ -401,7 +406,8 @@ whose Décision named the withheld paths and their risk is also an approval.
 Enqueue a go head only once: when the pull request's timeline shows it was enqueued since its
 `go` row and it is no longer, it was dropped, and re-queuing is the Maintenance routine's.
 
-**Three rounds.** A round-3 verdict short of go, or an interaction the demo cannot settle: ask the
+**Three rounds.** A round-3 verdict short of go, an interaction the demo cannot settle, or a head
+the fixer returned unchanged (name the conflict or the red it could not move): ask the
 project's first active maintainer with `asking-for-decisions`, the open entries named, options
 **Merge as it stands** (in `human` mode, or on a `gate: none` repository: you merge it), **Fix** (say what), **Close it**, **I take
 it**; name any withheld path and its risk, so « Merge as it stands » also approves them. Open the

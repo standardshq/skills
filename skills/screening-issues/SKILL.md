@@ -67,7 +67,7 @@ repository: read its facts (`working-on-issues` § Repository facts), which leav
 
 | Run | Issues |
 |---|---|
-| an issue created | that issue, unless it is already `done` (the Maintenance routine's « Factory operations log » is created closed and never screened) |
+| an issue created | that issue, unless it is already `done` (the « Factory operations log », created closed by any routine, is never screened) |
 | a `woke` row with `resumeAt: screening` | that issue; any other `resumeAt`: stop |
 | an `assessment` row with `resumeAt: screening` (`verdict: approved`) | that issue: the maintainer approved the feature |
 | the daily pass | every `backlog` issue that needs screening (below), oldest first; then every `backlog` feature whose latest `screening` row is `assess` with no newer `assessment` row: run `assessing-features` on it |

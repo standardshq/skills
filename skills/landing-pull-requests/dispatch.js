@@ -32,11 +32,13 @@ export const meta = {
 // carries a target sha that has since moved: `targetBranch` is merged into it
 // and the gate re-run, and only a head that still fails goes to a fixer.
 // `state: 'demo'` is a go head with a screen and no `demo`
-// row yet. A Sight head comes here only red (for its fixer), or once a fixer
-// committed on its pull request (a `fixing` row on it), or when it touches a
-// `withheld` or `generated` path: a juror then judges it at the Standard
-// counts, never landing alone. An untouched green Sight head that touches no
-// `withheld` or `generated` path never comes here: landing writes its rows itself. Every row is an `evidence`
+// row yet. A Sight head comes here red (for its fixer or, when the target moved,
+// its merger), once a fixer committed on its pull request (a `fixing` row on
+// it), or when it touches a `withheld` or `generated` path: a juror then
+// judges it at the Standard counts, never landing alone. An untouched green
+// Sight head that touches no `withheld` or `generated` path never comes here:
+// landing writes its rows itself. A merge that conflicts goes to the fixer; a
+// fixer that returns the head unchanged ends the chain `with-maintainer`. Every row is an `evidence`
 // row on `issue` whose `subject` is `github:<repo>#<number>@<sha>`; no comment
 // on the pull request is state.
 
@@ -303,6 +305,9 @@ async function chain(given) {
     }
     if (state === "red") {
       const push = await fixer(pr, pr.failure, "Fix");
+      // A head the fixer could not move (a conflict it cannot resolve) must not come back every run.
+      if (push.head === pr.head)
+        return { number: pr.number, head: push.head, outcome: "with-maintainer", note: push.summary };
       return { number: pr.number, head: push.head, outcome: "fixed", note: push.summary };
     }
     if (state === "demo") {
