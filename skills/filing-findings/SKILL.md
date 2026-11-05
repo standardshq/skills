@@ -1,6 +1,6 @@
 ---
 name: filing-findings
-description: Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind>. The shared cost, budget, ranking and routing bar every scout obeys.
+description: Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind>. The shared cost, budget and ranking bar every scout obeys.
 ---
 
 # Filing findings
@@ -23,7 +23,7 @@ scout is the filter**: not screening, not the maintainer.
   decision nobody has made. « Small » is not a cost; « one file, no decision » is.
 - **Value:** in the unit your scout defines, measured rather than predicted.
 
-Both go into the issue (or the message) verbatim, where a reader can dispute them.
+Both go into the issue verbatim, where a reader can dispute them.
 
 ## Budget
 
@@ -59,7 +59,7 @@ that already exists is never filed twice:
   changed in the code since, and cite the closed issue (`issues:<id>`);
 - an issue closed `done`: a regression is a new issue citing it.
 
-## Route
+## Filing
 
 File one issue per candidate, in the project the finding belongs to:
 
