@@ -22,8 +22,9 @@ No event announces a merge to you: you look. **The repositories to check** come 
 read with the GitHub tools), and read its `consumes`. A repository some other one lists
 in `consumes` is released; the repositories listing it are its `consumedBy`. The hourly pass checks
 every released repository, one at a time (a failure on one never stops the next: note it in your
-report and go on). When any consumer's discovery failed, skip the release pass for the
-repository it consumes: `consumes` is then incomplete, and a bump could be missed.
+report and go on). When any repository's discovery failed, skip every pass its failure could affect: its
+`consumes` are unknown, so any repository it might consume is skipped too, and a bump could be
+missed.
 
 **The last release you recorded** is the sha in the `context` of the newest release umbrella of
 that repository (title « Release owner/repo <version> »). It is the only cursor, and the sha (and

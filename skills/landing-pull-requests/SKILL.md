@@ -16,7 +16,8 @@ Judge with `evaluating-changes` (`SOLO.md`). Ask people with `asking-for-decisio
 
 **What landing moves:** pull requests, and nothing else. You never take an issue's lease, never
 move an issue's status except to pause it (§ 7), never close an issue: `done` comes from the merged
-pull request through the Maintenance routine.
+pull request through the Maintenance routine. The one other thing you write is a `signal` or
+Décision about the repository (§ 2), on the operations log when no issue fits.
 
 ## Which pull requests
 
@@ -108,7 +109,8 @@ target branch's values, never its own. Then route on the rows first, the head se
   waits for the next sweep. One in round 2 or 3 is judged loud: its answers and its delta need no
   gate.
 - **target red:** a failed `check-run` on this head whose failing commands (named in its `body`)
-  all fail on `targetBranch` too, or a required check failing on the head that fails on the target's
+  all fail on `targetBranch` too (and the target's sha has not moved: when it has, merge the target
+  in and re-run the gate, § 2), or a required check failing on the head that fails on the target's
   latest commit as well (§ 3). The head waits, with no fixer. Write the one `signal` and Décision
   (§ 2), then re-run the gate once the target's sha moves past the one in the `body`. A command
   failing only on the head is red, below.
@@ -117,10 +119,10 @@ target branch's values, never its own. Then route on the rows first, the head se
   them with the factory gate for `verify` and `both`; for `ci` the juror checks them first, and a
   hit is a `blocking` entry of its verdict.
 - **`gate: none`:** the head is never green. Fix the tier (§ 4) and judge it as a green one would be,
-  a Sight head at the Standard counts: the juror is the only check. On `go`, ask as § 7's `human`
+  never at the Sight tier (Standard at least): the juror is the only check. On `go`, ask as § 7's `human`
   row says whatever `mode` is; never call it green and never enqueue it.
 - **green, no go:** fix the tier (§ 4), then judge. A Sight head is never dispatched while no fixer
-  touched it: you write its rows yourself (§ 4). A Sight head with a `fixing` row on its pull
+  touched it and it touches no `withheld` or `generated` path: you write its rows yourself (§ 4). A Sight head with a `fixing` row on its pull
   request (a fixer committed on it) is dispatched like any head, judged by a juror at the Standard
   counts: you never approve a fixer's commit yourself.
 
@@ -166,8 +168,15 @@ outcome is `target-red`, and no fixer is sent. Only the landing run writes what 
 rule and sha: one `signal` (`rule: target_red`, `subject: github:owner/repo@<sha>` of the target) and
 one Décision to the project's first active maintainer, on the « Target branch red: owner/repo »
 issue when one is open (`operating-the-factory` § 7), else on the project's « Factory operations
-log »; a `signal` with that rule and subject already there means it was done. A command failing
+log » (created on first need, as `operating-the-factory` says); a `signal` with that rule and
+subject already there means it was done. The Décision asks whether to **Wait for the repair** (the
+heads wait and re-run once the target's sha moves), **Run them anyway** (say which commands to
+skip: the heads go on to a fixer) or **I take it**; it opens no wait. A command failing
 only on the head goes to the fixer as usual.
+
+**A head whose latest `check-run` carries a target sha** is not sent to a fixer when the target
+moves: merge `targetBranch` into it first (a merge commit, which keeps a `go`, § 4 « A go
+survives ») and re-run the gate. It goes to a fixer only if it still fails.
 
 **Paths,** on every head whatever the `gate`, from the diff against the merge-base:
 
@@ -193,7 +202,8 @@ reach is a finding for a fixer.
 
 A required CI check that fails on the head gets the same test first: read the same check on the
 latest commit of `targetBranch` (live, GitHub tools). It fails there too: the head is target red
-(§ 1), not the fixer's.
+(§ 1), not the fixer's. A check absent from the target's commit (CI that runs only on pull
+requests) is not failing on the target: the head goes to the fixer as before.
 
 A fixer gets a checkout of the branch, the pinned head, the failed step's log or the factory gate's
 `check-run` body, and the conflict if any. Its brief:
@@ -350,11 +360,12 @@ dispatched in a single message, following the script as the plan.
                "screen": false } ] }
 ```
 
-`state` is `red`, `green`, `unverified` (a factory gate not yet run on the head), `change` (a
+`state` is `red`, `green`, `unverified` (a factory gate not yet run on the head), `retarget` (its latest
+`check-run` carries a target sha that moved: § 2), `change` (a
 person asked for a change: `previousVerdict` holds their words) or `demo` (a go head with a screen
 and no `demo` row). `round`, `limit` and `judged` are § The ledger's (`judged` absent when the pull request has no juror verdict yet); `ciGreen` says the required
 checks are green on the head now. A pull request at its round limit goes to § 7, never to the
-dispatch, and an untouched green Sight head never goes to it. Every row is written by the fixer, juror,
+dispatch, and an untouched green Sight head that touches no `withheld` or `generated` path never goes to it. Every row is written by the fixer, juror,
 verifier or demonstrator inside its chain, so a chain that dies leaves the ledger true up to its
 last row. Then act on each outcome: `go` → § 7, `with-maintainer` → § 7 « Three rounds »,
 `fixed` → the next run re-reads the head, `red` → the next run triages the failed `check-run`
@@ -392,7 +403,7 @@ Enqueue a go head only once: when the pull request's timeline shows it was enque
 
 **Three rounds.** A round-3 verdict short of go, or an interaction the demo cannot settle: ask the
 project's first active maintainer with `asking-for-decisions`, the open entries named, options
-**Merge as it stands** (in `human` mode: you merge it), **Fix** (say what), **Close it**, **I take
+**Merge as it stands** (in `human` mode, or on a `gate: none` repository: you merge it), **Fix** (say what), **Close it**, **I take
 it**; name any withheld path and its risk, so « Merge as it stands » also approves them. Open the
 `decision` wait (`resumeAt: landing`) and pause the issue. On wake, read the ruling: « Merge as it
 stands » is a `go` row on that head citing the ruling, then this section from the top; « Fix » buys

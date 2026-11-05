@@ -19,7 +19,7 @@ export const meta = {
 //   repositories: { 'owner/repo': { targetBranch, gate, verify, pathGates, generated, withheld, sensitiveData, boot, reset, apps } },
 //   heads: [{ issue, repo, number, branch, head, tier, round, limit, screen: boolean,
 //             ciGreen: boolean,
-//             state: 'red' | 'green' | 'unverified' | 'change' | 'demo',
+//             state: 'red' | 'green' | 'unverified' | 'change' | 'demo' | 'retarget',
 //             failure?: '<failed step + log excerpt, the check-run body, or the conflict>',
 //             judged?: '<sha the last juror verdict judged; absent when the PR has none>',
 //             previousVerdict?: '<entries of the last verdict, with the fixer's answers>' }],
@@ -28,11 +28,15 @@ export const meta = {
 // `check-run` is not a round); `limit` is three plus one per ruling asking a
 // change. `ciGreen`: the required checks are green on `head` now. `state:
 // 'change'` is a person's review or ruling asking a change, quoted in
-// `previousVerdict`. `state: 'demo'` is a go head with a screen and no `demo`
-// row yet. A Sight head comes here only red (for its fixer) or once a fixer
-// committed on its pull request (a `fixing` row on it): a juror then judges it
-// at the Standard counts, never landing alone. An untouched green Sight head
-// never comes here: landing writes its rows itself. Every row is an `evidence`
+// `previousVerdict`. `state: 'retarget'` is a head whose latest `check-run`
+// carries a target sha that has since moved: `targetBranch` is merged into it
+// and the gate re-run, and only a head that still fails goes to a fixer.
+// `state: 'demo'` is a go head with a screen and no `demo`
+// row yet. A Sight head comes here only red (for its fixer), or once a fixer
+// committed on its pull request (a `fixing` row on it), or when it touches a
+// `withheld` or `generated` path: a juror then judges it at the Standard
+// counts, never landing alone. An untouched green Sight head that touches no
+// `withheld` or `generated` path never comes here: landing writes its rows itself. Every row is an `evidence`
 // row on `issue` whose `subject` is `github:<repo>#<number>@<sha>`; no comment
 // on the pull request is state.
 
@@ -47,6 +51,11 @@ const VERDICT = {
   type: "object",
   properties: { head: { type: "string" }, go: { type: "boolean" }, verdict: { type: "string" } },
   required: ["head", "go", "verdict"],
+};
+const MERGE = {
+  type: "object",
+  properties: { head: { type: "string" }, merged: { type: "boolean" }, summary: { type: "string" } },
+  required: ["head", "merged", "summary"],
 };
 const GATE = {
   type: "object",
@@ -106,6 +115,16 @@ When a command fails, run it on a fresh clone of the repository's \`targetBranch
 Repository facts: ${JSON.stringify(args.repositories[pr.repo])}
 Return the head, passed / failed / error / target-red, and the failing output in a few lines.`,
     { label: `verify:${pr.repo}#${pr.number}`, phase: "Verify", schema: GATE },
+  );
+}
+
+function merger(pr) {
+  return agent(
+    `You are the merger of pull request ${pr.repo}#${pr.number} (branch \`${pr.branch}\`, pinned head \`${pr.head}\`), issue ${pr.issue}.
+Merge the repository's \`targetBranch\` into the branch in a merge commit (never a rebase, never a force push) and push it. Repository facts: ${JSON.stringify(args.repositories[pr.repo])}
+A conflict is not yours to resolve: abort the merge and return the unchanged head with merged=false and the conflict in the summary.
+Run \`git cat-file -e <new head>\` before quoting it. Return the head sha, merged, and one line.`,
+    { label: `merge:${pr.repo}#${pr.number}`, phase: "Fix", schema: MERGE },
   );
 }
 
@@ -268,6 +287,19 @@ async function chain(given) {
       if (stop?.outcome === "gate-error" || stop?.outcome === "target-red") return stop;
       state = stop ? "red" : "green";
       if (stop) pr = { ...pr, failure: stop.note };
+    }
+    if (state === "retarget") {
+      // The target moved: merge it in and re-run the gate; only a head still failing goes to a fixer.
+      const merge = await merger(pr);
+      if (merge.merged) {
+        const stop = await gate(pr, merge.head);
+        if (!stop) return { number: pr.number, head: merge.head, outcome: "fixed", note: merge.summary };
+        if (stop.outcome === "gate-error" || stop.outcome === "target-red") return stop;
+        pr = { ...pr, head: merge.head, failure: stop.note };
+      } else {
+        pr = { ...pr, failure: merge.summary };
+      }
+      state = "red";
     }
     if (state === "red") {
       const push = await fixer(pr, pr.failure, "Fix");

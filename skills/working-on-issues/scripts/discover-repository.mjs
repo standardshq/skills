@@ -116,7 +116,7 @@ async function workflowRuns(checkout) {
   return { pullRequest, deploy };
 }
 
-/** Rules of the default branch, as `GET /repos/{o}/{r}/rules/branches/{b}` returns them. */
+/** Rules of the branch being run, as `GET /repos/{o}/{r}/rules/branches/{b}` returns them. */
 function rulesOf(rules) {
   const list = Array.isArray(rules) ? rules : [];
   const checks = list

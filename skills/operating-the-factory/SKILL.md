@@ -46,8 +46,8 @@ run does both, as separate passes, and this one never wakes an issue. Ask people
 **No issue to hang it on** (a repository's `notes`, a routine, a repository's
 health): write the `signal` on the project's **« Factory operations log »** issue, and link the
 record in the Décision (`record:projects:<id>`). One per project, found by its title and
-`origin: operator`; on first need, create it with `status: done`, `closeReason: done`, `type:
-chore`, `origin: operator`, and an `intent` saying it only carries the Maintenance routine's signals. It is
+`origin: operator`; any routine that finds it missing creates it, on first need, with `status: done`, `closeReason: done`, `type:
+chore`, `origin: operator`, and an `intent` saying it only carries the factory routines' signals. It is
 never screened, launched or reopened; the dashboard's Health block reads the signals on it. A
 repository serving several projects: the log of each.
 
@@ -117,7 +117,7 @@ An open `wait` whose `owner` is empty, an agent, or deactivated:
   it (same `issue`, `target`, `waitKind`, `resumeAt`, `data`, the deadline unchanged) with `owner`
   the first active maintainer and a `body` citing the old row (`evidence:<id>`) and why, then the
   `signal` (`rule: wait_rerouted`, `subject: evidence:<old id>`). The old row stays as it is; the
-  `waking-issues` ends both when the target resolves, and asks at the deadline. A wait already
+  that skill ends both when the target resolves, and asks at the deadline. A wait already
   re-routed (a `wait_rerouted` signal on it) is never re-routed again.
 - no active maintainer: the `signal` (`rule: no_owner`), once.
 

@@ -41,7 +41,7 @@ memory of an earlier pass. Intake never does.
    Clone that branch, fetch `rules.json` and `protection.json` again for it (they decide `gate` and
    `mode`), and run the script again. A second exit 3 is not yours to settle: write a `signal`
    (`rule: target_unresolved`, `subject` the repository) on the project's « Factory operations
-   log », ask one Décision per repository and rule (`asking-for-decisions`), and stop working that
+   log » (created on first need, as `operating-the-factory` says), ask one Décision per repository and rule (`asking-for-decisions`), and stop working that
    repository.
 5. Exit 2, a clone you cannot make, or no sandbox: you have no facts. Touch nothing in that
    repository, merge nothing, write a `signal` (`rule: environment_broken`) and say so in your
