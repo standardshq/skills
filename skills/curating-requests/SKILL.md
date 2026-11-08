@@ -34,7 +34,8 @@ thread are the whole state. Before deciding, and again right before writing:
    |---|---|
    | a decline | a message posted after it that brings something the decline lacked: judge again with it. Any other message: stop |
    | a link to an issue | a message posted after it that changes the work or adds proof: Gate 3's row for that issue's state, open or `done`. Any other message: stop silently |
-   | a question, as a card or in plain text | a message posted after it is the answer: judge again with it. The message it answered, or an older one: stop |
+   | a question as a card | the run resumed on the card's answer: that answer is it, judge again with it (§ Asking). A message woke you instead: stop |
+   | a question in plain text | a message posted after it is the answer: judge again with it. The message it answered, or an older one: stop |
    | none | judge it when it states a request; otherwise stop silently |
 
 ## Requests

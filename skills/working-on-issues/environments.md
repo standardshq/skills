@@ -71,9 +71,11 @@ A **harness** runs a routine with the person's own coding agent and provider acc
 - A turn refused with `ENVIRONMENT_MODEL_ACCESS_MISSING` names the variable this instance needs: set
   that one. An instance may not accept `CLAUDE_CODE_OAUTH_TOKEN` yet, and then needs
   `ANTHROPIC_API_KEY`.
-- The harness is chosen per routine, in its **Environment** row. That confirmation clears what a
-  harness cannot honour: tools other than memory, GitHub, Slack and trusted MCP servers, delegation,
-  the budget. The model is then picked in the prompt's footer, among that harness's models.
+- An environment lists the harnesses it accepts (`acceptedHarnesses`). A routine's **Environment**
+  row pairs a harness with an environment: the person picks both there. That confirmation clears
+  what a harness cannot honour: tools other than memory, GitHub, Slack and trusted MCP servers,
+  delegation, the budget. The model is then picked in the prompt's footer, among that harness's
+  models.
 - Choosing it makes the person the author of the routine's triggers and schedule.
 - **Intake** stays on Standards: it reads no code, and it holds no shell on purpose, since anyone in
   the channel can write to it.

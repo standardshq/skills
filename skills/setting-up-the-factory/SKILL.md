@@ -67,7 +67,8 @@ the provider's own install, so the card is the one place to send them.
 
 Read `environments.md` in `working-on-issues`, § Choosing one, and follow it. Ask who should run
 `screening`, `build` and `land`: Standards, which needs nothing and is what you recommend for a first
-setup, or a coding agent they already pay for (Claude Code, Codex or Cursor). Intake stays on
+setup, or a coding agent they already pay for (Claude Code, Codex or Cursor). The harness is picked
+apart from the environment, on each routine's **Environment** row (step 9). Intake stays on
 Standards.
 
 For a coding agent, read the key names in `get_agents`, `include: ["available"]`, and ask for a
@@ -183,19 +184,19 @@ enter from that row, **New environment** (not offered: this instance cannot crea
 admin):
 
 - name: `Factory`
-- harness: the one chosen in step 2, or Standards
+- accepted harnesses: the one chosen in step 2, plus Standards
 - visibility: Workspace, accepting the shared machine notice
 - repositories: every listed repository
 - setup script: only what failed or took too long in your sandbox (a service such as Docker or a
   database), with no secret, since members can read the machine; none when every install worked
 
 They choose the **Build** button at the top of the environment dialog; if it fails, read its last
-lines with them and correct the script. Once built, they choose `Factory` in the **Environment** row
-of `screening`, `build` and `land`, and accept the confirmation. With a coding agent, they pick each
-routine's model in the prompt's footer, Land another than Build, and check the row is not greyed: a
-coding agent without its key is.
+lines with them and correct the script. Once built, on the **Environment** row of `screening`,
+`build` and `land` they pick the `Factory` environment and the harness chosen in step 2, and accept
+the confirmation; then the model in the prompt's footer, Land another than Build. With a coding
+agent, they check the row is not greyed: a coding agent without its key is.
 
-*Done when* the three routines show `Factory` in their **Environment** row.
+*Done when* the three routines show `Factory` and their harness in their **Environment** row.
 
 ## 10. Switch them on
 
