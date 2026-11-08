@@ -97,16 +97,17 @@ The answer resumes the run that asked. `read decision:<id>` for the answer, `ans
 
 | Found | Write | Then |
 |---|---|---|
-| the issue is no longer where you left it (Paused, or In review for Merge it): a person moved it, or the PR merged | the `ruling`, with `Superseded by:` that gesture and its time | change nothing |
-| Draw it with me | the `ruling` | it stays Paused for the sitting; clear `waitingOn` |
-| Merge it | the `ruling` | it stays In review; clear `waitingOn`. The person merges on GitHub, and Land's pipe sets Done |
+| the issue is no longer where you left it (Paused, or In review for Merge it): a person moved it, or the PR merged | the `ruling`, with `Superseded by:` that gesture and its time | change nothing else |
+| Draw it with me | the `ruling` | it stays Paused for the sitting |
+| Merge it | the `ruling` | it stays In review. The person merges on GitHub, and Land's pipe sets Done |
 | I take it | the `ruling`, and the person's direction added to `## Plan` of `body`, dated and attributed, the rest kept | Mine |
 | Close it | the `ruling` | Done, `closeReason` `wont_do` unless the answer names refuted, overtaken or duplicate; close its open PRs with a comment naming the ruling |
 | any other answer to a Land checkpoint whose PR is open | the `ruling` | In review; Land's next run judges it again |
 | any other answer | the `ruling` | Backlog: Screening takes rulings first and routes by `Resume at:` |
 
-A move out of Paused clears `need` and `waitingOn` in the same update. Then clear your claim and
-end: a run never continues its own stage after its question.
+Every answer, superseded included, clears `waitingOn`; a move out of Paused also clears `need`, in
+the same update. Then clear your claim and end: a run never continues its own stage after its
+question.
 
 **The `ruling` row** (`timeline-kinds.md`): `subject: decisions:<id>`; `Decision-maker:` who
 answered, `Recorded by:` your routine, `Source:` `decisions:<id>` and the date, `Resume at:` the
