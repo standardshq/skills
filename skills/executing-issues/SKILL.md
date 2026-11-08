@@ -16,8 +16,10 @@ something to compare against that the implementation could not have chosen.
 
 The pipe (`workflow.md`, Build): In progress issues with no live claim and no open linked PR,
 whose latest move into In progress passes `workflow.md` § Launch. An issue with an open linked PR
-belongs to that PR: Build starts no second implementation. An issue that has tasks (`childIds`)
-is never work; one with a `blockedBy` issue not Done waits, with nothing written.
+belongs to that PR: Build starts no second implementation. One still In progress and unclaimed (a
+run died between opening the PR and moving the issue): claim it, finish § 6's last writes, end.
+An issue that has tasks (`childIds`) is never work; one with a `blockedBy` issue not Done waits,
+with nothing written.
 
 Claim it, then read it with `read-recipe.md`.
 

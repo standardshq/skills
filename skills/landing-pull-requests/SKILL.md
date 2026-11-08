@@ -19,9 +19,12 @@ The pipe, in order:
 
 1. **A head to judge:** an In review issue whose open linked PR has a head with no `verdict` row
    (`subject: github:owner/repo#N@<sha>`) and every check on it concluded.
-2. **A ruling to apply:** an In review issue whose newest `ruling`, other than a Merge it, is newer
-   than its newest `verdict`. A person's answer to a Land checkpoint re-opens the same head.
-3. **Merged:** an In review issue whose every linked PR is merged. Set `status: done`,
+2. **A ruling to apply:** an In review issue whose newest `ruling` answers a Land checkpoint (its
+   checkpoint's `Resume at:` is land) with anything but Merge it, and has no `verdict` row after it.
+   Skip it while auto-merge is enabled on its PR or a Merge it Decision is open.
+3. **A go to retry:** an In review issue whose PR head has a go `verdict` and is neither merged,
+   nor enqueued, nor named by a Merge it Decision (dequeued, or the merge failed): run § 4 again.
+4. **Merged:** an In review issue whose every linked PR is merged. Set `status: done`,
    `closeReason: done`, clear the claim, end.
 
 Claim the issue, then read it with `read-recipe.md`. Close it is `deciding-issues`' to apply: it
@@ -44,11 +47,14 @@ download, a runner port already bound, a flake the repository tracks) is rerun o
 GitHub tools, failed jobs only, when its attempt number is 1. Then clear the claim and end: the
 next run judges the head once the rerun concludes.
 
-**A ruling to apply** (pipe 2) skips the judge:
+**A ruling to apply** (pipe 2) skips the judge and is consumed by a `verdict` row on the head
+(§ 3's shape and round), its body citing the ruling:
 
-- "Merge as it stands": the person's approval of this head, withheld paths included. § 4, merging
-  with `method` whatever `mode` says; a merge GitHub refuses for a required review becomes Merge it.
-- any other answer: its words, quoted and attributed, are the fixer's brief (§ 5).
+- "Merge as it stands": `Outcome: go`, the person's approval of this head. Run § 4 from its first
+  row, reading `mode: human` as `direct`: withheld paths and required reviews still go to Merge it,
+  and a queue repository enqueues.
+- any other answer: `Outcome: changes`, its words, quoted and attributed, the one entry, and the
+  fixer's brief (§ 5).
 
 *Done when* the dossier names the frozen sha and every check's conclusion.
 
