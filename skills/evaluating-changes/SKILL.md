@@ -1,102 +1,90 @@
 ---
 name: evaluating-changes
-description: Use when a pull request head, an unpushed branch, or a written spec must be tried before it is trusted, by the Review routine's juror or on a person's request. Nine sealed jurors instructed in parallel, or one juror trying selected counts in sequence, one ranked verdict, nothing written to the code.
+description: Trial of a change before it is trusted. Use when Land's judge tries a PR head, or a person asks for a pull request, a branch or a written spec to be judged. One juror, five counts in sequence, one ranked verdict, nothing written to the code.
 ---
 
 # Evaluating changes
 
-The work is the accused. Nine jurors each instruct one count, in isolation, and the court returns a
-single ranked verdict. Nothing is committed, no line is fixed: the tribunal judges and reports.
+The work is the accused. One juror tries it count by count, each count on its own, and returns one
+ranked verdict. Nothing is committed, no line is fixed: the trial judges and reports.
 
-Across four review tools and 617 findings, 93.4 % were raised by exactly one reviewer: coverage
-comes from cloistering the counts, not from more eyes on the same one. So a juror reports its own
-count alone, and a finding raised by one juror stands on its own evidence.
+**Who may judge.** On an issue's work, `working-on-issues` § Provenance first: a judge is never
+the author. What the verdict becomes on the issue (a `verdict` row) is the convener's:
+`landing-pull-requests` writes it. On a person's request, return the verdict to that person and
+write nothing.
 
-When only one subagent can be spent on the trial (the Review routine's juror, a small target),
-convene the single-juror form in `SOLO.md` beside this file instead of § 2; the dossier and the
-deliberation are the same.
+## 1. Freeze the dossier
 
-**Who may judge.** When the target belongs to an issue, read `working-on-issues` § Verification
-first: you never judge work whose issue you hold or last held. What the verdict becomes on the
-issue (a `verdict` row, a `go`) is the convener's: `landing-pull-requests` writes it. Run on a
-person's request, you return the verdict to that person and write nothing.
+Freeze one target:
 
-## 1. Instruct the dossier
-
-Freeze one target and build the dossier every juror will read. The three targets differ only in
-how the dossier is assembled:
-
-- **A pull request:** with the GitHub tools, its description, its review and bot comments, its
-  diff against the base, and the head sha. Record the head sha: a new head voids the trial.
+- **A pull request:** with the GitHub tools, its description, its reviews and bot comments, its
+  diff against the base, each check's conclusion on the head, and the head sha. A new head voids
+  the trial.
 - **A branch:** the merge-base against the repository's `targetBranch`, `git diff` against it, and
   the commit list.
 - **A spec or plan:** the document, plus the code it claims to change, read at `targetBranch`.
 
-Add the issue when there is one, read with `working-on-issues` `read-recipe.md`: its `body`
-(`## Request`, `## Acceptance`, `## Plan`), its rulings (a ruling outranks the sections it contradicts) and, for a task of
-an umbrella, the umbrella's sections and rulings. Add the repository's own agent rules
-(`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) and whatever they point at for the surface touched,
-read in the checkout, never a copy; for a pull request, read them on `targetBranch`, never on the
-head: the head's version is part of the diff under judgement; and from its facts (`working-on-issues` § Repository facts), `withheld`, `generated` and
-`sensitiveData`. Nothing `sensitiveData` names is ever quoted in the dossier or the verdict.
+Add the issue when there is one, read with `working-on-issues` `read-recipe.md`: its brief
+(`## Problem`, `## Acceptance`, `## Seams`, `## Out of scope`), its rulings (a ruling outranks the
+section it contradicts), and an umbrella's sections and rulings for a task. Add the repository's
+agent rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) and whatever they point at for the surface
+touched, read on `targetBranch`: the head's version is part of the diff on trial. Add the facts
+`withheld`, `generated` and `sensitiveData`; nothing `sensitiveData` names is quoted in the
+dossier or the verdict.
 
-Write the dossier to one file in your scratch directory and pass its path to every juror, so all
-nine try the same frozen thing.
+Then **map the change** once: each changed file with its callers, found by searching its exported
+names; the test files that import a changed file or that the diff touches, named one by one.
 
-## 2. Convene the nine
+Write the dossier and its map to one file in your scratch directory.
 
-Dispatch all nine in a **single message**, one subagent each, so they run concurrently and none can
-see another's reasoning. Convene every count on every target: a count with no material returns
-*nothing to charge*, which is cheap and is a real answer. Never set a tool-call limit on a juror.
+*Done when* the file names the frozen sha or merge-base and holds every part above that exists.
 
-| Count | What it prosecutes |
-|---|---|
-| `coherence` | the diff against the patterns already in the code and the repository's stated rules |
-| `omission` | what the work should have touched and did not |
-| `proof` | whether the test fails without the change |
-| `performance` | the hot path, the unbounded query, the re-render, the extra round trip |
-| `state-of-the-art` | the deprecated API, the idiom the upstream docs retired |
-| `blast-radius` | tenancy, permissions, visibility, migrations, rollback |
-| `surface` | secrets, injection, the authorization the change exposes |
-| `dry` | what this rebuilds that the codebase already has |
-| `elegance` | the abstraction nobody needed, the flexibility no caller uses |
+## 2. Seat the counts
 
-Each juror's prompt carries the dossier path, its own count name, and this instruction: read your
-section of `CHARGES.md` beside this skill and return only that section's verdict shape. The
-president reads none of them.
+A count sits when its row says so; a count that sits with no material returns *nothing to charge*.
+A count that does not sit is named in the verdict as *not convened*, with the row that kept it out.
 
-Give `dry` and `elegance` the largest model available. They are the two counts that pay for
-judgment rather than for looking, and a fast tier spends the call without buying it.
+| Count | What it tries | Sits on |
+|---|---|---|
+| `spec` | the work against what was asked: missing, partial, wrong, unasked, the other call sites | every target |
+| `standards` | the repository's rules, the neighbours, what it rebuilds, what could be deleted, the Fowler smells | every target |
+| `proof` | whether each test goes red without the change, and earns its place | a behaviour change |
+| `risk` | blast radius, surface, concurrency, performance, each part on its trigger | every target |
+| `experience` | what a person meets on the screen: states, keyboard, focus, copy, theme | a target with a screen |
 
-## 3. Deliberate
+A **behaviour change** is code that decides, computes, stores, fetches or renders conditionally,
+or a test added, edited or deleted. Styles, copy, docs, comments and config values alone are not.
 
-The president receives nine returns and does four things:
+A target **has a screen** when it changes code that renders what a person sees: a component, a
+hook or store a component reads, a page, a style, a locale. It is **screen-only** when every file
+it changes, tests aside, is screen code. On a spec, read both off the code it claims to change.
 
-- **Strike what left its lane, and what is paraphrased.** A finding outside the juror's own count
-  was made without the dossier reading that count demands. A finding whose evidence is a summary of
-  the code rather than the code has no evidence.
-- **Merge the overlaps.** When two counts land on the same lines from different angles, keep the
-  higher rank and name both angles in one entry.
-- **Keep the singletons.** One juror is sufficient authority. Corroboration raises rank; its
-  absence never removes a finding.
-- **Rank.** `blocking`: the work is wrong or unsafe as it stands. `to fix`: real, and cheap to
-  repair before it lands. `noted`: true, non-blocking, recorded for the record.
+Run the juror on the largest model available: `standards` pays for judgment rather than for
+looking.
 
-## 4. Return the verdict
+*Done when* every count is seated or named not convened with its reason.
 
-One document, ranked, findings first, each entry in the shape `CHARGES.md` prescribes. Close with
-the frozen target (head sha or merge-base) and the counts that returned nothing to charge, named
-one by one.
+## 3. Try them in sequence
 
-The trial is complete when all nine counts have returned and every surviving finding carries an
-executable command or a quoted excerpt as its evidence. The ruling on what to do with the verdict
-belongs to whoever convened the court.
+Convene the juror as `SOLO.md` says, with the dossier path and the seated counts in this order:
+`spec`, `standards`, `proof`, `risk`, `experience`.
 
-## Red flags
+## 4. Deliberate and return
 
-- a verdict on a head other than the frozen one, or a trial that went on after the head moved;
-- a juror that saw another juror's return;
-- a finding with a paraphrase for evidence, or outside its juror's count;
-- a finding dropped because only one juror raised it;
-- a verdict written as a `verdict` row by anyone who held the issue's lease;
-- `sensitiveData` quoted in the dossier or the verdict.
+Read the return and:
+
+- **Strike what is paraphrased:** a finding whose evidence summarises the code rather than quoting
+  it, or running it, has no evidence.
+- **Keep the singletons:** one count is sufficient authority for a finding.
+- **Rank** each entry on the ladder in `CHARGES.md`. The juror's line on why a lower rung tempted
+  it is the only ground for lowering.
+
+Return one document, findings first, ranked `blocking`, `to fix`, `noted`, each in the shape
+`CHARGES.md` prescribes. Close with the frozen target, the counts that returned nothing to charge,
+and the counts not convened with their reason.
+
+**Go** is no `blocking` and no `to fix`. Anything else goes back to whoever writes code, entry by
+entry; what to do with the verdict belongs to whoever convened the trial.
+
+*Done when* every seated count has returned and every surviving finding carries an executable
+command or a quoted excerpt.

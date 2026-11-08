@@ -23,7 +23,7 @@ machine, so it clones and installs every time. Intake runs on Standards, with no
 | Machine | Node 22, `git`, `gh`, sudo; install what a repository declares | Node 24, Python 3.14, the harness; install what a repository declares |
 | GitHub | `git` and `gh`, as the person the run acts for | the same |
 | Slack | Slack tools, when granted | the same |
-| Sub-agents | your orchestration tools, and workflow scripts such as `dispatch.js` | your harness's own sub-agents; no workflow script |
+| Sub-agents | your orchestration tools | your harness's own sub-agents |
 | Paid by | the workspace's credits | the key's provider |
 
 Where a skill names a path under `/workspace/skills/`, or a verb such as `write`, read it through
@@ -33,9 +33,8 @@ this table.
 a harness. It raises an approval decision and returns at once. Never report it as done, and never
 retry it.
 
-**A workflow script on a harness:** do its phases yourself, in its order, with your own sub-agents.
-Every rule stays: a juror is a fresh sub-agent that never saw the fix, the gate runs in full, and
-each row is written as the skill says.
+**Sub-agents on a harness:** every rule stays: a judge is a fresh sub-agent that never saw the
+fix, the gate runs in full, and each row is written as the skill says.
 
 **A rule never bends to the machine.** A tool you lack is a reason to report it and stop, keeping
 every gate and juror: a refusal (`SKILL.md` § Refusals), `Rule: environment_broken`, naming what is

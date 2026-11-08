@@ -17,11 +17,11 @@
   },
   {
     "name": "evaluating-changes",
-    "description": "Use when a pull request head, an unpushed branch, or a written spec must be tried before it is trusted, by the Review routine's juror or on a person's request. Nine sealed jurors instructed in parallel, or one juror trying selected counts in sequence, one ranked verdict, nothing written to the code."
+    "description": "Trial of a change before it is trusted. Use when Land's judge tries a PR head, or a person asks for a pull request, a branch or a written spec to be judged. One juror, five counts in sequence, one ranked verdict, nothing written to the code."
   },
   {
     "name": "executing-issues",
-    "description": "Use when the Build routine runs, on an issue a person moved to In progress, a woke row with resumeAt execution, or its 30-minute launch-queue pass. Claims a launched issue under a lease and turns it into a verified pull request with Issue <id> in the body, or into a pause that names what it waits on."
+    "description": "Build stage. Use when the Build routine takes the next In progress issue of its pipe and turns it into a pull request on a green gate, or into a Decision that names what is missing."
   },
   {
     "name": "filing-findings",
@@ -32,16 +32,12 @@
     "description": "Implement a piece of work based on a spec or set of tickets."
   },
   {
-    "name": "implementing-changes",
-    "description": "Use when a change is designed and implemented in the same pass (a feature, component, refactor or behaviour change), and whenever the Build routine implements a launched issue. Acceptance assertions stated before any code, independent tasks in parallel, one blocking review of the batch, a green gate, then one final elegance and DRY check on the largest model."
-  },
-  {
     "name": "importing-github-issues",
     "description": "Use once per repository at its cutover to the factory, with the maintainer. Reads the repository's GitHub issues once and maps the legacy pipeline's label vocabulary (factory:*, preview:*, scout:*, intake origins) onto factory issues (open ones, plus closed ones carrying a preview label or an intake origin) with their timeline rows and draft waits, holds a sitting where the maintainer confirms every pause, and imports only on the maintainer's explicit go."
   },
   {
     "name": "landing-pull-requests",
-    "description": "Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its timeline rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says."
+    "description": "Land stage. Use when the Land routine takes the next In review issue of its pipe, for one judging round on its PR head (judge, then merge or fixer), or to close an issue whose every linked PR is merged."
   },
   {
     "name": "measuring-the-factory",
@@ -66,10 +62,6 @@
   {
     "name": "releasing-downstream",
     "description": "Use when the Maintenance routine runs, on its hourly pass over the repositories other repositories consume. Finds a release not yet recorded, idempotent by sha and tag, and opens one release umbrella, one bump issue per consuming repository under it, and blocker waits on those bumps for the issues waiting on that release."
-  },
-  {
-    "name": "reproducing-bugs",
-    "description": "Use when the Build routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for."
   },
   {
     "name": "screening-issues",
