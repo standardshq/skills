@@ -17,10 +17,12 @@ claim, not your stage's pipe, not launched): clear your claim and take the next.
 6. **Pull requests:** each line of `pullRequests`: state (open, merged, closed) and head sha, with the
    `verdict` rows whose `subject` names **that** head. A verdict on an older head is history.
 7. **Structure:** `blockedBy` and the status of each, `parent` and its sections and rulings, which a
-   task inherits.
-8. **Failures:** `failedAttempts`, and the `attempt` rows: the last 3 in full, a count for the earlier
+   task inherits; `links` and each one's `kind` (a `duplicates` link names the issue kept).
+8. **Files:** `mockups` (only the `approved` one is built; `rejected` ones are history) and
+   `evidence` (`reproduction` before the change, `proof` after).
+9. **Failures:** `failedAttempts`, and the `attempt` rows: the last 3 in full, a count for the earlier
    ones.
-9. **Who moved it:** the issue's activity for the latest `status` move, and whether a person or an
+10. **Who moved it:** the issue's activity for the latest `status` move, and whether a person or an
    agent wrote it (`workflow.md` § Launch).
 
 Then answer, before acting: what stage is this issue at, which exit of that stage does the evidence

@@ -42,8 +42,8 @@ The person reads it cold, perhaps weeks later, in the workspace's language, with
 ### 3. Mockups
 
 A `design` need is owed for new chrome, a new layout or a new interaction; restyling never needs
-one. Draw it as `mockups.md` says, one PNG per option, each stored as a file attached to the issue,
-and ask: Approve (and Approve and launch, as § 2 says), Change (say what), No mockup needed,
+one. Draw it as `mockups.md` says, one PNG per option, each attached to the issue's `mockups` with
+`option` its number and `status: proposed`, and ask: Approve (and Approve and launch, as § 2 says), Change (say what), No mockup needed,
 Close it. A `decision` whose question is a screen (Preview) carries its mockups the same way.
 
 A screen you cannot draw (no source for it, or a direction only a person can choose): send the
@@ -117,6 +117,10 @@ answered, `Recorded by:` your routine, `Source:` `decisions:<id>` and the date, 
 checkpoint's; the question as asked, the answer quoted verbatim, the defaults taken unasked one per
 line, or « none ». An approved mockup is named by its attached file.
 
+**The mockups** follow the answer in the same update as the status move: the option approved gets
+`status: approved` and every other `proposed` one `rejected`; any answer that approves none rejects
+them all. One write of `mockups` with `{ id, props }` per file, so the files stay.
+
 **Answered with a question:** answer it from the codebase and evidence, then ask again (§ Ask)
 with the missing context, writing no ruling.
 
@@ -150,7 +154,8 @@ you write it down; you never implement, and a ruling from a sitting never launch
 3. **Ask** in the conversation, where questions do not expire: at most four issues per batch, one
    question each, headed by the issue's title, written as § Ask 2 without Approve and launch. A
    free-text answer overrides every option; a question asked back is handled as § Answer says.
-4. **Draw** a design with the person looking, as `mockups.md` says, and attach it to the issue.
+4. **Draw** a design with the person looking, as `mockups.md` says, and attach it to `mockups`
+   (`status: proposed`); their approval sets it `approved`, as § Answer says.
    Their approval, their change, or their « no mockup needed » is the ruling; a mockup they never
    saw is not.
 5. **Record** each answer as § Answer, under a claim (`working-on-issues` § The claim):
