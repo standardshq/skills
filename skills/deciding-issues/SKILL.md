@@ -100,7 +100,7 @@ The answer resumes the run that asked. `read decision:<id>` for the answer, `ans
 
 | Found | Write | Then |
 |---|---|---|
-| the issue is no longer where you left it (Paused, or In review for Merge it): a person moved it, or the PR merged | the `ruling`, with `Superseded by:` that gesture and its time | change nothing else |
+| the issue is no longer where you left it (Paused, or In review for Merge it): a person moved it, the PR merged, or a `ruling` row newer than your checkpoint records a person's move (Paused again on a newer checkpoint) | the `ruling`, with `Superseded by:` that gesture and its time | change nothing else |
 | Draw it with me | the `ruling` | it stays Paused for the sitting |
 | Merge it | the `ruling` | it stays In review. The person merges on GitHub, and Land's pipe sets Done |
 | I take it | the `ruling`, and the person's direction added to `## Plan` of `body`, dated and attributed, the rest kept | Mine, `waitingOn` the person who answered, so Needs you shows it |
@@ -109,22 +109,22 @@ The answer resumes the run that asked. `read decision:<id>` for the answer, `ans
 | any other answer | the `ruling` | Backlog: Screening takes rulings first and routes by `Resume at:` |
 
 Every answer but I take it, superseded included, clears `waitingOn`; a move out of Paused also
-clears `need`, in the same update. Then clear your claim if you
-hold one and end: a run never continues its own stage after its question.
+clears `need`, in one update. Then clear any claim and
+end: a run never continues its own stage after its question.
 
 **The `ruling` row** (`timeline-kinds.md`): `subject: decisions:<id>`; `Decision-maker:` who
 answered, `Recorded by:` your routine, `Source:` `decisions:<id>` and the date, `Resume at:` the
 checkpoint's; the question as asked, the answer quoted verbatim, the defaults taken unasked one per
-line, or « none ». An approved mockup is named by its file, attached to the issue.
+line, or « none ». An approved mockup is named by its attached file.
 
-**Answered with a question:** answer it from the codebase and the evidence, then ask again (§ Ask)
-with the missing context added, writing no ruling.
+**Answered with a question:** answer it from the codebase and evidence, then ask again (§ Ask)
+with the missing context, writing no ruling.
 
-**Expired** (24 hours, the run resumes with no answer): write nothing, change nothing, clear your
+**Expired** (24 hours, the run resumes with no answer): change nothing, clear your
 claim, end. The issue stays Paused, for a sitting or a person's move to Ready.
 
 **A person's gesture while a Decision is open** (a move to Ready, Mine or Done): only the run that
-asked closes its question, so the card stays open. Answered later, the first row above records it
+asked closes its question. Answered later, the first row above records it
 superseded; expired, it leaves nothing.
 
 ## In Slack
