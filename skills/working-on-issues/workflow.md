@@ -34,7 +34,7 @@ ordered by `priority`, empty last, then oldest first (`SKILL.md` § One issue pe
 | Screening | Screening | `*/15 * * * *`; the Monday 06:00 run also sweeps the backlog for duplicates and families | issues with a `ruling` or a person's move to Ready newer than their last `screening` row; then Backlog issues never screened; then the oldest screening due for a refresh | Ready with an agent brief; In progress (§ Launch); Paused; Done with `closeReason` `refuted`, `overtaken` or `duplicate` | `decision`: a ruling the route depends on, or a feature too large for the factory |
 | Preview | Screening, in the same run | as Screening | the features its screening routes to preview | Paused: every feature stops on a Decision approving its scope | `decision`, with a mockup when the screen is the question |
 | Build | Build | `*/30 * * * *` | In progress issues, launched, with no live claim and no open PR | In review once a PR is linked on a green gate; Paused | `design` for a mockup owed before code; `decision` for a blocking ruling, or the gate red 3 times |
-| Land | Land | `*/15 * * * *` | In review issues whose PR head is not yet judged and whose CI has finished; then merged PRs whose issue is not Done | Done once every linked PR is merged; In review after a fix is pushed or Merge it is sent; Paused | `decision`: Merge it, on a withheld path, a required human review or `mode` `human`; no go after 3 rounds |
+| Land | Land | `*/15 * * * *` | In review issues whose PR head is not yet judged and whose CI has finished; then merged PRs whose issue is not Done | Done once every linked PR is merged; In review after a fix is pushed or Merge it is sent (`waitingOn` set, no Paused); Paused | `decision`: Merge it, on a withheld path, a required human review or `mode` `human`; no go after 3 rounds |
 
 **The answer.** A Paused issue leaves Paused through the run that asked, on its answer
 (`deciding-issues`): Backlog for a ruling, Mine for "I take it", Done for "Close it"; Merge it leaves
@@ -48,8 +48,8 @@ other board move. A routine never makes these moves, except the two launches bel
 
 Build takes an In progress issue only when the latest move into In progress was a person's, or was
 Screening's with a `screening` row naming the launch case and its grant. Any other move into In
-progress is not a launch: leave the status, write a `signal` (`Rule: unlaunched`), take the next
-issue.
+progress is not a launch: leave the status; it is a refusal (`SKILL.md` § Refusals),
+`Rule: unlaunched`.
 
 Screening launches in two cases, checked as `screening-issues` says: **small and safe**, under the
 project's `autoLaunch` switch; **approved and launched**, on a maintainer's answer "Approve and

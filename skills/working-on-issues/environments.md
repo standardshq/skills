@@ -38,8 +38,8 @@ Every rule stays: a juror is a fresh sub-agent that never saw the fix, the gate 
 each row is written as the skill says.
 
 **A rule never bends to the machine.** A tool you lack is a reason to report it and stop, keeping
-every gate and juror. Write a `signal` (`Rule: environment_broken`) naming what is missing, clear
-your claim, and end. A routine run cannot ask for a key: `request_setup` offers keys only to a
+every gate and juror: a refusal (`SKILL.md` § Refusals), `Rule: environment_broken`, naming what is
+missing. A routine run cannot ask for a key: `request_setup` offers keys only to a
 person in a conversation.
 
 **Published links** (`*.standards.run`): publish the running app, and attach its link to a `design`

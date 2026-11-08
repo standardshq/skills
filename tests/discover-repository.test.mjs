@@ -267,21 +267,31 @@ describe("bad input", () => {
 });
 
 describe("rulesets", () => {
+  const sqlReviewer = [{ type: "pull_request", parameters: {
+    required_reviewers: [{ file_patterns: ["*.sql"], reviewer: { id: 42, type: "Team" } }],
+    allowed_merge_methods: ["squash", "rebase"] } }];
   test("a ruleset required reviewer withholds its pattern and names the login", () => {
     const { facts } = discover({
-      rules: [{ type: "pull_request", parameters: {
-        required_reviewers: [{ file_patterns: ["*.sql"], reviewer: { type: "Team", slug: "data" } }],
-        allowed_merge_methods: ["squash", "rebase"] } }],
+      rules: sqlReviewer,
+      github: { "teams.json": [{ id: 42, slug: "data" }] },
     });
     assert.ok(facts.withheld.split("\n").includes("*.sql"));
     assert.equal(facts.reviewers, "*.sql\tteam:data");
+  });
+  test("a reviewer id with no teams.json is named by its id", () => {
+    assert.equal(discover({ rules: sqlReviewer }).facts.reviewers, "*.sql\tteam:42");
   });
   test("allowed merge methods without squash give their first method", () => {
     const { facts } = discover({ rules: [{ type: "pull_request", parameters: { allowed_merge_methods: ["rebase"] } }] });
     assert.equal(facts.method, "rebase");
   });
-  test("CODEOWNERS owners are the reviewers of their paths", () => {
-    const { facts } = discover({ files: { CODEOWNERS: "/billing/ @ann @org/money\n" } });
+  test("a required code owner review makes CODEOWNERS owners the reviewers of their paths", () => {
+    const files = { CODEOWNERS: "/billing/ @ann @org/money\n" };
+    assert.equal(discover({ files }).facts.reviewers, "");
+    const { facts } = discover({
+      files,
+      rules: [{ type: "pull_request", parameters: { require_code_owner_review: true } }],
+    });
     assert.equal(facts.reviewers, "billing/**\tuser:ann,team:money");
   });
   test("a required approval count, from a ruleset or classic protection, asks any reviewer", () => {
