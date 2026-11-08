@@ -1,313 +1,154 @@
 ---
 name: working-on-issues
-description: Use when any factory routine reads an issue, changes its status, claims or releases it, pauses it, or writes a timeline row on it. Holds the statuses and who may move them, the lease, the timeline ledger, the shape of a wait and the read recipe.
+description: Contract of every factory run. Use when a routine takes the next issue of its pipe, claims or releases it, stops for a person, writes a timeline row, or reads a repository's rules.
 ---
 
 # Working on issues
 
-This is the contract every factory routine follows. Stage skills (`screening-issues`,
-`executing-issues`, `landing-pull-requests`…) own their method; this skill owns state. When a stage
-skill and this one disagree on state, this one wins.
+Stage skills own their method; this contract owns state, and wins when they disagree on it.
 
-Companion files, read when you need them:
+Read, in order, before acting:
 
-- `read-recipe.md`: how to read an issue before acting on it. Read it at the start of every run.
-- `timeline-kinds.md`: every timeline kind, who writes it, and its fields.
-- `environments.md`: which tools and paths you have on Standards or on a harness. Read it first.
+1. `workflow.md`: the pipe of every stage, its exits, and who moves each status. Statuses and their
+   movers live there only; follow it as edited.
+2. `environments.md`: which tools and paths you have here.
+3. `read-recipe.md`: how to read the issue you took.
 
-**Where a skill's files are.** Loading a skill writes its folder into your sandbox:
-`/workspace/skills/<skill>/` on Standards (on a harness, see `environments.md`), with its files at
-their relative paths. A path a skill names, such
-as `scripts/issue-families.mjs`, is `/workspace/skills/<skill>/scripts/issue-families.mjs`. Load a
-skill before running another skill's script.
+`timeline-kinds.md` holds every timeline kind and the shape of its body.
 
-## Repository facts
+## One issue per run
 
-A repository is a `projects` record with a `fullName`; a project's repositories are the `projects`
-records with a `fullName` at or under it. Its facts are not stored: a stage that acts
-on a repository reads them at the start of every pass from the repository itself, never from
-memory of an earlier pass. Intake never does.
+1. List your stage's pipe (`workflow.md`), ordered by `priority` (`p1_urgent` to `p4_low`, empty
+   last), then `createdAt`, oldest first.
+2. Take the head. When its claim is live, take the next one. An empty pipe ends the run with nothing
+   written.
+3. Claim it (below) before reading anything else of it, work it to one exit of your stage, and end.
+   Screening's passes that ask nothing may take up to five issues; the first that needs a person
+   ends the run after its checkpoint.
 
-1. Clone the default branch into your sandbox and gather five files with the GitHub tools into one
-   folder: `repo.json`, `branches.json`, `rules.json` (the rulesets that apply to the branch),
-   `protection.json` (its classic branch protection; absent when there is none) and `pulls.json`
-   (recent merged pull requests).
-2. Run `node /workspace/skills/working-on-issues/scripts/discover-repository.mjs --checkout <clone>
-   --github <folder>`. Add `--listed <file>` (`[{ "fullName", "packages": ["<package name>"] }]`,
-   the package names read from each repository's manifests) only when you need `consumes`.
-3. It prints one JSON object: `targetBranch`, `productionBranch`, `mode` (`queue` or `human`),
-   `method`, `verify`, `withheld`, `generated`, `sensitiveData`, `boot`, `apps`, `reset`,
-   `consumes`, and `gate` (`ci`, `verify` or `none`). Lists are one entry per line. An empty field
-   means nothing was found, never « unlimited ».
-4. Exit 3 means the clone is not on the target branch, and prints `{"targetBranch":"<branch>"}`.
-   Clone that branch, fetch `rules.json` and `protection.json` again for it (they decide `gate` and
-   `mode`), and run the script again. A second exit 3 is not yours to settle: write a `signal`
-   (`rule: target_unresolved`, `subject` the repository) on the project's « Factory operations
-   log » (created on first need, as `operating-the-factory` says), ask one Décision per repository and rule (`asking-for-decisions`), and stop working that
-   repository.
-5. Exit 2, a clone you cannot make, or no sandbox: you have no facts. Touch nothing in that
-   repository, merge nothing, write a `signal` (`rule: environment_broken`) and say so in your
-   report. A skill meant to run without a sandbox never runs this section.
-6. Then apply the record's `notes`. They can only tighten what was discovered: a command added
-   through `notes` turns `none` into `verify` and `ci` into `both`; a path added is withheld.
-   `both` exists only this way; the script never prints it.
+## The claim
 
-Before running a repository's commands, install the package manager it declares (for example
-`sudo npm i -g pnpm@<version>`), once per sandbox.
+`leaseHolder` and `leaseExpiresAt` keep two runs off one issue (Land: the issue of the PR it judges).
 
-The facts are read from the target branch, never from a pull request's head: a pull request that
-edits `CODEOWNERS`, a workflow or the repository's `## Factory` section is judged on the target
-branch's values. `context` and `maintainers` are read on the project, walking up to the root.
+- **Check:** the claim is free when `leaseExpiresAt` is empty or past, by server time.
+- **Write:** `leaseHolder` = you, `leaseExpiresAt` = now + 30 min, in one update, then re-read. When
+  `leaseHolder` is someone else, they won: take the next issue.
+- **Renew** to now + 30 min at least every 20 minutes of work. At 2 hours of work, finish as a
+  failure (`timeout`).
+- **Park:** a run that stops for a person keeps its claim, with `leaseExpiresAt` set to its
+  question's expiry (sent + 24 h), and clears it when it resumes. Merge it releases the claim once
+  sent, so Land's pipe can set Done after a person merges on GitHub.
+- **Clear** both fields on every other exit, as the run's last write, then re-read: report only a
+  state you verified.
+- **Expired:** an expired lease frees the issue; no pass cleans claims. The run taking it over writes
+  an `attempt` (`lapsed`) on an In progress issue, a `released` row elsewhere.
 
-What `gate: "none"` means for a head: `landing-pull-requests` § 2.
+## Stopping for a person
 
-## Two layers
+A run stops for a person only through a Decision, sent as `deciding-issues` says. Any instruction to ask someone, including "ask the user" in a borrowed skill (`implement`, `tdd`,
+`diagnosing-bugs`, `pr`), means that Decision.
 
-| Layer | Where | Rule |
-|---|---|---|
-| Living document | the issue's two richtext fields: `body` (what to do) and `context` (what we know: evidence, Slack permalinks, cited paths) | rewrite `body` freely, section by section; add to `context`; the audit log keeps every version |
-| Ledger | `timeline` records linked by `issue`; the newest `handoff` row is the issue's current state | append only. Never edit or delete a row; a correction is a new row |
+Once it is sent:
 
-The one sanctioned ledger edit: the Maintenance routine sets `resolvedAt` on a `wait` row.
+1. Write the `checkpoint` row.
+2. Set `waitingOn` (the recipient) and, except for Merge it, which leaves the issue In review,
+   `status: paused` with `need` (`decision` for a ruling, `design` for a mockup), in one update.
+3. Park the claim (Merge it: clear it) and end your turn.
 
-`body` holds these sections, as Markdown headings, when they apply; a section with nothing to say
-is left out: `## Request` (the reporter's words, quoted and attributed), `## Problem`,
-`## Acceptance`, `## Plan`.
+The answer resumes this run; `deciding-issues` says what each answer does. Whoever moves the issue
+out of Paused clears `need` and `waitingOn`, except the move to Mine on I take it, which keeps
+`waitingOn` (the person who took it); after Merge it, the resumed run clears `waitingOn`.
 
-Rules (no code enforces them):
+### The checkpoint row
 
-- `## Request` is written by people. Never rewrite it.
-- `## Acceptance`: never edit it while you hold the lease.
-- To change a section, re-read `body`, change that section alone, and write the others back word
-  for word.
-- A person's reply or a ruling that changes what to do goes into `body`, written by the routine
-  that acts on it.
-- `context` is added to, never rewritten: the permalinks in it stop a message being handled twice.
-- A `handoff` row (`timeline-kinds.md`): a run that held the lease, or paused or moved the issue,
-  writes a new one before it stops: where the work stands, the next step, open questions. It wakes
-  nothing. Intake, scouts and a pass that changed nothing write none, apart from the
-  note § Pausing asks for on a `mine` issue. Review writes one only when
-  it hands an issue on (moved, or sent to a person), never per sweep. The Maintenance routine's
-  wakes and applied rulings write none: their `woke` and `applied` rows say what happened.
+`kind: checkpoint`, `subject: decisions:<id>`, and a body that holds, one labelled line each:
 
-## Statuses and who moves them
+```
+Stage: <the blocked stage>
+Reason: <why the run cannot go on without a person>
+Evidence: <what was found, with paths and links>
+Question: <the question as asked>
+Options: <each option as offered, recommendation first>
+Recommendation: <the option recommended, and why>
+Mockups: <file references, or none>
+Resume at: <the stage that takes the issue after the answer>
+Head: <github:owner/repo#N@sha, or none>
+```
 
-Values: `backlog`, `paused`, `mine`, `ready`, `in_progress`, `in_review`, `done`.
+## The timeline
 
-| Move | Who | Condition |
-|---|---|---|
-| `backlog` → `ready` | Triage routine | after its `screening` row |
-| any but `mine` → `paused` | any routine | only with at least one open `wait` row written first (see Pausing) |
-| `paused` → `backlog`, `in_review` or `in_progress` | Maintenance routine only | the wake conditions and status of `waking-issues` § 7 (the single source) |
-| `paused` → `ready`, `mine` → `ready` | a person | board drag; open waits become `released` |
-| `ready` → `in_progress` | a person | the launch. For a task of an umbrella, the person's drag to `ready` is the launch (see Launch) |
-| any → `mine` | a person | board drag, or a ruling « I take it », applied by the Maintenance routine |
-| `in_progress` → `in_review` | executor | a pull request linked in `pullRequests` |
-| `in_review` → `in_progress` | Maintenance routine | every linked PR closed unmerged, none open |
-| `in_progress` or `in_review` → `done` | Maintenance routine | every linked PR closed, at least one merged; `closeReason: done` |
-| `backlog` → `done` | Triage routine | its `screening` row says close; `closeReason` `refuted`, `overtaken` or `duplicate` |
-| umbrella → `done` | Maintenance routine | every child `done` (`waking-issues` § 5): `closeReason: done` when at least one child closed `done`, else the children's common `closeReason`, else `wont_do` |
-| any → `done` | Maintenance routine | a ruling « close it »; `closeReason` `wont_do` or `overtaken`. A linked PR open then: `in_review` first, `done` once every linked PR is closed (`waking-issues` § 4) |
+`timeline` rows linked by `issue` are its ledger, append only: a correction is a new row. Every row
+carries its issue's `project`, so the project page lists its rulings.
 
-**Gestures are a person's.** A routine never writes a move marked "a person" above, except the
-moves in the next table.
+The issue is the living document: rewrite `body` one section at a time, the others written back word
+for word, `## Request` and, under your claim, `## Acceptance` left as they were. `context` is added
+to, never rewritten: its permalinks stop a message being handled twice.
 
-### Moves an agent may make on a person's behalf
+## Refusals
 
-Each carries out a gesture a person already made. Write the evidence first, then the move. The
-Maintenance routine accepts an agent-written move into `in_progress`, `mine` or `done` only when this
-evidence precedes it, and reverts any other.
+A run that cannot act on an issue it took (no facts, a missing tool, an unlaunched move) writes a
+`signal` with its `Rule:`, clears its claim, takes the next issue. It writes that signal on an
+issue once: a run meeting the same refusal while that signal is the issue's newest row, with no
+person's gesture since, stops for a person with a `decision` checkpoint instead.
 
-| Move | Agent | Evidence that must precede it |
-|---|---|---|
-| `ready` → `in_progress`, an umbrella task | Build routine | a person's move of the task to `ready` (activity), newer than its last pause; a `screening` row with `verdict: ready` on it; every `blockedBy` issue `done` |
-| `in_review` → `in_progress` | Maintenance routine | every linked PR closed unmerged, none open, and an `attempt` row saying so; the issue was launched |
-| `paused` → `in_progress` on wake | Maintenance routine | a `woke` row; the wake status chosen by `waking-issues` § 7 |
-| any → `mine` | Maintenance routine | a `ruling` quoting the person's « I take it », then `released` on every open wait |
-| any → `in_review`, « close it » with a linked PR open | Maintenance routine | a `ruling` quoting the person's « close it », then `released` on every open wait; the ruling's `applied` row, recording the pending close, follows the move |
-| umbrella → `done` | Maintenance routine | every child of the umbrella `done` (their status and `closeReason` are the evidence; the body of the move names them); the umbrella neither `mine` nor `paused`, no linked PR open |
-| back to the status before an agent's move no table here sanctions | Maintenance routine | its `signal` (`rule: reverted_move`) naming the move it undoes, and no move since |
-| any → `done` with `closeReason` `wont_do` or `overtaken` | Maintenance routine | a `ruling` quoting the person's « close it », then `released` on every open wait; or, after the move to `in_review` above, that `applied` row and every linked PR closed |
+## Only screening queues
 
-**The ruling may live on another issue.** One Décision can answer several issues (`waking-issues`
-§ 6 « One Décision, several issues »): its `ruling` is recorded on one of them only. For the rows
-above that cite « a `ruling` quoting… », the evidence is that ruling on this issue, or a ruling on
-another issue whose `subject` equals the `target` of a `decision` or `approval` wait of this issue.
-Either way, the `released` rows on this issue's waits follow it, and the move follows them.
+Ready is reached by Screening's route or by a person. A routine writes a move `workflow.md` gives to
+a person only as that file allows, and Build takes an In progress issue only when its launch holds
+(`workflow.md` § Launch). The issue's activity says whether a person or an agent
+made each move.
 
-**Who made a move** is read in the issue's activity (audit log): each entry says whether a person
-or an agent wrote it. Never infer it from `updatedBy` alone or from the current value.
+## Three tries
 
-## Launch
-
-The Build routine starts work only on a launched issue. Before claiming, read the latest
-activity entry that set `status` to `in_progress`:
-
-| That entry was written by | Launched? |
-|---|---|
-| a person | yes |
-| the Maintenance routine, moving `in_review` → `in_progress` or waking `paused` → `in_progress` | yes, if the move before it into `in_progress` was a launch |
-| the Build routine, for an issue with a `parent`, after a person's drag of that issue to `ready` | yes |
-| the Maintenance routine, reverting an agent's move out of `in_progress` (its `reverted_move` signal precedes it) | yes, if the move before it into `in_progress` was a launch |
-| any other agent | **no**: refuse. Write a `signal` row ("moved to In progress by an agent, not launched"), leave the status, stop |
-
-Umbrella task launch: an issue with a `parent`, whose latest move to `ready` was a person's,
-whose latest `screening` row says `verdict: ready` (none, or another verdict: leave it in `ready`
-and write nothing; screening has not handed it on), whose `blockedBy` issues are all `done` and
-whose umbrella is not `paused` (the Maintenance routine pauses
-umbrellas to stop launching when the budget is spent), is launched. The launch queue view does not list it (it
-is `ready`): the Build routine's 30-minute pass also reads `ready` issues with a `parent`,
-checks those conditions, moves each one to `in_progress` itself, then claims it as below.
-
-An umbrella (an issue that has tasks) is a container, never work: never claim it. A leaf is an
-issue whose `childIds` is empty: filter on that to find leaves, and on `parentId` to list an
-umbrella's tasks (`childIds` holds six at most and is not returned to you).
-
-## Claiming: the lease
-
-The launch queue view lists `in_progress` leaves under the failure ceiling. It does not check the
-lease or blockers; you do. Before claiming, re-read the issue and check all of:
-
-1. `status` is `in_progress` and the issue is launched (above).
-2. It is a leaf (`childIds` empty).
-3. `leaseExpiresAt` is empty or in the past.
-4. Every `blockedBy` issue is `done`. If one is open: leave the issue, write nothing, take the next.
-5. `failedAttempts` < 3, after the reset below.
-
-**Reset on a person's gesture:** when the latest person-written status move on the issue is newer
-than its latest `attempt` row, set `failedAttempts` to 0 before claiming. The ceiling counts
-failures since the last human gesture. A `ruling` newer than the latest `attempt` (« retry », or
-any answer) is reset by the Maintenance routine when it applies the ruling; a superseded ruling (older
-than a person's later status move) neither applies nor resets.
-
-**Dates:** lease expiry, deadlines and every "newer than" are computed from server timestamps
-(the records' `createdAt`, activity entry times, stored dates), never guessed or taken from your
-own sense of the time.
-
-**Taking over a lapsed lease:** if `leaseHolder` is set and `leaseExpiresAt` is past, the previous
-run ended without finishing. Write an `attempt` row for it (`outcome: lapsed`, `holder` = that
-actor) and increment `failedAttempts`; if that reaches 3, apply the failure ceiling instead of
-claiming.
-
-**Claim:** write `leaseHolder` = yourself and `leaseExpiresAt` = now + 30 min in one update
-(conditioned on the values you read, when the record tool offers it). Then re-read the issue. If
-`leaseHolder` is not you, another run won: stop, write nothing more.
-
-**Screening holds it too:** the Triage routine may hold the lease outside
-`in_progress` while they work an issue, to keep two runs off it: the same claim write and re-read,
-the same 30-minute expiry, renewal and release on every exit; the launch checks do not apply. Their
-lease guards against a double run, not a failure: an expired one is simply taken over, with no
-`attempt` row, no `failedAttempts` increment and no failure ceiling.
-
-**Renew:** while working, push `leaseExpiresAt` to now + 30 min at least every 20 minutes. Never
-set it beyond 2 hours after your claim. At 2 hours, stop and finish as a failure (`outcome:
-timeout`).
-
-**Finish:** on every exit, success or not:
-
-1. Write the evidence first (`attempt` on failure, the PR link on success).
-2. Then the transition, if any.
-3. Write a `handoff` row.
-4. Clear `leaseHolder` and `leaseExpiresAt`.
-5. Re-read the issue and check the state you meant to leave. If a write failed, say exactly which
-   state is left in a new `handoff` row and in your report; never claim a transition you did not
-   verify. After writing `body`, check `## Request` and `## Acceptance` read as before.
-
-**The one exception:** a stage hand-off row (an `assessment` row carrying `resumeAt: screening`,
-`timeline-kinds.md` § Stage hand-offs) starts Triage the moment it exists. A `screening` row's
-`resumeAt: assessment` starts nothing: the run continues into assessment itself.
-Write it **after** steps 3 and 4, as the run's last write, then re-read. It is not a `handoff` row:
-a `handoff` row starts nothing, so it comes before this one, and a correction after the re-read is
-safe.
-
-**Failure:** write an `attempt` row, increment `failedAttempts`. At 3: apply the failure ceiling.
-
-**Failure ceiling:** pause the issue with a `decision` wait to the project's first active maintainer
-(`projects.maintainers`), asked with `asking-for-decisions`: summarise the three attempts, offer
-retry with a stated change, take it (`mine`), or close. A paused issue leaves the queue. The
-Maintenance routine applies the answer.
-
-## Verification is never your own
-
-- Never write `go`, `verdict` or `check-run` on an issue whose `leaseHolder`, current or last
-  (the `holder` of its latest `attempt`, or the latest `leaseHolder` in its activity), is you.
-- Never edit `## Acceptance` while you hold the lease.
-- Never call your own work done: `done` comes from merged PRs through the Maintenance routine.
-
-## Pausing
-
-A pause is `status: paused` and one open `wait` row per condition. Never `paused` without one.
-
-Never pause an issue in `mine`: it is a person's own lane. Note what you found in a `handoff` row and stop.
-
-1. **Check the target first.** If what you would wait on is already resolved (issue `done`, PR
-   merged, Task done, Décision answered, date past), it is not a pause: carry on.
-2. **Make the target exist:**
-   - `decision`: ask with `asking-for-decisions`; the Décision's id is the target.
-   - `task`: create a Task on the workspace's task object (see below), assigned to the owner, due
-     at the deadline, whose description says what is needed, why, and names the issue.
-   - `approval`: a Décision asking a person to approve a withheld change, asked with
-     `asking-for-decisions`.
-3. **Write the `wait` row** (fields in `timeline-kinds.md`): `target`, `waitKind`, `owner`,
-   `resumeAt`, and `data` with the `deadline`. The `owner` is an active person; when the person
-   you would name is deactivated, name the project's first active maintainer; when the project
-   has none, write a `signal` (`rule: no_owner`) and do not pause.
-   `resumeAt` is a hint: the stage that paused. On wake, the Maintenance routine derives the stage
-   from the status the issue wakes to (`waking-issues` § 7) and keeps your hint in the `woke` body.
-4. **Then** set `status: paused`, write a `handoff` row, and release your lease if you hold one.
-
-| `waitKind` | `target` | `owner` | Default `deadline` | `resumeAt` hint |
-|---|---|---|---|---|
-| `blocker` | `issues:<id>` or `github:owner/repo#N` | a person who can unblock it | created + 14 days | `screening` |
-| `decision` | `decisions:<id>` | the person asked | created + 14 days | the stage that asked |
-| `task` | `tasks:<id>` | the Task's assignee | the Task's due date | `screening` |
-| `date` | `date:<iso>` | a person | created + 14 days, after the date | the stage that paused |
-| `approval` | `decisions:<id>` | the approver | created + 14 days | `landing` |
-
-**Décision or Task:** a Décision is an answer in a minute; a Task is a sitting (a spec, a mockup,
-a repro, a measurement). A spec needed to move forward is a Task to the project's first active
-maintainer with `resumeAt: screening`.
-
-**The workspace's task object:** use the object named `tasks` or `task`, else the one the
-maintainer names in the project's `context`. Read its schema for the assignee, due date, done status and
-description fields before writing. The wait's target is `tasks:<id>` whatever the object's name.
-
-Never resolve a wait, never wake an issue, never move `paused` → anything: that is the Maintenance
-routine's alone (`waking-issues`).
-
-## Waking
-
-When the Maintenance routine wakes an issue it writes a `woke` row with `resumeAt`; the routine named
-by `resumeAt` is triggered. The wake status and `resumeAt` are chosen in `waking-issues` § 7 (the
-single source). When triggered by `woke`, act only if `resumeAt` names your stage. Read the issue
-with the read recipe: the resolved waits, their `resolved` rows and any `ruling` carry what you
-waited for.
-
-## Pull requests
-
-- Link each PR in `pullRequests`, one `owner/repo#N` per line, before moving to `in_review`.
-- A PR body says `Issue: <issue id>`. An imported issue's PR may say `Closes #<githubNumber>`.
-- An issue with an open linked PR belongs to that PR: never start a second implementation.
-- A pending close (the newest `applied` row carrying `closeWhenPullRequestsClose: true`, with no
-  person-written status move newer than it, `waking-issues` § 6) takes the issue out of Review: no `verdict`, no `go`, no merge; Review's only action is to close its open PRs, each with a comment linking the ruling (`landing-pull-requests`), then Maintenance closes the issue.
+Every `attempt` row increments `failedAttempts`. At 3, stop for a person with a `decision`
+checkpoint summarising the three: retry with a stated change, I take it, or Close it. Reset
+`failedAttempts` to 0 when a person's gesture (a status move or an answered Decision) is newer than
+the latest `attempt` row.
 
 ## Provenance
 
-- Only a person's own words are human evidence: an answered Décision, a person's message, a
-  person's gesture in the audit log. An agent recommendation, a default you assumed, or a message
-  written by an agent is not.
-- When you transcribe a person's ruling, name the decision-maker, yourself as recorder, and the
-  source (`decisions:<id>`, or the conversation and date with the quoted answer).
-- Write assumptions you made unasked apart from the ruling, so the next stage sees what was
-  defaulted.
+- Only a person's explicit answer, message or gesture is human evidence; a recommendation, a default
+  or an expired Decision never is. Write defaults apart, one per line.
+- Evidence quotes no secret, no environment value and nothing `sensitiveData` names: a row is read by
+  whoever can read its issue.
+- A judge is never the author: write no `verdict` on work you held.
 - Human evidence never overrides a safety gate.
 
-## Red flags
+## Pull requests
 
-- `paused` with no open `wait` row, or a wait on a target already resolved.
-- A wait whose `owner` is an agent or a deactivated person.
-- Claiming without re-reading the lease and blockers after the queue listed the issue.
-- Writing a gesture a person owns; trusting an `in_progress` an agent wrote.
-- Writing `go`, `verdict` or `check-run` on work you held.
-- Editing or deleting a timeline row; setting `resolvedAt` yourself.
-- Ending a run with your lease still set, or with no `handoff` row saying where it stands.
+- Link each PR in `pullRequests`, one `owner/repo#N` per line, before the move to In review.
+- A PR body says `Issue: <issue id>`, and `Closes #<githubNumber>` for an imported issue.
+
+## Repository facts
+
+A repository is a `projects` record with a `fullName`; `context` and `maintainers` are read walking
+up to the root. A run that acts on a repository reads its rules through `discover-repository.mjs`
+alone, each run, from the target branch, never from a PR's head.
+
+1. Clone the default branch and gather, with the GitHub tools, into one folder: `repo.json`,
+   `branches.json`, `rules.json` (the rulesets of the branch), `protection.json` (its classic
+   protection, absent when none) and `pulls.json` (recent merged PRs).
+2. Run `node /workspace/skills/working-on-issues/scripts/discover-repository.mjs --checkout <clone>
+   --github <folder>`, adding `--listed <file>` (`[{ "fullName", "packages": [...] }]`) only when you
+   need `consumes`.
+3. **Exit 3** prints `{"targetBranch":"<branch>"}`: clone that branch, fetch `rules.json` and
+   `protection.json` for it, run again. A second exit 3 is a person's to settle: stop with a
+   `decision` checkpoint naming the branches found.
+4. **Exit 2**, a clone you cannot make, or no sandbox: you have no facts. Touch and merge nothing in
+   that repository: a refusal (§ Refusals), `Rule: environment_broken`.
+
+Install the package manager the repository declares before running its commands.
+
+| Fact | Holds |
+|---|---|
+| `targetBranch`, `productionBranch` | where PRs go; what deploys |
+| `mode` | `queue` (a merge queue rule: enqueue), `human` (a person merges through Merge it), `direct` (`merge: direct` in `## Factory`: Land merges) |
+| `method` | the queue's method, else the first of squash, merge, rebase both the settings and the rulesets allow |
+| `verify`, `gate` | the commands that prove a change (a `## Verification` section wins), and `ci`, `verify` or `none` |
+| `withheld` | globs a person must approve: workflows, judging files, migrations, `CODEOWNERS` paths, ruleset reviewer patterns |
+| `reviewers` | one `<glob>\t<reviewer>,…` line per pattern: `user:<login>`, `team:<slug>`, or `any:<n>` approvals; name ruleset reviewers by saving `gh api orgs/<org>/teams` as `teams.json` and `gh api repos/<o>/<r>/collaborators` as `users.json` in the folder |
+| `links` | `true` when `## Factory` says `links: on`: runs may publish the running app |
+| `generated`, `sensitiveData` | never hand-edited; never quoted |
+| `boot`, `apps`, `reset`, `consumes`, `deployWorkflows` | how to run it, seed it, and what it depends on |
+
+Lists are one entry per line; empty means nothing found, never unlimited.

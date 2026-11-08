@@ -9,20 +9,32 @@
  * `rules.json` (the rulesets that apply to the branch being run: the default
  * branch, or the printed one after an exit 3),
  * `protection.json` (its classic branch protection; absent or a 404 body when
- * there is none) and `pulls.json` (recent merged pull requests). Required
+ * there is none) and `pulls.json` (recent merged pull requests), plus,
+ * optionally, `teams.json` (`[{ id, slug }]`) and `users.json` (`[{ id, login }]`)
+ * to name the ruleset reviewers, which GitHub gives by id only. Required
  * checks are the union of rulesets and protection. `--listed` is
  * `[{ "fullName", "packages": ["<package name>"] }]` for the repositories
  * already listed, to find `consumes`.
  *
  * A `## Factory` section of the checkout's `AGENTS.md` overrides discovery,
- * one `key: value` per line: `targetBranch: <branch>`, `skipVerify: <command>`,
- * `withheld: <glob>`. Any other key is ignored.
+ * one `key: value` per line, optionally a list item: `targetBranch: <branch>`,
+ * `skipVerify: <command>`, `withheld: <glob>`, `merge: direct` (Land merges
+ * itself) and `links: on` (runs publish the running app). Any other key is
+ * ignored.
+ *
+ * A `## Verification` section of `AGENTS.md`, else `CLAUDE.md`, else
+ * `CONTRIBUTING.md`, replaces the derived `verify` list with the backticked
+ * commands of its list items, in order.
  *
  * The script reads files and runs git on the checkout; it never calls GitHub.
  * It prints one JSON object of facts, each string newline-joined when it
  * holds a list, plus `gate`: "ci" when required checks exist, else "verify"
- * when `verify` holds a command, else "none". The script never prints "both":
- * a command added through the record's `notes` is what makes it.
+ * when `verify` holds a command, else "none"; `links` is a boolean.
+ * `reviewers` is one `<glob>\t<reviewer>[,<reviewer>…]` line per pattern, a
+ * reviewer being `user:<login>`, `team:<slug>` or `any:<count>` (that many
+ * approvals from anyone who may approve); an id the folder cannot name stays
+ * `user:<id>` or `team:<id>`. CODEOWNERS owners are reviewers only when a code
+ * owner review is required.
  *
  * Exit 0: facts produced. 2: usage or input error. 3: the checkout is not on
  * the target branch; stdout is exactly `{"targetBranch":"<branch>"}`.
@@ -116,15 +128,41 @@ async function workflowRuns(checkout) {
   return { pullRequest, deploy };
 }
 
+/** A ruleset reviewer (`{ id, type }`) as `team:<slug>` or `user:<login>`, else by its id. */
+function reviewerName(reviewer, { teams, users }) {
+  if (reviewer?.type === "Team") {
+    return `team:${teams.find((team) => team.id === reviewer.id)?.slug ?? reviewer.id}`;
+  }
+  return `user:${users.find((user) => user.id === reviewer?.id)?.login ?? reviewer?.id}`;
+}
+
 /** Rules of the branch being run, as `GET /repos/{o}/{r}/rules/branches/{b}` returns them. */
-function rulesOf(rules) {
+function rulesOf(rules, names) {
   const list = Array.isArray(rules) ? rules : [];
   const checks = list
     .filter((rule) => rule.type === "required_status_checks")
     .flatMap((rule) => rule.parameters?.required_status_checks ?? [])
     .map((check) => check.context);
   const queue = list.find((rule) => rule.type === "merge_queue");
-  return { checks, queue };
+  const pullRequest = list.filter((rule) => rule.type === "pull_request").map((rule) => rule.parameters ?? {});
+  const reviewers = pullRequest.flatMap((parameters) =>
+    (parameters.required_reviewers ?? []).flatMap((entry) =>
+      (entry.file_patterns ?? []).map((glob) => ({ glob, reviewer: reviewerName(entry.reviewer, names) })),
+    ),
+  );
+  // Every rule applies, so the methods allowed are those every rule allows; empty means all.
+  const allowedMethods = pullRequest
+    .map((parameters) => parameters.allowed_merge_methods)
+    .filter(Array.isArray)
+    .reduce((allowed, methods) => (allowed ? allowed.filter((method) => methods.includes(method)) : methods), null);
+  return {
+    checks,
+    queue,
+    reviewers,
+    allowedMethods: allowedMethods ?? [],
+    approvals: Math.max(0, ...pullRequest.map((parameters) => parameters.required_approving_review_count ?? 0)),
+    codeOwnerReview: pullRequest.some((parameters) => parameters.require_code_owner_review === true),
+  };
 }
 
 /** Required checks of a classic branch protection (`GET /repos/{o}/{r}/branches/{b}/protection`). */
@@ -134,19 +172,70 @@ function protectionChecks(protection) {
   return [...(required.contexts ?? []), ...(required.checks ?? []).map((check) => check.context)];
 }
 
-/** The `key: value` lines under the `## Factory` heading of AGENTS.md, as lists of values per key. */
-function factoryInstructions(agents) {
-  const instructions = { targetBranch: [], skipVerify: [], withheld: [] };
+/** The reviews a classic branch protection requires on every pull request. */
+function protectionReviews(protection) {
+  const reviews = protection?.required_pull_request_reviews;
+  return {
+    approvals: reviews?.required_approving_review_count ?? 0,
+    codeOwnerReview: reviews?.require_code_owner_reviews === true,
+  };
+}
+
+/** The first of squash, merge, rebase that the repository settings and the rulesets both allow. */
+function mergeMethod({ repo, queue, allowedMethods }) {
+  const queueMethod = queue?.parameters?.merge_method?.toLowerCase();
+  if (["squash", "merge", "rebase"].includes(queueMethod)) return queueMethod;
+  const settings = {
+    squash: repo.allow_squash_merge,
+    merge: repo.allow_merge_commit,
+    rebase: repo.allow_rebase_merge,
+  };
+  return (
+    ["squash", "merge", "rebase"].find(
+      (method) =>
+        settings[method] !== false && (!allowedMethods.length || allowedMethods.includes(method)),
+    ) ?? ""
+  );
+}
+
+/** The lines under a `## <title>` heading, up to the next heading. */
+function sectionLines(text, title) {
+  const lines = [];
   let inside = false;
-  for (const line of agents.split("\n")) {
+  for (const line of text.split("\n")) {
     if (/^#{1,6}\s/.test(line)) {
-      inside = /^##\s+Factory\s*$/.test(line);
+      inside = new RegExp(`^##\\s+${title}\\s*$`).test(line);
       continue;
     }
-    const match = inside && line.match(/^\s*(\w+):\s*(.+?)\s*$/);
+    if (inside) lines.push(line);
+  }
+  return lines;
+}
+
+/** The `key: value` lines under the `## Factory` heading of AGENTS.md, as lists of values per key. */
+function factoryInstructions(agents) {
+  const instructions = { targetBranch: [], skipVerify: [], withheld: [], merge: [], links: [] };
+  for (const line of sectionLines(agents, "Factory")) {
+    const match = line.match(/^\s*(?:[-*]\s+)?(\w+):\s*(.+?)\s*$/);
     if (match && match[1] in instructions) instructions[match[1]].push(match[2]);
   }
   return instructions;
+}
+
+/** The backticked commands of the list items under a `## Verification` heading, in order. */
+function verificationCommands(text) {
+  return sectionLines(text, "Verification")
+    .filter((line) => /^\s*(?:[-*]|\d+\.)\s/.test(line))
+    .flatMap((line) => [...line.matchAll(/`([^`]+)`/g)].map((match) => match[1].trim()));
+}
+
+/** The first of AGENTS.md, CLAUDE.md, CONTRIBUTING.md that lists verification commands. */
+async function declaredVerification(checkout) {
+  for (const name of ["AGENTS.md", "CLAUDE.md", "CONTRIBUTING.md"]) {
+    const commands = verificationCommands(await readText(join(checkout, name)));
+    if (commands.length) return commands;
+  }
+  return [];
 }
 
 /**
@@ -162,13 +251,21 @@ function ownedGlobs(pattern) {
   return /[*?[]/.test(body) ? [`${prefix}${body}`] : [`${prefix}${body}`, `${prefix}${body}/**`];
 }
 
-/** The globs of every path a person owns; the catch-all `*` owns nothing in particular. */
+/** A CODEOWNERS owner as `team:<slug>` or `user:<login>` (an email owner stays an email). */
+function ownerName(owner) {
+  const name = owner.replace(/^@/, "");
+  return name.includes("/") ? `team:${name.split("/").pop()}` : `user:${name}`;
+}
+
+/** Every path a person owns, as globs with their owners; the catch-all `*` owns nothing in particular. */
 function ownedPaths(codeowners) {
   return codeowners
     .split("\n")
-    .map((line) => line.trim().split(/\s+/)[0])
-    .filter((pattern) => pattern && !pattern.startsWith("#") && pattern !== "*")
-    .flatMap(ownedGlobs);
+    .map((line) => line.replace(/#.*/, "").trim().split(/\s+/))
+    .filter(([pattern]) => pattern && pattern !== "*")
+    .flatMap(([pattern, ...owners]) =>
+      ownedGlobs(pattern).map((glob) => ({ glob, reviewers: owners.map(ownerName) })),
+    );
 }
 
 async function readCodeowners(checkout) {
@@ -190,7 +287,8 @@ function branchFacts({ pulls, branches, defaultBranch, head, override }) {
   return { targetBranch: honoured ? override : derived, productionBranch: defaultBranch };
 }
 
-function verifyCommands({ scripts, pm, workflowCommands, skipped }) {
+function verifyCommands({ scripts, pm, workflowCommands, skipped, declared }) {
+  if (declared.length) return declared.filter((command) => !skipped.includes(command));
   const commands = VERIFY_SCRIPTS.filter((name) => scripts[name]).map((name) => `${pm} run ${name}`);
   for (const command of workflowCommands) {
     const proves = /^(pnpm|npm|yarn|bun|npx|node|make|cargo|go|pytest|uv|poetry)\b/.test(command);
@@ -199,7 +297,7 @@ function verifyCommands({ scripts, pm, workflowCommands, skipped }) {
   return commands.filter((command) => !skipped.includes(command));
 }
 
-async function withheldGlobs({ checkout, files, extra }) {
+function withheldGlobs({ files, owned, extra }) {
   const migrationDirs = new Set(
     [...files].map((path) => path.match(/^(.*?(?:migrations|migrate))\//)?.[1]).filter(Boolean),
   );
@@ -208,10 +306,20 @@ async function withheldGlobs({ checkout, files, extra }) {
       ".github/workflows/**",
       ...JUDGING_PATHS,
       ...[...migrationDirs].map((dir) => `${dir}/**`),
-      ...ownedPaths(await readCodeowners(checkout)),
+      ...owned.map((entry) => entry.glob),
       ...extra,
     ]),
   ];
+}
+
+/** One `<glob>\t<reviewer>,…` line per pattern, in the order the rules name them. */
+function reviewerLines({ owned, codeOwnerReview, ruleset, approvals }) {
+  const byGlob = new Map();
+  const add = (glob, names) => byGlob.set(glob, [...new Set([...(byGlob.get(glob) ?? []), ...names])]);
+  if (codeOwnerReview) for (const entry of owned) if (entry.reviewers.length) add(entry.glob, entry.reviewers);
+  for (const entry of ruleset) add(entry.glob, [entry.reviewer]);
+  if (approvals > 0) add("**", [`any:${approvals}`]);
+  return [...byGlob].map(([glob, names]) => `${glob}\t${names.join(",")}`);
 }
 
 async function generatedFiles(checkout) {
@@ -290,9 +398,13 @@ export async function discover({ checkout, github, listed = [] }) {
   if (!repo.default_branch) throw new Error(`${github}/repo.json: no default_branch`);
   const branches = (await readJson(join(github, "branches.json"), [])).map((branch) => branch.name);
   const pulls = await readJson(join(github, "pulls.json"), []);
-  const rules = rulesOf(await readJson(join(github, "rules.json"), []));
-  const classic = protectionChecks(await readJson(join(github, "protection.json"), null));
-  const checks = [...new Set([...rules.checks, ...classic])];
+  const names = {
+    teams: await readJson(join(github, "teams.json"), []),
+    users: await readJson(join(github, "users.json"), []),
+  };
+  const rules = rulesOf(await readJson(join(github, "rules.json"), []), names);
+  const protection = await readJson(join(github, "protection.json"), null);
+  const checks = [...new Set([...rules.checks, ...protectionChecks(protection)])];
   const { queue } = rules;
   await git(checkout, ["rev-parse", "--git-dir"]);
   const head = await git(checkout, ["rev-parse", "--abbrev-ref", "HEAD"]);
@@ -302,19 +414,18 @@ export async function discover({ checkout, github, listed = [] }) {
   const workflows = await workflowRuns(checkout);
   const instructions = factoryInstructions(await readText(join(checkout, "AGENTS.md")));
 
-  const queueMethod = queue?.parameters?.merge_method?.toLowerCase();
-  const method =
-    queueMethod === "merge" || queueMethod === "squash"
-      ? queueMethod
-      : repo.allow_squash_merge !== false
-        ? "squash"
-        : "merge";
+  const declared = await declaredVerification(checkout);
   const verify = verifyCommands({
     scripts,
     pm,
     workflowCommands: workflows.pullRequest,
     skipped: instructions.skipVerify,
+    declared,
   });
+  const owned = ownedPaths(await readCodeowners(checkout));
+  const classicReviews = protectionReviews(protection);
+  const approvals = Math.max(rules.approvals, classicReviews.approvals);
+  const codeOwnerReview = rules.codeOwnerReview || classicReviews.codeOwnerReview;
   const resetScript = RESET_SCRIPTS.find((name) => scripts[name]);
   const envFiles = [...files].filter((path) => /(^|\/)\.env(\.[\w-]+)?$/.test(path));
 
@@ -327,10 +438,16 @@ export async function discover({ checkout, github, listed = [] }) {
       head,
       override: instructions.targetBranch.at(-1),
     }),
-    mode: queue ? "queue" : "human",
-    method,
+    mode: queue ? "queue" : instructions.merge.at(-1) === "direct" ? "direct" : "human",
+    method: mergeMethod({ repo, queue, allowedMethods: rules.allowedMethods }),
+    links: ["on", "true", "yes"].includes(instructions.links.at(-1)?.toLowerCase()),
     verify: verify.join("\n"),
-    withheld: (await withheldGlobs({ checkout, files, extra: instructions.withheld })).join("\n"),
+    withheld: withheldGlobs({
+      files,
+      owned,
+      extra: [...rules.reviewers.map((entry) => entry.glob), ...instructions.withheld],
+    }).join("\n"),
+    reviewers: reviewerLines({ owned, codeOwnerReview, ruleset: rules.reviewers, approvals }).join("\n"),
     generated: (await generatedFiles(checkout)).join("\n"),
     sensitiveData: envFiles.length ? `Values of the variables named in ${envFiles.join(", ")}` : "",
     ...(await bootFacts({ checkout, scripts, pm })),

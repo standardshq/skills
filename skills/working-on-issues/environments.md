@@ -1,7 +1,10 @@
 # Environments
 
-Where a routine runs changes its tools and its paths, never its rules. Read this at the start of
-every run, then work out which case you are in.
+Where a routine runs changes its tools and its paths, never its rules.
+
+Screening, Build and Land run on one fixed environment, `Factory`, holding every repository of the
+factory: a scheduled run has no triggering repository to pick one by. Each scheduled run gets its own
+machine, so it clones and installs every time. Intake runs on Standards, with no shell.
 
 ## Which one am I on
 
@@ -20,7 +23,7 @@ every run, then work out which case you are in.
 | Machine | Node 22, `git`, `gh`, sudo; install what a repository declares | Node 24, Python 3.14, the harness; install what a repository declares |
 | GitHub | `git` and `gh`, as the person the run acts for | the same |
 | Slack | Slack tools, when granted | the same |
-| Sub-agents | your orchestration tools, and workflow scripts such as `dispatch.js` | your harness's own sub-agents; no workflow script |
+| Sub-agents | your orchestration tools | your harness's own sub-agents |
 | Paid by | the workspace's credits | the key's provider |
 
 Where a skill names a path under `/workspace/skills/`, or a verb such as `write`, read it through
@@ -30,23 +33,29 @@ this table.
 a harness. It raises an approval decision and returns at once. Never report it as done, and never
 retry it.
 
-**A workflow script on a harness:** do its phases yourself, in its order, with your own sub-agents.
-Every rule stays: a juror is a fresh sub-agent that never saw the fix, the gate runs in full, and
-each row is written as the skill says.
+**Sub-agents on a harness:** every rule stays: a judge is a fresh sub-agent that never saw the
+fix, the gate runs in full, and each row is written as the skill says.
 
-**A rule never bends to the machine.** A tool you lack is a reason to report it and stop, not to skip
-a gate or a juror. Write a `signal` (`rule: environment_broken`) naming what is missing.
+**A rule never bends to the machine.** A tool you lack is a reason to report it and stop, keeping
+every gate and juror: a refusal (`SKILL.md` § Refusals), `Rule: environment_broken`, naming what is
+missing. A routine run cannot ask for a key: `request_setup` offers keys only to a
+person in a conversation.
 
-**A routine run cannot ask for a key:** `request_setup` only offers keys to a person in a conversation.
-Report what is missing with that `signal` and stop.
+**Published links** (`*.standards.run`): publish the running app, and attach its link to a `design`
+Decision or to Merge it, only when the repository's facts say `links: true`. No link is published
+otherwise.
 
 ## Choosing one
 
 This part is for `setting-up-the-factory`.
 
-**Standards** needs no key and no setup, and is the recommendation for a first setup. A run installs
-what a repository declares. A custom Standards environment is only for what cannot be installed on
-each run (a service such as Docker or a database) or takes too long.
+**Standards** needs no key and no setup, and is the recommendation for a first setup. The `Factory`
+environment is a Standards environment holding every repository of the factory; a run installs what
+a repository declares. Add to it only what cannot be installed on each run (a service such as Docker
+or a database) or takes too long.
+
+**Links** are off by default. Ask the person, per repository, whether runs may publish the running
+app; on yes, write `links: on` under the `## Factory` section of that repository's `AGENTS.md`.
 
 A **harness** runs a routine with the person's own coding agent and provider account:
 
@@ -62,11 +71,13 @@ A **harness** runs a routine with the person's own coding agent and provider acc
 - A turn refused with `ENVIRONMENT_MODEL_ACCESS_MISSING` names the variable this instance needs: set
   that one. An instance may not accept `CLAUDE_CODE_OAUTH_TOKEN` yet, and then needs
   `ANTHROPIC_API_KEY`.
-- The harness is chosen per routine, in its **Environment** row. That confirmation clears what a
-  harness cannot honour: tools other than memory, GitHub, Slack and trusted MCP servers, delegation,
-  the budget. The model is then picked in the prompt's footer, among that harness's models.
+- An environment lists the harnesses it accepts (`acceptedHarnesses`). A routine's **Environment**
+  row pairs a harness with an environment: the person picks both there. That confirmation clears
+  what a harness cannot honour: tools other than memory, GitHub, Slack and trusted MCP servers,
+  delegation, the budget. The model is then picked in the prompt's footer, among that harness's
+  models.
 - Choosing it makes the person the author of the routine's triggers and schedule.
 - **Intake** stays on Standards: it reads no code, and it holds no shell on purpose, since anyone in
   the channel can write to it.
-- **Review** should use another model than **Build**, so the judge does not share the author's blind
-  spots. With a single provider, pick another of its models.
+- **Land** uses another model than **Build**, so the judge does not share the author's blind spots.
+  With a single provider, pick another of its models.

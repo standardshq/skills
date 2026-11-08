@@ -265,3 +265,59 @@ describe("bad input", () => {
     assert.equal(discover({ github: { "rules.json": "not json" } }).status, 2);
   });
 });
+
+describe("rulesets", () => {
+  const sqlReviewer = [{ type: "pull_request", parameters: {
+    required_reviewers: [{ file_patterns: ["*.sql"], reviewer: { id: 42, type: "Team" } }],
+    allowed_merge_methods: ["squash", "rebase"] } }];
+  test("a ruleset required reviewer withholds its pattern and names the login", () => {
+    const { facts } = discover({
+      rules: sqlReviewer,
+      github: { "teams.json": [{ id: 42, slug: "data" }] },
+    });
+    assert.ok(facts.withheld.split("\n").includes("*.sql"));
+    assert.equal(facts.reviewers, "*.sql\tteam:data");
+  });
+  test("a reviewer id with no teams.json is named by its id", () => {
+    assert.equal(discover({ rules: sqlReviewer }).facts.reviewers, "*.sql\tteam:42");
+  });
+  test("allowed merge methods without squash give their first method", () => {
+    const { facts } = discover({ rules: [{ type: "pull_request", parameters: { allowed_merge_methods: ["rebase"] } }] });
+    assert.equal(facts.method, "rebase");
+  });
+  test("a required code owner review makes CODEOWNERS owners the reviewers of their paths", () => {
+    const files = { CODEOWNERS: "/billing/ @ann @org/money\n" };
+    assert.equal(discover({ files }).facts.reviewers, "");
+    const { facts } = discover({
+      files,
+      rules: [{ type: "pull_request", parameters: { require_code_owner_review: true } }],
+    });
+    assert.equal(facts.reviewers, "billing/**\tuser:ann,team:money");
+  });
+  test("a required approval count, from a ruleset or classic protection, asks any reviewer", () => {
+    const ruleset = discover({
+      rules: [{ type: "pull_request", parameters: { required_approving_review_count: 2 } }],
+    });
+    assert.equal(ruleset.facts.reviewers, "**\tany:2");
+    const classic = discover({
+      github: { "protection.json": { required_pull_request_reviews: { required_approving_review_count: 1 } } },
+    });
+    assert.equal(classic.facts.reviewers, "**\tany:1");
+  });
+});
+
+describe("factory section", () => {
+  test("merge: direct gives direct", () => {
+    const { facts } = discover({ files: { "AGENTS.md": "## Factory\n\n- merge: direct\n" } });
+    assert.equal(facts.mode, "direct");
+  });
+  test("links is off when absent and on when set", () => {
+    assert.equal(discover().facts.links, false);
+    assert.equal(discover({ files: { "AGENTS.md": "## Factory\n\n- links: on\n" } }).facts.links, true);
+  });
+  test("a Verification section in AGENTS.md is the verify list", () => {
+    const { facts } = discover({ files: { "AGENTS.md": "## Verification\n\n- `pnpm typecheck`\n- `pnpm test`\n" } });
+    assert.equal(facts.verify, "pnpm typecheck\npnpm test");
+    assert.equal(facts.gate, "verify");
+  });
+});

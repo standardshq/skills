@@ -1,86 +1,58 @@
 [
   {
-    "name": "asking-for-decisions",
-    "description": "Use when a factory routine needs a person's answer before an issue can move: a product or architecture call, an approval, a mockup to approve, a passed deadline. Asks one forking question as a Décision written as a briefing, opens the decision wait, and records the answer as a ruling."
-  },
-  {
-    "name": "assessing-features",
-    "description": "Use when the Triage routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as an assessment timeline row, and asks the maintainer, or parks the feature on a typed wait."
-  },
-  {
-    "name": "brainstorming",
-    "description": "Use before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
-  },
-  {
     "name": "curating-requests",
-    "description": "Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Turns it into one issue with origin slack in the project that owns it, points it at an existing issue, asks one question, or declines it politely, never twice for one Slack message."
+    "description": "Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Files one issue per independent request with origin slack in the project that owns it, points a request at an existing issue, asks the reporter in the thread, or declines politely, never twice for one request."
+  },
+  {
+    "name": "deciding-issues",
+    "description": "Decisions, the one way a factory run asks a person. Use when a run must stop for a ruling or a mockup, when its question is answered or expires, when Intake asks a reporter in Slack, or when a person starts a sitting to clear Paused issues."
+  },
+  {
+    "name": "diagnosing-bugs",
+    "description": "Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow."
   },
   {
     "name": "evaluating-changes",
-    "description": "Use when a pull request head, an unpushed branch, or a written spec must be tried before it is trusted, by the Review routine's juror or on a person's request. Nine sealed jurors instructed in parallel, or one juror trying selected counts in sequence, one ranked verdict, nothing written to the code."
+    "description": "Trial of a change before it is trusted. Use when Land's judge tries a PR head, or a person asks for a pull request, a branch or a written spec to be judged. One juror, five counts in sequence, one ranked verdict, nothing written to the code."
   },
   {
     "name": "executing-issues",
-    "description": "Use when the Build routine runs, on an issue a person moved to In progress, a woke row with resumeAt execution, or its 30-minute launch-queue pass. Claims a launched issue under a lease and turns it into a verified pull request with Issue <id> in the body, or into a pause that names what it waits on."
+    "description": "Build stage. Use when the Build routine takes the next In progress issue of its pipe and turns it into a pull request on a green gate, or into a Decision that names what is missing."
   },
   {
-    "name": "filing-findings",
-    "description": "Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind>. The shared cost, budget and ranking bar every scout obeys."
-  },
-  {
-    "name": "implementing-changes",
-    "description": "Use when a change is designed and implemented in the same pass (a feature, component, refactor or behaviour change), and whenever the Build routine implements a launched issue. Acceptance assertions stated before any code, independent tasks in parallel, one blocking review of the batch, a green gate, then one final elegance and DRY check on the largest model."
-  },
-  {
-    "name": "importing-github-issues",
-    "description": "Use once per repository at its cutover to the factory, with the maintainer. Reads the repository's GitHub issues once and maps the legacy pipeline's label vocabulary (factory:*, preview:*, scout:*, intake origins) onto factory issues (open ones, plus closed ones carrying a preview label or an intake origin) with their timeline rows and draft waits, holds a sitting where the maintainer confirms every pause, and imports only on the maintainer's explicit go."
+    "name": "implement",
+    "description": "Implement a piece of work based on a spec or set of tickets."
   },
   {
     "name": "landing-pull-requests",
-    "description": "Use when the Review routine runs, on an issue moved to In review, a woke row with resumeAt landing, or its sweep every 30 minutes, which reads each pull request's checks, reviews and head itself. Takes each open pull request of an In review issue to merged through its timeline rows - the gate the repository's discovered facts give, red heads handed to a fixer, green heads judged at a tier fixed on the first read, three rounds then the maintainer, a screen demonstrated on video, withheld paths approved by a person, the merge done as the repository's mode says."
+    "description": "Land stage. Use when the Land routine takes the next In review issue of its pipe, for one judging round on its PR head (judge, then merge or fixer), or to close an issue whose every linked PR is merged."
   },
   {
-    "name": "measuring-the-factory",
-    "description": "Use when the Maintenance routine runs, nightly. Exports issues, status history, timeline rows, pull requests, run costs and deploys with your own tools, runs measure.mjs on the export, and writes every row it prints as a factory snapshot. You never compute or correct a number yourself."
+    "name": "pr",
+    "description": "Use when writing a PR body."
   },
   {
-    "name": "operating-the-factory",
-    "description": "Use when the Maintenance routine runs, every 15 minutes. Catches what slipped through the structure - broken invariants, gestures or a repository's `notes` written by an agent, waits with no active owner, double or looping leases, self-verification, idle or dropped pull requests, a red target branch, piled-up Décisions, failing routines, unhealthy repositories, a stalled delivery chain, a blown budget - and answers each with one listed action or a Décision."
-  },
-  {
-    "name": "pruning-tests",
-    "description": "Use when the Maintenance routine sweeps a repository's test suite, when a maintainer asks to audit a suite, or when an issue with origin scout:tests is executed. Scouts the tests whose time, flakiness or upkeep outweighs what they alone catch, audits every test of a suite for what it witnesses, or cuts one candidate, folding its lone assertion into a surviving test first."
-  },
-  {
-    "name": "releasing-downstream",
-    "description": "Use when the Maintenance routine runs, on its hourly pass over the repositories other repositories consume. Finds a release not yet recorded, idempotent by sha and tag, and opens one release umbrella, one bump issue per consuming repository under it, and blocker waits on those bumps for the issues waiting on that release."
-  },
-  {
-    "name": "reproducing-bugs",
-    "description": "Use when the Build routine works a launched bug, before any diagnosis or fix. Produces one fast, deterministic command whose assertion fails on the reported symptom against the unmodified target branch, or ends the run with the exact missing artifact asked for."
+    "name": "previewing-features",
+    "description": "Use when screening routes a feature to preview, or a ruling resumes one at preview. Weighs the feature's durable value against its durable debt, writes the verdict candidate, park or reject as a preview row, and stops on a Decision for the maintainer's approval."
   },
   {
     "name": "screening-issues",
-    "description": "Use when the Triage routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait."
+    "description": "Use when the Screening routine takes the next issue of its pipe, on a ruling, a person's release, a new issue or a refresh, and on its Monday sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision."
   },
   {
     "name": "setting-up-the-factory",
-    "description": "Use when a person sets up Factory, adds a repository to it, changes its Slack channel, or asks why it skips a repository."
+    "description": "Use when a person sets up Factory, adds a repository to it, changes its Slack channel, resets an old install, or asks why it skips a repository."
   },
   {
-    "name": "shaping-features",
-    "description": "Use when a maintainer wants to choose what to shape next (the map of the open backlog), or when a feature idea, a family of issues, or an issue paused on a spec Task must become one approved spec, written to an umbrella issue with one task issue per change, chained by blockedBy. Runs live with the maintainer, never as a routine."
+    "name": "tdd",
+    "description": "Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions \"red-green-refactor\", or wants integration tests."
   },
   {
-    "name": "waking-issues",
-    "description": "Use when the Maintenance routine runs, on an issue set Done, a ruling recorded, or its hourly pass, which also reads every Task done or deleted and every merged or closed pull request. It is the only skill that resolves waits, applies a person's answers, wakes paused issues, and closes issues from their pull requests."
+    "name": "triaging-issues",
+    "description": "Use when a Screening run takes an issue whose `type` is empty or contradicted by a ruling. Classifies it as bug, enhancement, feature or chore from the issue's own text, keeps the reporter's cause as a hypothesis, and stops for a person when the text cannot settle the type."
   },
   {
     "name": "working-on-issues",
-    "description": "Use when any factory routine reads an issue, changes its status, claims or releases it, pauses it, or writes a timeline row on it. Holds the statuses and who may move them, the lease, the timeline ledger, the shape of a wait and the read recipe."
-  },
-  {
-    "name": "writing-plans",
-    "description": "Use when you have a spec or requirements for a multi-step task, before touching code"
+    "description": "Contract of every factory run. Use when a routine takes the next issue of its pipe, claims or releases it, stops for a person, writes a timeline row, or reads a repository's rules."
   }
 ]
