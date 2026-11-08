@@ -74,7 +74,7 @@ Screening's pipe, in this order; inside each tier by `priority` then age, the cl
    `screening` row; a `ready` issue whose latest move to `ready` was a person's and is newer than
    its latest `screening` row.
 2. **Never screened:** a `backlog` issue with no `screening` row.
-3. **Refresh:** a `backlog` or `ready` issue whose latest `screening` row is older than 7 days; a
+3. **Refresh:** a `backlog` issue whose latest `screening` row is older than 7 days; a
    parked feature only once its `Expires:` date has passed.
 
 Up to 5 issues per run while each one asks nothing; the first that sends a Decision ends the run.
@@ -101,13 +101,19 @@ it was filed (activity); one whose only defect is age. For them, stop for a pers
 1. Write a `ruling` row, no `subject`: `Decision-maker:` who moved it, `Source:` the move and its
    time from the activity, `Resume at: screening`, and the scope taken as approved (the latest
    brief, `preview` row or ruling that named one).
-2. When the move took the issue out of Paused, dismiss its open Decision (`deciding-issues`) and
-   clear `need` and `waitingOn`.
-3. Screen it in this run (§ 1 to § 6), naming the ruling in `Ruling consumed:`. A release lifts a
-   pause, never a gate: a feature with no approved preview goes to preview.
+2. When it has an open Decision, dismiss it (`deciding-issues`), and clear `need` and
+   `waitingOn`. A move to Mine or Done dismisses its Decision through `deciding-issues`, not here.
+3. Screen it in this run (§ 1 to § 5), naming the ruling in `Ruling consumed:`. The release is the
+   approval of that scope, a feature never previewed included: it skips preview. A released issue
+   leaves screening only three ways: it stays `ready` (with its brief, § 6), it launches
+   (§ Launch), or, when the evidence contradicts it (delivered, refuted, overtaken, a duplicate,
+   a symptom, `full`), a `decision` checkpoint takes it to Paused, Close it among the options.
+   Screening never closes a released issue itself.
 
 **A `ruling` row** routes by its `Resume at:`: `screening` and `preview` run here; `build` is
-screened, then reached through Ready or a launch (§ Launch). A ruling marked `Superseded by:` is
+screened, then reached through Ready or a launch (§ Launch); `land` is not screening's
+(`deciding-issues` returns those issues to In review). Any other target is a refusal
+(`working-on-issues` § Refusals), `Rule: unroutable_ruling`. A ruling marked `Superseded by:` is
 history.
 
 ## 1. Resolve what the issue asserts
@@ -164,7 +170,7 @@ lives in, every other repository read listed with its sha in `body`), then act:
 | `checkpoint` | a symptom (§ 3) | `decision`: fix the family first (recommended), or patch this one |
 | `checkpoint` | `full` (§ 4) | `decision`, I take it first, the split into one-change issues proposed |
 | `checkpoint` | the right fix changes a public contract, a security posture or an agent's authority; or the route needs a fact or an artifact only a person has | `decision`: the one question that forks the work |
-| `preview` | `type: feature` with no ruling answering its latest `preview` row | `previewing-features`, in this run |
+| `preview` | `type: feature`, not released by a person, with no ruling answering its latest `preview` row | `previewing-features`, in this run |
 | `park` | a ruling parked the feature its latest `preview` row named | stays `backlog` until its `Expires:` |
 | `ready` | every claim resolves, no family owns it, it is not `full`, and a feature has a ruling approving its preview | § 6, then § Launch, else `ready` |
 
