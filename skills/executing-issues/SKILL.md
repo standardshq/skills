@@ -40,10 +40,10 @@ still missing. The work already landed, or the premise is gone: a `decision` che
 feature, the slice its approving `ruling` names; for a task, its umbrella's sections and rulings
 too. A ruling outranks the section it contradicts.
 
-**A mockup owed.** The change brings new chrome, a new layout or a new interaction, and no
-`ruling` approves a mockup for it: before any code, a `design` Decision through `deciding-issues`
+**A mockup owed.** The change brings new chrome, a new layout or a new interaction, and no file of
+`mockups` is `approved`: before any code, a `design` Decision through `deciding-issues`
 § Ask 3, drawn as `mockups.md` says, or sent with `Mockups: none` when no run can draw the screen.
-Restyling what exists is built, never asked.
+Restyling what exists is built, never asked. An `approved` mockup is the screen to build.
 
 *Done when* every repository has its branch and facts, and no checkpoint is owed.
 
@@ -51,7 +51,8 @@ Restyling what exists is built, never asked.
 
 `type: bug` runs `diagnosing-bugs` before any production edit. Its loop ends on a red command: a
 test or script that fails on the unmodified branch for the reported reason. That failing test is
-the first commit.
+the first commit. A bug you can see on a screen gets a capture of it in `evidence`
+(`kind: reproduction`) unless one is there already.
 
 No red after the loop: a `decision` checkpoint naming each attempt to reproduce and what it
 showed, with Close it recommended when the evidence says the bug is gone.
@@ -90,6 +91,10 @@ checkpoint with the three failures quoted (trimmed, no `sensitiveData`), options
 stated change (Approve, or Approve and launch), I take it, Close it.
 
 An empty `verify`: the PR's CI is the gate, and Land reads it there.
+
+A change with a screen you can run (the repository's `## Verification`, or a published link):
+attach a capture of the result to `evidence` (`kind: proof`), the same screen as the approved
+mockup or the reproduction.
 
 *Done when* every `verify` command exits 0 on the branch head you will push.
 

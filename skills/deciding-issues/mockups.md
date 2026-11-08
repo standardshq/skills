@@ -52,4 +52,5 @@ Open each PNG and correct it until, side by side with the real screen, only the 
 the change reads at a glance. Washed-out colors mean the theme did not load: check the pasted blocks
 and the `text/tailwindcss` type.
 
-*Done when* each option is one PNG, stored as a file and attached to the issue and to the Decision.
+*Done when* each option is one PNG, attached to the issue's `mockups` (`option` its number,
+`status: proposed`) and to the Decision.

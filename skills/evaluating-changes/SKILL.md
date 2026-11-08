@@ -30,7 +30,8 @@ section it contradicts), and an umbrella's sections and rulings for a task. Add 
 agent rules (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) and whatever they point at for the surface
 touched, read on `targetBranch`: the head's version is part of the diff on trial. Add the facts
 `withheld`, `generated` and `sensitiveData`; nothing `sensitiveData` names is quoted in the
-dossier or the verdict.
+dossier or the verdict. Add the issue's `approved` mockup and its `evidence`: `experience` judges
+the `proof` against the mockup, and against the `reproduction` for a bug.
 
 Then **map the change** once: each changed file with its callers, found by searching its exported
 names; the test files that import a changed file or that the diff touches, named one by one.

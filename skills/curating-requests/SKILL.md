@@ -89,7 +89,7 @@ Sibling reports from adjacent messages are the usual near-miss.
 | Found | Do |
 |---|---|
 | an open issue | DUPLICATE: append to its `context` a dated line « Also reported by <author> on <date>: <permalink> » and what the message adds. When the message changes what to do, also append that to `## Problem` of its `body`, with attribution, the other sections written back word for word; a message that only adds proof stays in `context` |
-| a `done` issue, `closeReason: done` | reply that it shipped and where it stands; new evidence that it still fails is a new issue citing `issues:<id>` |
+| a `done` issue, `closeReason: done` | reply that it shipped and where it stands; new evidence that it still fails is a new issue citing `issues:<id>`, in `links` with `kind: follows-up` |
 | a `done` issue closed `refuted`, `overtaken`, `duplicate` or `wont_do` | reply with the recorded reason (its last `screening` row and its rulings). Re-raise only with evidence the earlier decision lacked (a customer commitment, a measured cost, a new usage): a new issue citing `issues:<id>` and saying what is new |
 | a `paused` issue | DUPLICATE as above; the person it waits on reads the new evidence there |
 
@@ -161,13 +161,15 @@ English, short, every sentence useful to whoever works on it. One issue per requ
 | `project` | the repository record when the request clearly concerns one repository; the root project otherwise, including when it spans several repositories |
 | `origin` | `slack` |
 | `slackThread` | the thread's key, `<channel id>:<thread ts>`, the root message's `ts` |
+| `links` | the other issues filed from the same message, `kind: related`; the `done` issue a regression follows, `kind: follows-up` |
 | `type` | from the report alone: `bug` (intended behaviour broken), `enhancement` (an existing capability improved), `feature` (a new capability or surface), `chore`. Leave it empty when the report does not settle it: Screening classifies |
 | `body`, `## Request` | this request's part of the message, in the reporter's own words, quoted and attributed (« <author>, Slack, <date>: > … »). It belongs to people: quote, never paraphrase |
 | `body`, `## Problem` | the real problem in your words: for a bug, observed versus expected. State the one remaining uncertainty **once**, here, as the question Screening or reproduction must settle |
 | `body`, `## Acceptance` | only when the reporter states the expected outcome: that outcome as a check anyone can run. Otherwise leave the section out |
 | `context` | « Surfaced in <channel> on <date> by <author> » with the message's permalink (and the answer's, for an answered thread); each attached file by name; paths only when the reporter cited them or the message shows them |
 
-Attach the message's files to the issue when your tools allow it. Keep secrets, connection strings
+Attach the message's files to the issue when your tools allow it: a file showing the problem to
+`evidence` (`kind: reproduction`), any other to the issue's drive. Keep secrets, connection strings
 and customers' personal data out of the issue. Write only the fields above: Screening queues, people
 prioritise.
 

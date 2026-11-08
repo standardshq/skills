@@ -132,7 +132,8 @@ Run `issue-duplicates.mjs --project <id> --issue <id>`. Read both issues of ever
 For a same pair, keep the **richer** issue: further along (in progress before ready before
 backlog), then the one with rulings or evidence, then the one people edited, then the older. A
 fenced issue is always the kept one. Append to the kept issue's `context` what only the other
-carried, with `issues:<id>`. Close the other only when it is the one you are screening.
+carried, with `issues:<id>`. Close the other only when it is the one you are screening, with the kept
+issue in its `links` (`kind: duplicates`); the kept one gets the inverse on its own.
 
 ## 3. Families
 
@@ -164,7 +165,7 @@ lives in, every other repository read listed with its sha in `body`), then act:
 | Verdict | When | Then |
 |---|---|---|
 | `close`, `closeReason: overtaken` | the gap is closed on the target branch, by a change merged after the issue was filed (a merged pull request naming the issue counts) | `done`. The body names that pull request or commit |
-| `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `done`. File the residual as a new issue when it is real |
+| `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `done`. File the residual as a new issue when it is real, in `links` with `kind: follows-up` |
 | `close`, `closeReason: duplicate` | § 2 kept the other issue | `done`. The body names the kept issue, `issues:<id>` |
 | `checkpoint` | a symptom (§ 3) | `decision`: fix the family first (recommended), or patch this one |
 | `checkpoint` | `full` (§ 4) | `decision`, I take it first, the split into one-change issues proposed |
