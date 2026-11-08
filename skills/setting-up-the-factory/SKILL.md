@@ -27,6 +27,7 @@ and `land` each take the next issue of their pipe on a clock (`working-on-issues
 | add a repository | steps 1, 3, 4, 5 and 6, then the repository joins the environment (step 9) |
 | change the Slack channel, or who may raise requests | step 7 |
 | change where routines run | steps 2 and 9 |
+| stop or restore the reports of empty runs | step 10 |
 | reset an old install | § An old install |
 | why does it skip this repository | § Why it skips; write nothing |
 
@@ -198,7 +199,20 @@ agent, they check the row is not greyed: a coding agent without its key is.
 
 *Done when* the three routines show `Factory` and their harness in their **Environment** row.
 
-## 10. Switch them on
+## 10. Empty runs
+
+Screening and Land run every quarter of an hour, Build every half hour. A run that finds nothing in
+its pipe sends a one-line report to Decisions. Ask whether they want those reports. Kept unless they
+say no.
+
+On no: for `screening`, `build` and `land`, read each with `get_agents` (`id`) for its `systemPrompt`
+and `revision`, and send one `upsert_agent` card each, grouped in one message, with the prompt as it
+is plus, as its last line: « When your pipe is empty, end the run without sending anything. » Skip a
+routine whose prompt already ends with it. On a later yes, the same cards remove that line.
+
+*Done when* their answer is applied to the three routines, or kept.
+
+## 11. Switch them on
 
 List the routines not yet on (`get_agents` returns `active`), each linked as `/routines/<id>`; three
 without Slack. Each has a switch on its page. They should switch all of them themselves: anyone else
@@ -211,7 +225,7 @@ must choose **Link my account** first, and those routines then act as them.
 
 Questions to people arrive in **Decisions**.
 
-## 11. First test
+## 12. First test
 
 Suggest one real test: post a message in the channel and watch the issue appear. Without Slack,
 create an issue in the app and watch Screening pick it up within a quarter of an hour.
