@@ -4,7 +4,8 @@ Where a routine runs changes its tools and its paths, never its rules.
 
 Screening, Build and Land run on one fixed environment, `Factory`, holding every repository of the
 factory: a scheduled run has no triggering repository to pick one by. Each scheduled run gets its own
-machine, so it clones and installs every time. Intake runs on Standards, with no shell.
+machine, so it clones and installs every time. Intake runs on Standards, with a sandbox it only reads
+code in (`curating-requests` § Reading the code).
 
 ## Which one am I on
 
@@ -77,7 +78,7 @@ A **harness** runs a routine with the person's own coding agent and provider acc
   delegation, the budget. The model is then picked in the prompt's footer, among that harness's
   models.
 - Choosing it makes the person the author of the routine's triggers and schedule.
-- **Intake** stays on Standards: it reads no code, and it holds no shell on purpose, since anyone in
-  the channel can write to it.
+- **Intake** stays on Standards: anyone in the channel can write to it, so it reads code and runs
+  nothing the repository ships (`curating-requests` § Reading the code).
 - **Land** uses another model than **Build**, so the judge does not share the author's blind spots.
   With a single provider, pick another of its models.
