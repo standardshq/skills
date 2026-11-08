@@ -12,7 +12,7 @@ ask a person. You are a safety net, not a stage: you never do another skill's wo
 Read `working-on-issues` first, with `timeline-kinds.md` and `read-recipe.md`: the statuses, who
 moves them, the moves an agent may make on a person's behalf and the evidence each needs, the
 lease, the wait shape. Read `waking-issues` to know what that skill owns, so you leave it to it: a Maintenance
-run does both, as separate passes, and this one never wakes an issue. Ask people with `asking-for-decisions`.
+run does both, as separate passes, and this one never wakes an issue. Ask people with `deciding-issues`.
 
 ## What you never do
 
@@ -36,7 +36,7 @@ run does both, as separate passes, and this one never wakes an issue. Ask people
    `rule` and `subject` is newer than the condition's start: do not write it again, and take only
    the next step the table allows (a Décision after a re-queue, for instance).
 2. **Then the action,** at most one, from the table.
-3. **Then the Décision,** when the table says so, asked with `asking-for-decisions` (re-resolve,
+3. **Then the Décision,** when the table says so, asked with `deciding-issues` (re-resolve,
    one forking question, a briefing): to the project's first active maintainer unless the table
    names someone else. It opens no wait and moves no status, except where the action itself is a
    wait (an invariant, the budget). Group: one Décision per person per run, one section per case.

@@ -85,7 +85,7 @@ Paths:
 | You find | Do |
 |---|---|
 | the right fix changes a public contract, a security posture or an agent's authority | pause on a `decision` wait to the project's first active maintainer, the one question that forks the work |
-| it needs new chrome, a new layout or a new interaction nobody approved | draw the smallest mockup that decides it and ask with `asking-for-decisions` (approve, change, no mockup needed); when you cannot draw it, a `task` wait to the maintainer. Restyling what exists is not a stop: build it |
+| it needs new chrome, a new layout or a new interaction nobody approved | draw the smallest mockup that decides it and ask with `deciding-issues` (approve, change, no mockup needed); when you cannot draw it, a `task` wait to the maintainer. Restyling what exists is not a stop: build it |
 | it is several changes, not one | pause on a `task` wait to the maintainer for a spec (`shaping-features`) |
 
 Each pause: `resumeAt: execution`, a `handoff` row, then release the lease. Not a failure: no `attempt`.

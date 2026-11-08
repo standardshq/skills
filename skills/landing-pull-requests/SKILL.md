@@ -12,7 +12,7 @@ good.
 
 Read `working-on-issues` first, with `read-recipe.md` and `timeline-kinds.md`: § Verification, §
 Pausing and § Pull requests hold every rule of state below, and win when this skill disagrees.
-Judge with `evaluating-changes` (`SOLO.md`). Ask people with `asking-for-decisions`.
+Judge with `evaluating-changes` (`SOLO.md`). Ask people with `deciding-issues`.
 
 **What landing moves:** pull requests, and nothing else. You never take an issue's lease, never
 move an issue's status except to pause it (§ 7), never close an issue: `done` comes from the merged
@@ -393,7 +393,7 @@ or `skipped` for a model, all on that head. Then, in order:
 **Withheld paths.** The diff touches a `withheld` path, `mode` is not `human` and `gate` is not `none`: the merge needs a
 person's approval. An approval stands when a `ruling` approving the merge answers an `approval` wait
 on this pull request and every commit since the head it named leaves the withheld paths untouched.
-None: ask with `asking-for-decisions` an approval Décision to the project's first active
+None: ask with `deciding-issues` an approval Décision to the project's first active
 maintainer, naming each withheld path and the specific risk (never just the path), the verdict
 summary and the head; options **Approve the merge** (recommended when the verdict is clean),
 **Change** (say what), **Close it**, **I take it**. Open the `approval` wait (`resumeAt: landing`)
@@ -406,14 +406,14 @@ whose Décision named the withheld paths and their risk is also an approval.
 | `mode` | Do |
 |---|---|
 | `queue` | mark ready, enable auto-merge with `method` (the merge queue batches); in the sweep, every go of the run in the same pass |
-| `human` | merge nothing. Mark ready, then ask the project's first active maintainer with `asking-for-decisions` one Décision per head, naming any withheld path and its risk: **Merge it** (you merge it on GitHub; recommended), **Change** (say what), **Close it**, **I take it**. Open no wait and leave the issue `in_review`: the merge itself is the answer the Maintenance routine watches. Ask once per head: while a Décision linked to the issue names this head, open, answered or expired, never ask again (no daily re-ask). An expired one left unanswered: write one `signal` (`rule: merge_unanswered`, `subject` the head) and leave the issue `in_review`; a newer head is a new question. The answer's `ruling` is recorded as `asking-for-decisions` § 4 says; a « Change » is read by the next run (§ 1) |
+| `human` | merge nothing. Mark ready, then ask the project's first active maintainer with `deciding-issues` one Décision per head, naming any withheld path and its risk: **Merge it** (you merge it on GitHub; recommended), **Change** (say what), **Close it**, **I take it**. Open no wait and leave the issue `in_review`: the merge itself is the answer the Maintenance routine watches. Ask once per head: while a Décision linked to the issue names this head, open, answered or expired, never ask again (no daily re-ask). An expired one left unanswered: write one `signal` (`rule: merge_unanswered`, `subject` the head) and leave the issue `in_review`; a newer head is a new question. The answer's `ruling` is recorded as `deciding-issues` § 4 says; a « Change » is read by the next run (§ 1) |
 
 Enqueue a go head only once: when the pull request's GitHub timeline shows it was enqueued since its
 `go` row and it is no longer, it was dropped, and re-queuing is the Maintenance routine's.
 
 **Three rounds.** A round-3 verdict short of go, an interaction the demo cannot settle, or a head
 the fixer returned unchanged (name the conflict or the red it could not move): ask the
-project's first active maintainer with `asking-for-decisions`, the open entries named, options
+project's first active maintainer with `deciding-issues`, the open entries named, options
 **Merge as it stands** (in `human` mode, or on a `gate: none` repository: you merge it), **Fix** (say what), **Close it**, **I take
 it**; name any withheld path and its risk, so « Merge as it stands » also approves them. Open the
 `decision` wait (`resumeAt: landing`) and pause the issue. On wake, read the ruling: « Merge as it

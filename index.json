@@ -1,15 +1,15 @@
 [
   {
-    "name": "asking-for-decisions",
-    "description": "Use when a factory routine needs a person's answer before an issue can move: a product or architecture call, an approval, a mockup to approve, a passed deadline. Asks one forking question as a Décision written as a briefing, opens the decision wait, and records the answer as a ruling."
-  },
-  {
     "name": "brainstorming",
     "description": "Use before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
   },
   {
     "name": "curating-requests",
     "description": "Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Turns it into one issue with origin slack in the project that owns it, points it at an existing issue, asks one question, or declines it politely, never twice for one Slack message."
+  },
+  {
+    "name": "deciding-issues",
+    "description": "Decisions, the one way a factory run asks a person. Use when a run must stop for a ruling or a mockup, when its question is answered or expires, when Intake asks a reporter in Slack, or when a person starts a sitting to clear Paused issues."
   },
   {
     "name": "diagnosing-bugs",

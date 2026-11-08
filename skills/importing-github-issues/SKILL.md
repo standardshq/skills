@@ -12,7 +12,7 @@ references keep resolving through `githubNumber`.
 
 This is the one skill that reads GitHub issues, once, by design. It never writes to GitHub: no
 comment, label, close, project field or setting. Read `working-on-issues` (statuses, § Pausing,
-the wait shape), `timeline-kinds.md` and `asking-for-decisions` before you apply anything.
+the wait shape), `timeline-kinds.md` and `deciding-issues` before you apply anything.
 
 **A dry run by default.** § 1 to § 5 write nothing anywhere. § 6 runs only after the maintainer's
 explicit go for that repository, in their own words, in this conversation. One repository at a
@@ -90,7 +90,7 @@ neither a stamp nor a ruling. Each drafts the project's maintainer as owner.
 
 Present the counts (open, closed by set, by status, timeline rows, draft waits by kind), then one
 table of every draft wait, in the maintainer's language: the issue by title and `#N`, what it waits
-on (kind, target, the question or the Task in plain words, rewritten as `asking-for-decisions`
+on (kind, target, the question or the Task in plain words, rewritten as `deciding-issues`
 § 2 asks, never a bare id), the proposed owner.
 
 For each row the maintainer either confirms the owner (or names another active person), rewrites
@@ -132,7 +132,7 @@ With your record tools, in this order, re-reading each record after you write it
 3. **Timeline:** each planned row on its issue (`kind`, `subject`, `body`, `data` as JSON).
 4. **Waits,** for each issue whose plan `status` is `paused` (`working-on-issues` § Pausing):
    check the target first (a `blocker` whose imported issue is `done` is no wait: leave the issue
-   `backlog` and say so); make it exist (`decision`: ask it with `asking-for-decisions`, the
+   `backlog` and say so); make it exist (`decision`: ask it with `deciding-issues`, the
    confirmed question, to the confirmed owner; `task`: the Task to the owner, due at the deadline;
    `blocker`: `issues:<id>` of the imported blocker); write the `wait` row (`target`, `waitKind`,
    `owner`, `resumeAt`, `data` with `deadline` and, for a decision, `question`); then set

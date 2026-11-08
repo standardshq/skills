@@ -39,7 +39,7 @@ In `execution` mode the interrogation is already settled: the issue's
 reproduction or assessment, its `screening` row, and its rulings carry the
 decisions. Re-litigating them is scope creep. If those leave a branch that
 genuinely forks the work, **stop and ask**: `executing-issues` pauses the issue
-on a `decision` wait with `asking-for-decisions`. Do not guess.
+on a `decision` wait with `deciding-issues`. Do not guess.
 
 ## Dependencies
 
@@ -398,7 +398,7 @@ merge on its own and never re-runs after its fixes land.
 | Trusting a checker's `file:line` | Confirm against the current tree. Unmatched finding is discarded. |
 | Serializing tasks that share nothing | Dispatch them in parallel in one message. |
 | Running the full suite locally | Targeted tests plus filtered typecheck. |
-| Interrogating in `execution` mode | The issue already settled it. A genuine fork means a `decision` wait, asked with `asking-for-decisions`. |
+| Interrogating in `execution` mode | The issue already settled it. A genuine fork means a `decision` wait, asked with `deciding-issues`. |
 | Editing production code in `brief` mode | Brief mode stops at the decision report. |
 
 ## When not to use

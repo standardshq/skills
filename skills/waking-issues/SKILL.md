@@ -113,7 +113,7 @@ In this order:
 ### Ask
 
 Deadline passed, target abandoned, or failure ceiling reached in § 4: one Décision per issue,
-covering all its waits in this state, asked with `asking-for-decisions`. You decide the rows
+covering all its waits in this state, asked with `deciding-issues`. You decide the rows
 around it, not that skill: it only asks and, when answered, writes the `ruling`.
 
 **Never twice:** a wait already cited in an `escalation` row (its `data.waits`), or whose target
@@ -142,7 +142,7 @@ Then:
 
 ### Apply
 
-The asking run, when the answer resumes it, only writes the `ruling` and stops; the one exception is « I take it », where it also adds the person's direction to `## Plan` (`asking-for-decisions`). You apply every
+The asking run, when the answer resumes it, only writes the `ruling` and stops; the one exception is « I take it », where it also adds the person's direction to `## Plan` (`deciding-issues`). You apply every
 `ruling`, once per issue it reaches. **The marker:** the `applied` row, written on that issue
 (`subject: timeline:<ruling id>`, `data.rows` = the ids you wrote there) is always the **last**
 write of an application on that issue, after every `released`/`resolved`/`wait` row and after its
@@ -172,11 +172,11 @@ First, **any other `ruling`** on an issue newer than its latest `attempt` row re
 | **I take it** | `released` on every open wait of the issue, then `mine` |
 | **Close it**, no linked PR open | `released` on every open wait, then `done` with `closeReason: wont_do` (`overtaken` when the answer says the work landed) |
 | **Close it**, a linked PR still open | `released` on every open wait, then `in_review`, then the `applied` row with `data.closeReason` (as above) and `data.closeWhenPullRequestsClose: true`: a pending close, which § 4 carries out once every linked PR is closed. No question, no `signal` |
-| **Extend** (escalation) | for each cited wait still open: if its target is readable and not in its abandoned state, a new `wait` row identical but for `data.deadline`, then `released` on the old one. Otherwise (target gone, or a `decision`/`approval` wait whose Décision expired): if the `to` of § 6 « Ask » finds no active person, write the `no_owner` `signal` and leave the old wait open; else `released` on the old one, then ask once more with `asking-for-decisions` and open the new wait on the new Décision: **the only re-ask the « never twice » rule allows**, once per Extend ruling |
+| **Extend** (escalation) | for each cited wait still open: if its target is readable and not in its abandoned state, a new `wait` row identical but for `data.deadline`, then `released` on the old one. Otherwise (target gone, or a `decision`/`approval` wait whose Décision expired): if the `to` of § 6 « Ask » finds no active person, write the `no_owner` `signal` and leave the old wait open; else `released` on the old one, then ask once more with `deciding-issues` and open the new wait on the new Décision: **the only re-ask the « never twice » rule allows**, once per Extend ruling |
 | **Wait on something else** (escalation) | write the new `wait` the answer names (check its target first, `working-on-issues` § Pausing), then `resolved` on the escalation's own wait |
 | **Retry** (failure ceiling) | `resolved` on the wait; the reset above already applied |
 | anything else, on a `decision` or `approval` wait | `resolved` on the wait whose `target` is the ruling's `subject` |
-| anything else, on a ruling that answers no wait and no escalation (a Décision from the Maintenance routine, from Review in `human` mode, on a `none` gate or on a red target branch, or from any stage on an unresolved target, `asking-for-decisions` § 3) | nothing: the `applied` row with `data.skipped: "no_wait"`; the asking routine acts on the answer itself (a red target needs none: the target's sha moving is its answer) |
+| anything else, on a ruling that answers no wait and no escalation (a Décision from the Maintenance routine, from Review in `human` mode, on a `none` gate or on a red target branch, or from any stage on an unresolved target, `deciding-issues` § 3) | nothing: the `applied` row with `data.skipped: "no_wait"`; the asking routine acts on the answer itself (a red target needs none: the target's sha moving is its answer) |
 | a free answer to an escalation that fits no option | leave everything open, write a `signal` (`rule: unapplied_ruling`) for the Maintenance routine, and the `applied` row with `data.skipped: "unmapped"` |
 
 Then the `applied` row, last. « I take it » and « Close it » are moves on a person's behalf: the
