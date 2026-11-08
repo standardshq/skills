@@ -1,6 +1,6 @@
 ---
 name: screening-issues
-description: Use when the Triage routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait.
+description: Use when the Screening routine takes the next issue of its pipe, on a ruling, a person's release, a new issue or a refresh, and on its Monday sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision.
 ---
 
 # Screening issues
@@ -11,30 +11,31 @@ costs it before anyone can tell: the claim reads as well as the day it was filed
 
 Screening resolves those claims **by command, not by reading**. Reading is a perceptual task done
 under the pull of a plausible claim; a lookup is not. Every screening ends in one verdict:
-**close**, **hold**, **assess** or **ready**, and only `ready` work can be launched.
+**close**, **checkpoint**, **preview**, **park** or **ready**, and only `ready` work can be launched.
 
-Read `working-on-issues` first, with `read-recipe.md` and `timeline-kinds.md`: statuses, who
-moves them, pausing, the `screening` row. Ask people with `asking-for-decisions`. You own
-`backlog` → `ready`, `backlog` → `done` (refuted, overtaken, duplicate) and pauses; nothing else.
+Read `working-on-issues` first: `workflow.md` gives Screening's pipe and exits, `timeline-kinds.md`
+the `screening` and `ruling` rows. An issue with an empty `type` goes through `triaging-issues`
+before anything here; a feature routed to preview goes on to `previewing-features` in the same run.
 
 ## Scripts
 
-In `scripts/` of this skill (in your sandbox: `/workspace/skills/screening-issues/scripts/`, `working-on-issues`). They never call the workspace (the sandbox holds no workspace key):
-they read an export of issues you write with your own record tools, and git in a repository
-checkout. Never hand-assemble what a script prints.
+In `scripts/` of this skill (in your sandbox: `/workspace/skills/screening-issues/scripts/`). They
+never call the workspace (the sandbox holds no workspace key): they read an export of issues you
+write with your own record tools, and git in a repository checkout. Never hand-assemble what a
+script prints.
 
 | Script | Prints | Exit |
 |---|---|---|
 | `issue-freshness.mjs <issue-id> --input <file> --checkout <dir> --branch <targetBranch>` | every `issues:<id>`, `#N`, `owner/repo#N` and path the issue cites, resolved on the branch: `STALE`, `MISSING`, `UNDATED`, `SHORT` or `ok` | 0 all hold; 1 a claim no longer holds; 2 usage or input error, or the export lacks `projects` |
 | `issue-duplicates.mjs --input <file> --project <id> [--issue <id>]` | candidate duplicate pairs: open issues each pair once, or one issue against every other, closed ones included | 0 printed; 1 usage or input error; 2 the export lacks `projects` |
 | `saga-scan.mjs --checkout <dir> --branch <targetBranch>` | files corrected by three or more fixes (sagas), names three or more fixes had to add across modules (bindings) | 0 printed; 1 git failed |
-| `issue-families.mjs --input <file> --project <id> [--issue <id>]` | families of open issues that may ship under one plan; used by `assessing-features` | 0 printed; 1 usage or input error; 2 the export lacks `projects` |
+| `issue-families.mjs --input <file> --project <id> [--issue <id>]` | families of open issues that may ship under one plan | 0 printed; 1 usage or input error; 2 the export lacks `projects` |
 
 A usage or input error is not a finding: fix the call or the export and run it again.
 
 **The export** (`--input`): one JSON file per run, in your scratch directory, holding every issue
 filed on the project record or any record under it, every status, with the `projects` records of
-that tree, so a root covers its repositories. `issue-freshness.mjs`, and every script run with `--project`, exit 2 on an export without `projects` (a bare array, or a `data` wrapper alone).
+that tree, so a root covers its repositories.
 
 ```json
 {
@@ -60,68 +61,56 @@ that tree, so a root covers its repositories. `issue-freshness.mjs`, and every s
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to
    `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
 
-**The checkout:** the repositories of the issue's `project`, each checked out in your environment. Per
-repository: read its facts (`working-on-issues` § Repository facts), which leaves the checkout on
-`targetBranch`, then `git -C <dir> rev-parse origin/<targetBranch>` for the sha your
-`screening` row names. Read the repository's own agent rules (`AGENTS.md`, `CLAUDE.md`,
-`.cursor/rules`) there, never a copy.
+**The checkout:** per repository of the issue's `project`, read its facts (`working-on-issues`
+§ Repository facts), which leaves the checkout on `targetBranch`, then `git -C <dir> rev-parse
+origin/<targetBranch>` for the sha your `screening` row names.
 
-## Which issues
+## Which issue
 
-| Run | Issues |
-|---|---|
-| an issue created | that issue, unless it is already `done` (the « Factory operations log », created closed by any routine, is never screened) |
-| a `woke` row with `resumeAt: screening` | that issue; any other `resumeAt`: stop |
-| an `assessment` row with `resumeAt: screening` (`verdict: approved`) | that issue: the maintainer approved the feature |
-| the daily pass | every `backlog` issue that needs screening (below), oldest first; then every `backlog` feature whose latest `screening` row is `assess` with no newer `assessment` row: run `assessing-features` on it |
-| the daily pass on a Monday | the same, then § Weekly sweep |
+Screening's pipe, in this order; inside each tier by `priority` then age, the claim first
+(`working-on-issues` § One issue per run):
 
-**Needs screening:** status `backlog`, not an umbrella, and one of: no `screening` row yet; a
-`woke` row or a person-written status move newer than its latest `screening` row; an `assessment`
-row `verdict: approved` newer than its latest `screening` row `verdict: assess`. Otherwise a
-feature whose latest verdict is `assess` belongs to assessment: do not screen it again.
+1. **Rulings and releases:** a `backlog` issue with a `ruling` row newer than its latest
+   `screening` row; a `ready` issue whose latest move to `ready` was a person's and is newer than
+   its latest `screening` row.
+2. **Never screened:** a `backlog` issue with no `screening` row.
+3. **Refresh:** a `backlog` or `ready` issue whose latest `screening` row is older than 7 days; a
+   parked feature only once its `Expires:` date has passed.
 
-An empty list is a correct outcome: report it and stop. Never widen the search.
+Up to 5 issues per run while each one asks nothing; the first that sends a Decision ends the run.
 
-**One at a time, with a lease.** Before screening an issue, read it with the read recipe. A
-`leaseHolder` whose `leaseExpiresAt` is in the future: another run holds it, take the next. Else
-claim the lease (`working-on-issues` § Claiming, « Screening holds it too »). Release it on every exit.
+The first run after Monday 06:00 UTC (the one starting before 06:15) runs § Weekly sweep before
+its pipe.
 
 ## The fence
 
 | The issue | Do |
 |---|---|
-| `mine` | stop: write nothing |
-| `paused`, `ready`, `in_progress`, `in_review`, `done` | not yours outside § Weekly sweep: stop |
-| has tasks (an umbrella: some issue has it as `parent`) | a container, never work: screen its tasks, not it; never close it |
-| `origin: shaping` and no task yet | an umbrella `shaping-features` is still writing: stop, write nothing |
-| `origin: release`, no `parent` and no task yet | a release umbrella `releasing-downstream` is still writing: stop, write nothing |
-| `type: feature`, its `parent` has `origin: shaping`, and no `assessment` row `verdict: approved` on it yet | a task `shaping-features` is still writing: stop, write nothing; the daily pass takes it once the row exists |
+| `mine`, `done`, `paused`, `in_progress`, `in_review` | not in the pipe; a ruling on a `mine` or `done` issue is history: leave it |
+| an umbrella (some issue has it as `parent`) | a container, never work: screen its tasks, never route or close it |
 
 Screening closes on repository evidence alone. These stay open whatever the scripts print, because
-their evidence lives outside the repository: an issue with a `ruling`; an issue a person edited
-after it was filed (activity); an issue whose only defect is age. For them, write the `screening`
-row with what you found and pause on a `decision` wait (« close it, or keep it open »), Close it
-recommended when the evidence says so.
+their evidence lives outside the repository: an issue with a `ruling`; one a person edited after
+it was filed (activity); one whose only defect is age. For them, stop for a person
+(`need: decision`, « close it, or keep it open »), Close it recommended when the evidence says so.
 
-## 1. Classify the type
+## Release and rulings
 
-When `type` is empty, set it from the issue's text alone: title, `body`, origin. Do not read code
-to classify; a plausible cause invented here is carried by every stage after it.
+**A person's move to Ready** is the ruling "proceed as last scoped":
 
-| `type` | Test |
-|---|---|
-| `bug` | intended, existing behaviour is broken |
-| `enhancement` | an existing capability is improved |
-| `feature` | a new capability, workflow or product surface |
-| `chore` | maintenance with no behaviour change (a dependency, a rename, a cleanup) |
+1. Write a `ruling` row, no `subject`: `Decision-maker:` who moved it, `Source:` the move and its
+   time from the activity, `Resume at: screening`, and the scope taken as approved (the latest
+   brief, `preview` row or ruling that named one).
+2. When the move took the issue out of Paused, dismiss its open Decision (`deciding-issues`) and
+   clear `need` and `waitingOn`.
+3. Screen it in this run (§ 1 to § 6), naming the ruling in `Ruling consumed:`. A release lifts a
+   pause, never a gate: a feature with no approved preview goes to preview.
 
-Classify the requested outcome, not the suggested implementation. When the text holds several
-outcomes, or too little to pick one without inventing behaviour, do not guess: pause on a
-`decision` wait asking the issue's author (a person), else the project's first active maintainer,
-the one question that settles it.
+**A `ruling` row** routes by its `Resume at:`: `screening` and `preview` run here; `build` is
+screened, then reached through Ready or a launch (§ Launch). A ruling marked `Superseded by:` is
+history.
 
-## 2. Resolve what the issue asserts
+## 1. Resolve what the issue asserts
 
 Run `issue-freshness.mjs` against each repository the issue's work lives in.
 
@@ -130,7 +119,7 @@ can say which sentence of the issue it breaks. A stale reference is not fatal by
 may cite a merged pull request as its evidence. The question is always *what did the issue build on
 this*.
 
-## 3. Duplicates
+## 2. Duplicates
 
 Run `issue-duplicates.mjs --project <id> --issue <id>`. Read both issues of every pair; rule
 **same** (one change closes both) or **distinct**. Never rule on titles alone.
@@ -138,99 +127,120 @@ Run `issue-duplicates.mjs --project <id> --issue <id>`. Read both issues of ever
 For a same pair, keep the **richer** issue: further along (in progress before ready before
 backlog), then the one with rulings or evidence, then the one people edited, then the older. A
 fenced issue is always the kept one. Append to the kept issue's `context` what only the other
-carried, with `issues:<id>`. Close the other only if it is the one you are screening, or a
-`backlog` issue outside the fence (it gets its own `screening` row). A pair that is the same as a
-`done` issue: § 6, closed `duplicate` or `overtaken`.
+carried, with `issues:<id>`. Close the other only when it is the one you are screening.
 
-## 4. Families
+## 3. Families
 
 Run `saga-scan.mjs` on the repository. If the file the fix lives in tops the saga list, or the fix
 would add a call the binding list names, the issue is a symptom: the next compensation, not the
-fix. Hold it (§ 6) and name the family: the change that ends it is the boundary, or the one
-canonical name every caller must use.
+fix. Name the family: the change that ends it is the boundary, or the one canonical name every
+caller must use.
 
-## 5. Size
+## 4. Size
 
 Estimate the size the change will land at, from the files the issue cites, a scout's *Cost* line,
-and these triggers: concurrency, shared state, external input, a public contract, a migration, a
+and the triggers: concurrency, shared state, external input, a public contract, a migration, a
 permission or tenancy rule, more than one repository.
 
-| Estimate | Means |
+| Size | Bound |
 |---|---|
-| one reviewable pull request, no trigger | fits |
-| several pull requests, or any trigger above with a design still open | beyond one change: hold on a spec |
+| `small` | about 50 changed lines, no withheld path, no trigger |
+| `standard` | one reviewable pull request, no trigger |
+| `full` | several pull requests, or any trigger with a design still open: beyond the factory |
 
-A task of an umbrella (it has a `parent`) skips this step: its size and decisions were settled
-with the maintainer on the umbrella. Put the estimate and the line that drove it in the
-`screening` row's body.
+A task of an umbrella (it has a `parent`) skips this step: its size was settled on the umbrella.
+Put the size and the line that drove it in the `screening` row.
 
-## 6. Verdict
+## 5. Verdict
 
-Write the `screening` row first, except for `assess` (`subject: github:owner/repo@<sha>` of the repository the work
-lives in, every other repository read listed with its sha in `body`; `data.verdict`; `resumeAt`
-only for `assess`), then act:
+Write the `screening` row first (`subject: github:owner/repo@<sha>` of the repository the work
+lives in, every other repository read listed with its sha in `body`), then act:
 
 | Verdict | When | Then |
 |---|---|---|
-| `close`, `closeReason: overtaken` | the gap is closed on the target branch, by a change merged after the issue was filed (a merged pull request naming the issue counts) | status `done`. The body names that pull request or commit |
-| `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | status `done`. File the residual as a new issue when it is real |
-| `close`, `closeReason: duplicate` | § 3 kept the other issue | status `done`. The body names the kept issue, `issues:<id>` |
-| `hold` | a symptom (§ 4) | pause: `decision` wait to the project's first active maintainer, fix the family first (recommended) or patch this one |
-| `hold` | beyond one change (§ 5) | pause: `task` wait to the project's first active maintainer for a spec (`shaping-features`), `resumeAt: screening`. Propose the split into one-change issues in the Task |
-| `hold` | the right fix changes a public contract, a security posture or an agent's authority | pause: `decision` wait, the one question that forks the work |
-| `hold` | it needs something not yet done: another issue, a pull request, a date, a person's artifact | pause on that `blocker`, `date` or `task` wait |
-| `assess` | `type: feature`, no `assessment` row `approved` since its last `assess` verdict | status stays `backlog`; the row carries `resumeAt: assessment`, which marks where the same Triage run continues into `assessing-features` (no trigger fires), so it is written last (below) |
-| `ready` | every claim resolves, no family owns it, it fits one change, and for a feature an `assessment` row with `verdict: approved` | status `ready`; for a task of an umbrella (it has a `parent`), leave the status `backlog`: the person's drag to `ready` is its launch |
+| `close`, `closeReason: overtaken` | the gap is closed on the target branch, by a change merged after the issue was filed (a merged pull request naming the issue counts) | `done`. The body names that pull request or commit |
+| `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `done`. File the residual as a new issue when it is real |
+| `close`, `closeReason: duplicate` | § 2 kept the other issue | `done`. The body names the kept issue, `issues:<id>` |
+| `checkpoint` | a symptom (§ 3) | `decision`: fix the family first (recommended), or patch this one |
+| `checkpoint` | `full` (§ 4) | `decision`, I take it first, the split into one-change issues proposed |
+| `checkpoint` | the right fix changes a public contract, a security posture or an agent's authority; or the route needs a fact or an artifact only a person has | `decision`: the one question that forks the work |
+| `preview` | `type: feature` with no ruling answering its latest `preview` row | `previewing-features`, in this run |
+| `park` | a ruling parked the feature its latest `preview` row named | stays `backlog` until its `Expires:` |
+| `ready` | every claim resolves, no family owns it, it is not `full`, and a feature has a ruling approving its preview | § 6, then § Launch, else `ready` |
 
-Every pause follows `working-on-issues` § Pausing: check the target first, make it exist, the
-`wait` row, then `paused`. A hold is never a free-text "revisit later": it names its wait.
+A checkpoint stops for a person (`working-on-issues` § Stopping for a person) with the question
+`deciding-issues` phrases, `Resume at: screening`.
 
-Closing a stale, overtaken or symptomatic issue here costs minutes instead of a Build run:
-**closing is the point.** The body of a `close` row states the command that produced the finding
-and quotes the line of the issue that no longer holds, so the next reader re-runs it rather than
+**Closing is the point:** a stale, overtaken or symptomatic issue closed here costs minutes
+instead of a Build run. The body of a `close` row states the command that produced the finding and
+quotes the line of the issue that no longer holds, so the next reader re-runs it rather than
 re-litigates it.
 
-Then write a `handoff` row (verdict, the evidence, what the next stage needs), release the lease,
-re-read the issue and check the state you meant to leave. **The one exception to that order:** an
-`assess` verdict's row carries `resumeAt: assessment` and marks where this run continues into
-assessment (it triggers nothing), so write it **last**, after the `handoff` row and the lease release (`working-on-issues`
-§ Finish).
+A parked feature past its `Expires:` closes `wont_do`, its park ruling the authority, unless
+evidence in the workspace shows the `Revisit when:` trigger fired: then preview it again.
+
+## 6. The agent brief
+
+Build works from the brief; the request and discussion are context. Write it into `body`, one
+section at a time, each other section written back word for word:
+
+| Section | Holds |
+|---|---|
+| `## Problem` | current behaviour and desired behaviour, edge and error cases included; "Reported cause (hypothesis)" when triage kept one; for a task, what its umbrella settled |
+| `## Acceptance` | criteria a test or a command proves, each one on its own: `toBe`-exact, never "works correctly" |
+| `## Seams` | the public seams the change is driven and tested through: types, function signatures, commands, routes, config shapes. `tdd` reads its seams here |
+| `## Out of scope` | the adjacent changes Build leaves alone |
+
+Write it to stay true while the code moves: interfaces and behaviour, never paths or line numbers;
+what the system does, never how to edit it. A ruling outranks the sections it contradicts.
+
+## Launch
+
+Screening moves a `ready`-routed issue to `in_progress` in exactly two cases. Every other issue
+waits in Ready for a person.
+
+| Case | Who granted it | Condition Screening checks |
+|---|---|---|
+| Small and safe | the project's `autoLaunch` switch, last set by a maintainer of the project (read from the record's history), off by default | the issue was created by a maintainer, or moved to Ready by one; `type` bug or enhancement; smallest size tier; no withheld path; no migration; no new chrome, layout or interaction; no open blocker |
+| Approved and launched | a maintainer's answer "Approve and launch" to a Decision | the `ruling` row names `decisions:<id>`, that Decision was answered by a maintainer of the project with that option, and the scope is unchanged since |
+
+A maintainer is a person in the project's `maintainers`, walking up to the root. Check each
+person, never assume one:
+
+- **created or released by a maintainer:** the issue's `createdBy`, or the actor of its latest
+  move to `ready`;
+- **the grant:** the last writer of `autoLaunch` in the project record's history;
+- **the answer:** the person who answered the Decision the `ruling` names, with exactly that
+  option; scope unchanged means no newer `ruling`, `preview` row or person's edit of `body`.
+
+The smallest tier is `small` (§ 4); withheld paths are the repository's `withheld` globs. A
+feature never launches on `autoLaunch`; a ruling from a sitting never launches code.
+
+To launch: write the `screening` row with `Launch:` the case and its grant (`autoLaunch` set by
+whom and when, or `decisions:<id>` answered by whom), then `status: in_progress`.
 
 ## Weekly sweep
 
-On Monday's daily pass, after the issues that need screening, judge the whole open backlog of each
-project against itself and today's branch. Every finding comes from a script; read only to rule on
-what a script printed. The fence applies unchanged.
+Judge the whole open backlog of each project against itself and today's branch. Every finding
+comes from a script; read only to rule on what a script printed. The fence applies unchanged, and
+the sweep sends no Decision.
 
-1. **Duplicates:** `issue-duplicates.mjs --project <id>`. Rule every pair as in § 3. Close the
-   poorer one only when it is `backlog` and outside the fence; when it is `ready`, pause it on a
-   `decision` wait (Close it as a duplicate of the kept issue, recommended). Never touch an issue in
-   `in_progress`, `in_review` or `mine`: name the pair in your report.
-2. **Overtaken:** `issue-freshness.mjs` on every `backlog` and `ready` issue. Each exit 1 is ruled
-   as in § 6. A `backlog` issue closes there; a `ready` one is paused on a `decision` wait (Close it,
-   recommended, naming the change that overtook it). A stale reference cited only as prior evidence
-   leaves it as it is.
-3. **Size:** every `ready` issue without a `parent` goes through § 5 again. Beyond one change:
-   pause it on the spec `task` wait.
-
-Write a `screening` row for every issue the sweep closes or pauses, with the script line that drove
-it.
+1. **Duplicates:** `issue-duplicates.mjs --project <id>`. Rule every pair as in § 2. Close the
+   poorer one when it is `backlog` and outside the fence, with its `screening` row; otherwise
+   append the pair to both issues' `context`, so their next screening rules on it.
+2. **Families:** `issue-families.mjs --project <id>`. For an unshaped family of two or more open
+   members, append the family to each member's `context`: one plan may ship them.
 
 ## Report
 
 One line per issue: verdict, the evidence (the script line, the pull request, the kept issue), the
-wait opened. For the sweep, one table (issue, verdict, evidence) and a line naming every fenced
-issue you asked about instead of closing.
+Decision sent or the launch case. For the sweep, one table (issue, finding, evidence).
 
 ## Red flags
 
 - closing on a claim you read rather than a line a script printed;
 - `overtaken` without naming the change that overtook it;
-- reading code to set `type`;
 - `ready` on an issue whose target file tops the saga list;
-- `ready` on a feature no ruling approved after its assessment;
-- a hold with no `wait` row, or a wait on a target already resolved;
-- closing an issue with a ruling, one a person edited, or one whose only defect is age;
-- moving an issue out of `ready`, `in_progress` or `in_review` other than by a pause;
-- ending a run with your lease set or with no `handoff` row saying where it stands;
+- a launch with a grant, a creator or an answer you did not check against `maintainers`;
+- a brief naming paths or line numbers, or acceptance no test can prove;
 - growing this skill with a rule a script could compute instead.

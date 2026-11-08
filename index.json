@@ -4,16 +4,16 @@
     "description": "Use when a factory routine needs a person's answer before an issue can move: a product or architecture call, an approval, a mockup to approve, a passed deadline. Asks one forking question as a Décision written as a briefing, opens the decision wait, and records the answer as a ruling."
   },
   {
-    "name": "assessing-features",
-    "description": "Use when the Triage routine runs on a feature screening sent to assessment, or on a woke row with resumeAt assessment. Decides whether a feature's durable value justifies its durable debt, writes that verdict as an assessment timeline row, and asks the maintainer, or parks the feature on a typed wait."
-  },
-  {
     "name": "brainstorming",
     "description": "Use before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
   },
   {
     "name": "curating-requests",
     "description": "Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Turns it into one issue with origin slack in the project that owns it, points it at an existing issue, asks one question, or declines it politely, never twice for one Slack message."
+  },
+  {
+    "name": "diagnosing-bugs",
+    "description": "Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow."
   },
   {
     "name": "evaluating-changes",
@@ -26,6 +26,10 @@
   {
     "name": "filing-findings",
     "description": "Use when a scouting pass has candidates and must decide which of them get filed, as an issue with origin scout:<kind>. The shared cost, budget and ranking bar every scout obeys."
+  },
+  {
+    "name": "implement",
+    "description": "Implement a piece of work based on a spec or set of tickets."
   },
   {
     "name": "implementing-changes",
@@ -48,6 +52,14 @@
     "description": "Use when the Maintenance routine runs, every 15 minutes. Catches what slipped through the structure - broken invariants, gestures or a repository's `notes` written by an agent, waits with no active owner, double or looping leases, self-verification, idle or dropped pull requests, a red target branch, piled-up Décisions, failing routines, unhealthy repositories, a stalled delivery chain, a blown budget - and answers each with one listed action or a Décision."
   },
   {
+    "name": "pr",
+    "description": "Use when writing a PR body."
+  },
+  {
+    "name": "previewing-features",
+    "description": "Use when screening routes a feature to preview, or a ruling resumes one at preview. Weighs the feature's durable value against its durable debt, writes the verdict candidate, park or reject as a preview row, and stops on a Decision for the maintainer's approval."
+  },
+  {
     "name": "pruning-tests",
     "description": "Use when the Maintenance routine sweeps a repository's test suite, when a maintainer asks to audit a suite, or when an issue with origin scout:tests is executed. Scouts the tests whose time, flakiness or upkeep outweighs what they alone catch, audits every test of a suite for what it witnesses, or cuts one candidate, folding its lone assertion into a surviving test first."
   },
@@ -61,7 +73,7 @@
   },
   {
     "name": "screening-issues",
-    "description": "Use when the Triage routine runs, on a new issue, a woke row with resumeAt screening, its daily pass or the Monday backlog sweep. Classifies the issue's type, re-resolves what it asserts against the repository's target branch, closes what no longer holds, and sets Ready, sends a feature to assessment, or pauses on a typed wait."
+    "description": "Use when the Screening routine takes the next issue of its pipe, on a ruling, a person's release, a new issue or a refresh, and on its Monday sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision."
   },
   {
     "name": "setting-up-the-factory",
@@ -72,12 +84,20 @@
     "description": "Use when a maintainer wants to choose what to shape next (the map of the open backlog), or when a feature idea, a family of issues, or an issue paused on a spec Task must become one approved spec, written to an umbrella issue with one task issue per change, chained by blockedBy. Runs live with the maintainer, never as a routine."
   },
   {
+    "name": "tdd",
+    "description": "Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions \"red-green-refactor\", or wants integration tests."
+  },
+  {
+    "name": "triaging-issues",
+    "description": "Use when a Screening run takes an issue whose `type` is empty or contradicted by a ruling. Classifies it as bug, enhancement, feature or chore from the issue's own text, keeps the reporter's cause as a hypothesis, and stops for a person when the text cannot settle the type."
+  },
+  {
     "name": "waking-issues",
     "description": "Use when the Maintenance routine runs, on an issue set Done, a ruling recorded, or its hourly pass, which also reads every Task done or deleted and every merged or closed pull request. It is the only skill that resolves waits, applies a person's answers, wakes paused issues, and closes issues from their pull requests."
   },
   {
     "name": "working-on-issues",
-    "description": "Use when any factory routine reads an issue, changes its status, claims or releases it, pauses it, or writes a timeline row on it. Holds the statuses and who may move them, the lease, the timeline ledger, the shape of a wait and the read recipe."
+    "description": "Contract of every factory run. Use when a routine takes the next issue of its pipe, claims or releases it, stops for a person, writes a timeline row, or reads a repository's rules."
   },
   {
     "name": "writing-plans",

@@ -6,7 +6,7 @@ A routine reads a row back from its `body`: it opens with the labelled lines the
 
 | `kind` | Written by | `subject` | Body opens with | Means |
 |---|---|---|---|---|
-| `screening` | Screening | `github:owner/repo@<sha>` of the default branch read | `Verdict:` ready, close, checkpoint or preview; `Ruling consumed:` the `ruling` row, or none; `Launch:` small and safe or approved and launched, with its grant, when it launched | what the issue asserts, re-resolved against today's branch, and the route taken |
+| `screening` | Screening | `github:owner/repo@<sha>` of the default branch read | `Verdict:` ready, close, checkpoint, preview or park; `Ruling consumed:` the `ruling` row, or none; `Launch:` small and safe or approved and launched, with its grant, when it launched | what the issue asserts, re-resolved against today's branch, and the route taken |
 | `checkpoint` | the run that sent a Decision | `decisions:<id>` | the labelled lines of `SKILL.md` § The checkpoint row | a run stopped for a person |
 | `ruling` | the run that asked, or the sitting, on an answer; Screening, for a person's move to Ready | `decisions:<id>`, or none for a move | `Decision-maker:`, `Recorded by:`, `Source:` (`decisions:<id>` and the date, or the conversation and its date), `Resume at:`; `Superseded by:` the gesture, when one came first | a person's answer, quoted verbatim under the question, with the defaults taken unasked one per line. A move to Ready is written as "proceed as last scoped", with who moved it and when |
 | `preview` | Screening, previewing a feature | `github:owner/repo@<sha>` | `Verdict:` candidate, park or reject; for a park, `Revisit when:` and `Expires:` (90 days at most) | a feature's value weighed against its durable debt |
