@@ -56,7 +56,8 @@ Once it is sent:
 3. Park the claim (Merge it: clear it) and end your turn.
 
 The answer resumes this run; `deciding-issues` says what each answer does. Whoever moves the issue
-out of Paused clears `need` and `waitingOn`; after Merge it, the resumed run does.
+out of Paused clears `need` and `waitingOn`, except the move to Mine on I take it, which keeps
+`waitingOn` (the person who took it); after Merge it, the resumed run clears `waitingOn`.
 
 ### The checkpoint row
 

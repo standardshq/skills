@@ -106,8 +106,8 @@ it was filed (activity); one whose only defect is age. For them, stop for a pers
    approval of that scope, a feature never previewed included: it skips preview. A released issue
    leaves screening only three ways: it stays `ready` (with its brief, § 6), it launches
    (§ Launch), or, when the evidence contradicts it (delivered, refuted, overtaken, a duplicate,
-   a symptom, `full`), a `decision` checkpoint takes it to Paused, Close it among the options.
-   Screening never closes a released issue itself.
+   a symptom, `full`), a `decision` checkpoint sent as a new Decision (`deciding-issues` § Ask 4)
+   takes it to Paused, Close it among the options. Screening never closes a released issue itself.
 
 **A `ruling` row** routes by its `Resume at:`: `screening` and `preview` run here; `build` is
 screened, then reached through Ready or a launch (§ Launch); `land` is not screening's

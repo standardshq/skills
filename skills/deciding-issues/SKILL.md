@@ -43,8 +43,8 @@ The person reads it cold, perhaps weeks later, in the workspace's language, with
 
 A `design` need is owed for new chrome, a new layout or a new interaction; restyling never needs
 one. Draw it as `mockups.md` says, one PNG per option, each stored as a file attached to the issue,
-and ask: Approve, Change (say what), No mockup needed, Close it. A `decision` whose question is a
-screen (Preview) carries its mockups the same way.
+and ask: Approve (and Approve and launch, as § 2 says), Change (say what), No mockup needed,
+Close it. A `decision` whose question is a screen (Preview) carries its mockups the same way.
 
 A screen you cannot draw (no source for it, or a direction only a person can choose): send the
 `design` Decision without one, its options Draw it with me in a sitting, No mockup needed,
@@ -56,9 +56,11 @@ running app's published link (`working-on-issues/environments.md`, Published lin
 ### 4. Send
 
 Search first: `search` with `kinds: ["decision"]`, `link: record:<issue id>`, `state: open`. One
-exists and a person moved the issue out of Paused after it was sent: write the ruling « proceed as
-last scoped » as Screening does (`screening-issues` § Release and rulings) and go on without
-asking. Otherwise the issue waits on it: send nothing, clear your claim, end.
+exists and a person moved the issue out of Paused after it was sent: with no `ruling` row recording
+that move yet, write the ruling « proceed as last scoped » as Screening does (`screening-issues`
+§ Release and rulings) and go on without asking; with one, a checkpoint on new evidence is sent as
+a new Decision, the old card superseded by that ruling. Otherwise the issue waits on it: send
+nothing, clear your claim, end.
 
 Call `send` with `questions`:
 
@@ -107,8 +109,8 @@ The answer resumes the run that asked. `read decision:<id>` for the answer, `ans
 | any other answer | the `ruling` | Backlog: Screening takes rulings first and routes by `Resume at:` |
 
 Every answer but I take it, superseded included, clears `waitingOn`; a move out of Paused also
-clears `need`, in the same update. Then clear your claim and end: a run never continues its own stage after its
-question.
+clears `need`, in the same update. Then clear your claim if you
+hold one and end: a run never continues its own stage after its question.
 
 **The `ruling` row** (`timeline-kinds.md`): `subject: decisions:<id>`; `Decision-maker:` who
 answered, `Recorded by:` your routine, `Source:` `decisions:<id>` and the date, `Resume at:` the
@@ -116,15 +118,14 @@ checkpoint's; the question as asked, the answer quoted verbatim, the defaults ta
 line, or « none ». An approved mockup is named by its file, attached to the issue.
 
 **Answered with a question:** answer it from the codebase and the evidence, then ask again (§ Ask)
-with the missing context added. Write no ruling; never guess on the person's behalf.
+with the missing context added, writing no ruling.
 
 **Expired** (24 hours, the run resumes with no answer): write nothing, change nothing, clear your
 claim, end. The issue stays Paused, for a sitting or a person's move to Ready.
 
 **A person's gesture while a Decision is open** (a move to Ready, Mine or Done): only the run that
 asked closes its question, so the card stays open. Answered later, the first row above records it
-superseded; expired, it leaves nothing. Screening records a move to Ready as a release
-(`screening-issues` § Release and rulings).
+superseded; expired, it leaves nothing.
 
 ## In Slack
 
@@ -134,7 +135,7 @@ pauses nothing; the answer resumes Intake, which judges the message again with i
 (`curating-requests`). A reporter who is not an active person of the
 workspace cannot answer a Decision: ask them in plain text, one reply in the thread.
 
-Every other routine's Decisions go to Decisions, for the maintainer, never to the channel.
+Every other routine's Decisions go to Decisions, never to the channel.
 
 ## The sitting
 
