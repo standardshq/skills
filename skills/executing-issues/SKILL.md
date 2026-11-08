@@ -14,10 +14,10 @@ something to compare against that the implementation could not have chosen.
 
 ## 1. Take the next issue
 
-The pipe (`workflow.md`, Build): In progress issues with no live claim and no open linked PR,
-whose latest move into In progress passes `workflow.md` § Launch. An issue with an open linked PR
-belongs to that PR: Build starts no second implementation. One still In progress and unclaimed (a
-run died between opening the PR and moving the issue): claim it, finish § 6's last writes, end.
+The pipe (`workflow.md`, Build): In progress issues with no live claim whose latest move into In
+progress passes `workflow.md` § Launch, and with no open linked PR. One with an open linked PR
+enters only because a run died between opening it and moving the issue: claim it, finish § 6's
+last writes, end; Build starts no second implementation.
 An issue that has tasks (`childIds`) is never work; one with a `blockedBy` issue not Done waits,
 with nothing written.
 
@@ -54,7 +54,7 @@ test or script that fails on the unmodified branch for the reported reason. That
 the first commit.
 
 No red after the loop: a `decision` checkpoint naming each attempt to reproduce and what it
-showed, with Close it offered when the evidence says the bug is gone.
+showed, with Close it recommended when the evidence says the bug is gone.
 
 *Done when* the red command is committed, or the checkpoint is sent.
 
@@ -87,7 +87,7 @@ code against the repository's conventions is Land's, once, by a judge that did n
 
 Red: read the failure, fix it, run the whole gate again. Red on the third run: a `decision`
 checkpoint with the three failures quoted (trimmed, no `sensitiveData`), options retry with a
-stated change, I take it, Close it.
+stated change (Approve, or Approve and launch), I take it, Close it.
 
 An empty `verify`: the PR's CI is the gate, and Land reads it there.
 

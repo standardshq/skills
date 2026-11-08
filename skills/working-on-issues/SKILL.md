@@ -36,7 +36,8 @@ Read, in order, before acting:
 - **Renew** to now + 30 min at least every 20 minutes of work. At 2 hours of work, finish as a
   failure (`timeout`).
 - **Park:** a run that stops for a person keeps its claim, with `leaseExpiresAt` set to its
-  question's expiry (sent + 24 h), and clears it when it resumes.
+  question's expiry (sent + 24 h), and clears it when it resumes. Merge it releases the claim once
+  sent, so Land's pipe can set Done after a person merges on GitHub.
 - **Clear** both fields on every other exit, as the run's last write, then re-read: report only a
   state you verified.
 - **Expired:** an expired lease frees the issue; no pass cleans claims. The run taking it over writes
@@ -52,7 +53,7 @@ Once it is sent:
 1. Write the `checkpoint` row.
 2. Set `waitingOn` (the recipient) and, except for Merge it, which leaves the issue In review,
    `status: paused` with `need` (`decision` for a ruling, `design` for a mockup), in one update.
-3. Park the claim and end your turn.
+3. Park the claim (Merge it: clear it) and end your turn.
 
 The answer resumes this run; `deciding-issues` says what each answer does. Whoever moves the issue
 out of Paused clears `need` and `waitingOn`; after Merge it, the resumed run does.

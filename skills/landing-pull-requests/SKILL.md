@@ -23,7 +23,8 @@ The pipe, in order:
    checkpoint's `Resume at:` is land) with anything but Merge it, and has no `verdict` row after it.
    Skip it while auto-merge is enabled on its PR or a Merge it Decision is open.
 3. **A go to retry:** an In review issue whose PR head has a go `verdict` and is neither merged,
-   nor enqueued, nor named by a Merge it Decision (dequeued, or the merge failed): run § 4 again.
+   nor enqueued, nor named by an open or answered Merge it Decision (dequeued, the merge failed, or
+   its Merge it expired): run § 4 again.
 4. **Merged:** an In review issue whose every linked PR is merged. Set `status: done`,
    `closeReason: done`, clear the claim, end.
 
@@ -33,7 +34,8 @@ closes the open PRs itself.
 **The round** of the head: one more than the `verdict` rows on this PR newer than the latest
 person's gesture (a status move or a `ruling`). A person's gesture restarts the count.
 
-*Done when* you hold the claim on one issue and know its PR, head, round, and which pipe took it.
+*Done when* you hold the claim on one issue and know its PR, head, round, and which pipe took it:
+pipe 3 goes to § 4; pipe 4 ends with the issue Done and the claim cleared.
 
 ## 2. Freeze the dossier
 
@@ -91,7 +93,7 @@ two lines, each withheld path with its specific risk, the head, and the publishe
 `links` is true. Options: Merge it (the person merges on GitHub, recommended), Change (say what),
 I take it, Close it. The issue stays In review; the merge itself is the answer the pipe reads.
 
-Enqueued or merged: clear the claim. The issue goes Done when the pipe sees every linked PR
+Enqueued, merged or Merge it sent: clear the claim. The issue goes Done when the pipe sees every linked PR
 merged.
 
 *Done when* the head is enqueued, merged, or waits on one open Merge it.

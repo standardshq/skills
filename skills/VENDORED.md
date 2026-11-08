@@ -12,7 +12,8 @@ Source: [mattpocock/skills](https://github.com/mattpocock/skills) at commit `4ae
 ## tdd
 
 - `GLOSSARY.md` and ADRs read via the repository's rules (`working-on-issues`, `scripts/discover-repository.mjs`).
-- Seams come from the `## Seams` section of the issue's agent brief instead of being asked of the user; no brief seam means report and stop.
+- Seams come from the `## Seams` section of the issue's agent brief instead of being asked of the user; no brief seam means a `decision` checkpoint (`working-on-issues` § Stopping for a person).
+- Dropped the pointer to `codebase-design`, which is not vendored.
 - Removed the `code-review` reference in "Rules of the loop".
 - `tests.md`, `mocking.md` unchanged.
 

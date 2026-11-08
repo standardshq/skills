@@ -98,11 +98,10 @@ it was filed (activity); one whose only defect is age. For them, stop for a pers
 
 **A person's move to Ready** is the ruling "proceed as last scoped":
 
-1. Write a `ruling` row, no `subject`: `Decision-maker:` who moved it, `Source:` the move and its
-   time from the activity, `Resume at: screening`, and the scope taken as approved (the latest
+1. Write a `ruling` row, no `subject`: `Decision-maker:` who moved it, `Recorded by:` Screening,
+   `Source:` the move and its time from the activity, `Resume at: screening`, and the scope taken as approved (the latest
    brief, `preview` row or ruling that named one).
-2. When it has an open Decision, dismiss it (`deciding-issues`), and clear `need` and
-   `waitingOn`. A move to Mine or Done dismisses its Decision through `deciding-issues`, not here.
+2. Clear `need` and `waitingOn`; its open Decision stays (`deciding-issues`, A person's gesture).
 3. Screen it in this run (§ 1 to § 5), naming the ruling in `Ruling consumed:`. The release is the
    approval of that scope, a feature never previewed included: it skips preview. A released issue
    leaves screening only three ways: it stays `ready` (with its brief, § 6), it launches
@@ -172,7 +171,7 @@ lives in, every other repository read listed with its sha in `body`), then act:
 | `checkpoint` | the right fix changes a public contract, a security posture or an agent's authority; or the route needs a fact or an artifact only a person has | `decision`: the one question that forks the work |
 | `preview` | `type: feature`, not released by a person, with no ruling answering its latest `preview` row | `previewing-features`, in this run |
 | `park` | a ruling parked the feature its latest `preview` row named | stays `backlog` until its `Expires:` |
-| `ready` | every claim resolves, no family owns it, it is not `full`, and a feature has a ruling approving its preview | § 6, then § Launch, else `ready` |
+| `ready` | every claim resolves, no family owns it, it is not `full`, and a feature has a ruling approving its preview, or a person's release | § 6, then § Launch, else `ready` |
 
 A checkpoint stops for a person (`working-on-issues` § Stopping for a person) with the question
 `deciding-issues` phrases, `Resume at: screening`.
@@ -222,8 +221,9 @@ person, never assume one:
 The smallest tier is `small` (§ 4); withheld paths are the repository's `withheld` globs. A
 feature never launches on `autoLaunch`; a ruling from a sitting never launches code.
 
-To launch: write the `screening` row with `Launch:` the case and its grant (`autoLaunch` set by
-whom and when, or `decisions:<id>` answered by whom), then `status: in_progress`.
+To launch: the § 5 `screening` row, the run's only one for the issue, carries `Launch:` the case
+and its grant (`autoLaunch` set by whom and when, or `decisions:<id>` answered by whom); then
+`status: in_progress`.
 
 ## Weekly sweep
 

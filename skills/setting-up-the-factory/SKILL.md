@@ -114,7 +114,7 @@ do there lives in the repository itself. For each repository:
 3. When `mode` is not `queue`, ask whether Land may merge itself once its judge says go. Otherwise
    a person merges each pull request, on a Decision Land sends them.
 4. When none of `AGENTS.md`, `CLAUDE.md` and `CONTRIBUTING.md` on the target branch has a
-   `## Verification` section, propose the commands that must pass before a pull request opens,
+   `## Verification` section that lists commands, propose the commands that must pass before a pull request opens,
    starting from `verify`, and let them correct the list. Build runs exactly these.
 5. Anything to add (a yes, or the commands): show the lines, and on their yes open one pull request
    on the target branch, branch `chore/factory-setup`, adding them to that repository's `AGENTS.md`
