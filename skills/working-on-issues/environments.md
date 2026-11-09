@@ -3,8 +3,8 @@
 Where a routine runs changes its tools and its paths, never its rules.
 
 Screening, Build and Land run on one fixed environment, `Factory`, holding every repository of the
-factory: a scheduled run has no triggering repository to pick one by. Each scheduled run gets its own
-machine, so it clones and installs every time. Intake runs on Standards, with a sandbox it only reads
+factory. Each run gets its own machine, so it clones and installs every time; a Land run woken by a
+pull request event starts with that pull request's repository. Intake runs on Standards, with a sandbox it only reads
 code in (`curating-requests` § Reading the code).
 
 ## Which one am I on
@@ -19,7 +19,7 @@ code in (`curating-requests` § Reading the code).
 | | Standards | Harness |
 |---|---|---|
 | Records | `search`, `query`, `read`, `write`, `organize`, `delete` | the same verbs, as `standards_search`, `standards_query`, `standards_read`, `standards_write`, `standards_organize`, `standards_delete` |
-| A skill's files | `/workspace/skills/<skill>/` | `$HOME/.standards/skills/<skill>/`, read-only, written when you read `skill:<skill>` with `standards_read` |
+| A skill's files (the skills folder) | `/workspace/skills/<skill>/` | `$HOME/.standards/skills/<skill>/` (`$HOME` is often `/vercel`), read-only, written when you read `skill:<skill>` with `standards_read`: read every skill you will run a script of before running it |
 | Working directory | `/workspace` | `/vercel/sandbox/work` |
 | Machine | Node 22, `git`, `gh`, sudo; install what a repository declares | Node 24, Python 3.14, the harness; install what a repository declares |
 | GitHub | `git` and `gh`, as the person the run acts for | the same |
@@ -27,8 +27,19 @@ code in (`curating-requests` § Reading the code).
 | Sub-agents | your orchestration tools | your harness's own sub-agents |
 | Paid by | the workspace's credits | the key's provider |
 
-Where a skill names a path under `/workspace/skills/`, or a verb such as `write`, read it through
-this table.
+Where a skill names the skills folder, a path under `/workspace/skills/`, or a verb such as
+`write`, read it through this table.
+
+**`gh` outside a checkout:** your working directory is rarely a clone, so pass `-R <owner/repo>`
+to every `gh pr` and `gh issue` command. The machine's `gh` may be older than its docs: a JSON
+field it refuses is read with `gh api` instead, never guessed.
+
+**A `send` refused as a repeat** was already delivered: never send it again, and never reword it to
+pass the check.
+
+**Long commands:** your shell may refuse a bare `sleep`. Start a long command in the background and
+poll for its end, and run the repository's checks scoped to what changed when its rules allow it:
+the PR's CI runs the rest.
 
 **A call needing a person's approval** (deleting, archiving, sending outside) changes nothing yet on
 a harness. It raises an approval decision and returns at once. Never report it as done, and never

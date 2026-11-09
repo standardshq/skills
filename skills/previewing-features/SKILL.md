@@ -31,7 +31,7 @@ the workspace already answered costs a full run to reach the same verdict. Recor
 places searched.
 
 Run `issue-families.mjs --input <file> --project <id> --issue <id>` (in
-`/workspace/skills/screening-issues/scripts/`, on the export `screening-issues` § Scripts writes):
+`screening-issues/scripts/` in the skills folder, on the export `screening-issues` § Scripts writes):
 
 | Family | Means |
 |---|---|

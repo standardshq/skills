@@ -24,7 +24,7 @@ Read, in order, before acting:
    written.
 3. Claim it (below) before reading anything else of it, work it to one exit of your stage, and end.
    Screening's passes that ask nothing may take up to five issues; the first that needs a person
-   ends the run after its checkpoint.
+   ends the run after its checkpoint. Land tracks every open PR before it takes its one issue.
 
 ## The claim
 
@@ -118,6 +118,9 @@ the latest `attempt` row.
 
 - Link each PR in `pullRequests`, one `owner/repo#N` per line, before the move to In review.
 - A PR body says `Issue: <issue id>`, and `Closes #<githubNumber>` for an imported issue.
+- A PR Build opens also carries the line `<!-- factory:build -->` in its body: the one mark of a
+  PR the factory wrote, since Build pushes as the person the run acts for. Never write it on a PR
+  you did not open.
 
 ## Repository facts
 
@@ -129,7 +132,7 @@ alone, each run, from the target branch, never from a PR's head.
    history, file contents fetched on demand), and gather, with the GitHub tools, into one folder:
    `repo.json`, `branches.json`, `rules.json` (the rulesets of the branch), `protection.json` (its
    classic protection, absent when none) and `pulls.json` (recent merged PRs).
-2. Run `node /workspace/skills/working-on-issues/scripts/discover-repository.mjs --checkout <clone>
+2. Run `node <skills folder>/working-on-issues/scripts/discover-repository.mjs --checkout <clone>
    --github <folder>`, adding `--listed <file>` (`[{ "fullName", "packages": [...] }]`) only when you
    need `consumes`.
 3. **Exit 3** prints `{"targetBranch":"<branch>"}`: clone that branch, fetch `rules.json` and
