@@ -12,8 +12,8 @@
     "description": "Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow."
   },
   {
-    "name": "evaluating-changes",
-    "description": "Trial of a change before it is trusted. Use when Land's judge tries a PR head, or a person asks for a pull request, a branch or a written spec to be judged. One juror, five counts in sequence, one ranked verdict, nothing written to the code."
+    "name": "evaluate",
+    "description": "Use when a pull request, an unpushed branch, or a written spec must be tried before it is trusted — one juror subagent tries every count the target calls for, one at a time, and returns one ranked verdict, nothing written to the code."
   },
   {
     "name": "executing-issues",

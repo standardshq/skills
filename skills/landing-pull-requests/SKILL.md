@@ -119,8 +119,9 @@ state, those are the history.
 
 Pin the head sha. Read the repository's facts from `targetBranch`, never the head: a PR that edits
 `CODEOWNERS`, a workflow or `## Factory` is judged on the target's values. Gather, as
-`evaluating-changes` § 1 says: the diff, the issue's brief and rulings, every review a person left,
-and each check's conclusion on the head.
+`evaluate` § 1 says: the diff, the issue's brief and rulings, every review a person left, and each
+check's conclusion on the head; add the issue's `approved` mockup and its `evidence`, the
+`withheld` paths, and what `sensitiveData` names, which the dossier never quotes.
 
 **Machinery red:** a failed check whose failing step the diff cannot reach (a refused artifact or
 download, a runner port already bound, a flake the repository tracks) is rerun once with the
@@ -137,10 +138,10 @@ concludes.
 - any other answer: `Outcome: changes`, its words, quoted and attributed, the one entry, and the
   fixer's brief (§ 7).
 
-Otherwise dispatch the judge: a fresh subagent running `evaluating-changes` (`SOLO.md`) on the
-dossier.
+Otherwise dispatch the judge: one fresh subagent running `evaluate` on the dossier, as its § 3
+says.
 
-- **Round 1:** every count that sits on the target.
+- **Round 1:** every count that sits on the target, in `evaluate`'s order.
 - **Rounds 2 and 3:** the later-round form of `SOLO.md`: the previous verdict's entries, the
   fixer's answers to them, and `git diff <judged sha>..<head>`, nothing else.
 
