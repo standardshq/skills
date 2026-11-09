@@ -61,9 +61,13 @@ that tree, so a root covers its repositories.
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to
    `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
 
-**The checkout:** per repository of the issue's `project`, read its facts (`working-on-issues`
+**The checkout:** per repository the issue's work lives in, read its facts (`working-on-issues`
 § Repository facts), which leaves the checkout on `targetBranch`, then `git -C <dir> rev-parse
-origin/<targetBranch>` for the sha your `screening` row names.
+origin/<targetBranch>` for the sha your `screening` row names. An issue on a repository record
+lives in that repository. An issue on a root project lives in the repositories its `context` paths
+name; without paths, `gh search code "<the wording or name the issue cites>" --repo <fullName>` on
+each repository under the root names them, and with no hit you clone them all. Code found in
+another project's repository goes in your `screening` row; the issue keeps its `project`.
 
 ## Which issue
 
