@@ -108,7 +108,9 @@ Per repository changed:
    `withheld` paths touched, and the assumptions made unasked, one per line.
 2. Add `owner/repo#N` to `pullRequests`, one per line, keeping the lines already there.
 
-Then `status: in_review`, clear the claim, re-read the issue.
+Then `status: in_review`, clear the claim, re-read the issue, at once: never wait for the PR's CI.
+The CI is Land's to read, and an issue left In progress beside its open PR is one Land has to
+repair.
 
 *Done when* the re-read shows every PR in `pullRequests`, the issue In review, and the claim
 empty. A write that failed is named in your report, never claimed.

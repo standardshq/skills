@@ -1,6 +1,6 @@
 ---
 name: landing-pull-requests
-description: Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, run one judging round on one head (judge, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged.
+description: Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, take its pipe from the open pull requests themselves, run one judging round on one head (judge, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged.
 ---
 
 # Landing pull requests
@@ -36,9 +36,18 @@ issue: an issue whose `pullRequests` holds `owner/repo#N`.
 
 | The PR | Do |
 |---|---|
-| already in an issue's `pullRequests` | nothing |
-| its body says `Issue: <issue id>`, or `Closes #N` / `Fixes #N` matching an issue's `githubNumber` in the repository's project | add `owner/repo#N` to that issue's `pullRequests`, keeping its lines; an issue not Done and not Paused moves to `in_review` |
+| already in an issue's `pullRequests` | its issue, as it is |
+| its body says `Issue: <issue id>`, or `Closes #N` / `Fixes #N` matching an issue's `githubNumber` in the repository's project | add `owner/repo#N` to that issue's `pullRequests`, keeping its lines |
 | neither | create the issue (below) |
+
+Then align the issue's status with its open PR, whoever left it behind:
+
+| The issue of an open PR is | Do |
+|---|---|
+| In review | nothing |
+| Backlog, Ready, In progress or Done | `status: in_review`, clear a lapsed claim, and write a `released` row naming the PR (`Holder:` the claim it cleared, if any). A live claim by Build stays: Build moves it itself, and Land judges it once that claim lapses |
+| Paused | nothing: it waits on a person (§ 3 reads its answer) |
+| Mine | nothing: a person took it. Its status comment says so, and Land never judges it |
 
 **A created issue:** `title` the PR title, `project` the repository record, `status: in_review`,
 `origin: github`, `type` from the title's conventional prefix (`feat` feature, `fix` bug,
@@ -57,22 +66,25 @@ marked ready.
 *Done when* every open PR of every repository is in exactly one issue's `pullRequests` and carries
 its link line.
 
-## 3. Take the next issue
+## 3. Take the next pull request
 
-Woken by a pull request event, take that PR's issue first when it is in the pipe. Otherwise the
-pipe, in order:
+The pipe is the open PRs you just tracked, never a list of issues: an open PR is judged whatever
+state its issue was left in. Woken by a pull request event, take that PR first when it is in the
+pipe. Otherwise in order, inside each tier by its issue's `priority`, then the PR's age:
 
-1. **A head to judge:** an In review issue whose open linked PR is not a draft and has a head with
-   no `verdict` row (`subject: github:owner/repo#N@<sha>`) and every check on it concluded.
-2. **A ruling to apply:** an In review issue whose newest `ruling` answers a Land checkpoint (its
+1. **A head to judge:** a PR that is not a draft, whose issue is In review, whose head has no
+   `verdict` row (`subject: github:owner/repo#N@<sha>`) and every check on it concluded.
+2. **A ruling to apply:** a PR whose issue's newest `ruling` answers a Land checkpoint (its
    checkpoint's `Resume at:` is land) with anything but Merge it, and has no `verdict` row after it.
-   Skip it while auto-merge is enabled on its PR or a Merge it Decision is open.
-3. **A go to retry:** an In review issue whose PR head has a go `verdict` and is neither merged,
-   nor enqueued, nor named by an open or answered Merge it Decision (dequeued, the merge failed, or
-   its Merge it expired): run § 6 again.
-4. **Merged or closed:** an In review issue whose every linked PR is merged: `status: done`,
-   `closeReason: done`. Every linked PR closed unmerged and none open: `status: backlog`, with a
-   `released` row naming the closed PRs, so Screening decides what is left. Clear the claim, end.
+   Skip it while auto-merge is enabled on it or a Merge it Decision is open.
+3. **A go to retry:** a PR whose head has a go `verdict` and is neither merged, nor enqueued, nor
+   named by an open or answered Merge it Decision (dequeued, the merge failed, or its Merge it
+   expired): run § 6 again.
+
+Then the issues the list no longer shows, from `pullRequests`: an In review issue whose every
+linked PR is merged gets `status: done`, `closeReason: done`; one whose every linked PR closed
+unmerged gets `status: backlog` and a `released` row naming them, so Screening decides what is
+left. These writes cost nothing: do them all, then take one PR.
 
 **The lock on the PR:** the status comment (§ 4) names who works the PR and since when. A status
 comment saying another run judges or fixes this head, updated less than 30 minutes ago, means the
@@ -82,9 +94,9 @@ issue with `read-recipe.md`. Close it is `deciding-issues`' to apply: it closes 
 **The round** of the head: one more than the `verdict` rows on this PR newer than the latest
 person's gesture (a status move or a `ruling`). A person's gesture restarts the count.
 
-*Done when* you hold the claim and the lock on one issue and know its PR, head, round, and which
-pipe took it: pipe 3 goes to § 6; pipe 4 ends with the issue Done (or Backlog) and the claim
-cleared.
+*Done when* you hold the claim and the lock on one PR's issue and know the PR, its head, its
+round, and which tier took it (tier 3 goes to § 6), or the pipe is empty and every merged or
+closed PR's issue is settled.
 
 ## 4. The status comment
 
@@ -116,7 +128,7 @@ GitHub tools, failed jobs only, when its attempt number is 1. Update the status 
 (`waiting on checks`), clear the claim and end: the next run judges the head once the rerun
 concludes.
 
-**A ruling to apply** (pipe 2) skips the judge and is consumed by a `verdict` row on the head
+**A ruling to apply** (tier 2) skips the judge and is consumed by a `verdict` row on the head
 (this section's shape and round), its body citing the ruling:
 
 - "Merge as it stands": `Outcome: go`, the person's approval of this head. Run § 6 from its first
@@ -209,7 +221,7 @@ new head once its checks conclude.
 A round-3 verdict short of go, or a fixer that returned the head unchanged (an unresolvable
 conflict, a red it could not move; never a head its author moved, which is simply judged next): a `decision` checkpoint (`deciding-issues`), Paused, the open
 entries named, each withheld path with its risk. Options: Fix (say what), Merge as it stands,
-I take it, Close it. The answer returns the issue to In review, and pipe 2 applies it. The status
+I take it, Close it. The answer returns the issue to In review, and tier 2 applies it. The status
 comment says `paused: waiting on <person>`.
 
 *Done when* the checkpoint is sent, the issue is Paused and the status comment says so.
