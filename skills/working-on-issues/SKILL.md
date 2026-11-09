@@ -125,9 +125,10 @@ A repository is a `projects` record with a `fullName`; `context` and `maintainer
 up to the root. A run that acts on a repository reads its rules through `discover-repository.mjs`
 alone, each run, from the target branch, never from a PR's head.
 
-1. Clone the default branch and gather, with the GitHub tools, into one folder: `repo.json`,
-   `branches.json`, `rules.json` (the rulesets of the branch), `protection.json` (its classic
-   protection, absent when none) and `pulls.json` (recent merged PRs).
+1. Clone the default branch, blobless (`gh repo clone <fullName> -- --filter=blob:none`: the whole
+   history, file contents fetched on demand), and gather, with the GitHub tools, into one folder:
+   `repo.json`, `branches.json`, `rules.json` (the rulesets of the branch), `protection.json` (its
+   classic protection, absent when none) and `pulls.json` (recent merged PRs).
 2. Run `node /workspace/skills/working-on-issues/scripts/discover-repository.mjs --checkout <clone>
    --github <folder>`, adding `--listed <file>` (`[{ "fullName", "packages": [...] }]`) only when you
    need `consumes`.
