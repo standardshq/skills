@@ -1,43 +1,109 @@
 ---
 name: landing-pull-requests
-description: Land stage. Use when the Land routine takes the next In review issue of its pipe, for one judging round on its PR head (judge, then merge or fixer), or to close an issue whose every linked PR is merged.
+description: Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, run one judging round on one head (judge, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged.
 ---
 
 # Landing pull requests
 
-Land alone takes a PR from In review to merged. One run, one head, one round: a **judge** tries
-the head, then either the merge goes by the repository's mode or a **fixer** answers the verdict
-and pushes. The judge and the fixer are distinct subagents, each from a fresh context; the one who
-wrote a fix never decides it is good.
+Land alone takes a PR from open to merged, every open PR of the factory's repositories, whoever
+opened it. One run, one head, one round: a **judge** tries the head, then either the merge goes by
+the repository's mode or a **fixer** answers the verdict and pushes. The judge and the fixer are
+distinct subagents, each from a fresh context; the one who wrote a fix never decides it is good.
+
+The PR is the source of truth and Standards keeps the ledger: everything Land decides is written
+on the issue's timeline and said on the PR, so a person reading either sees the same state.
 
 `working-on-issues` owns the state below (the claim, § Stopping for a person, § Provenance,
 § Repository facts) and wins when this skill disagrees. Ask people with `deciding-issues`.
 
-## 1. Take the next issue
+## 1. Preflight
 
-The pipe, in order:
+Once per run, before any claim: for each repository of the factory (`projects` records with a
+`fullName`), `gh auth status` and `gh repo view <fullName> --json name`, and a checkout you can
+fetch. Pass `-R <owner/repo>` to every `gh` command: your working directory is not a checkout.
 
-1. **A head to judge:** an In review issue whose open linked PR has a head with no `verdict` row
-   (`subject: github:owner/repo#N@<sha>`) and every check on it concluded.
+A failure: one `signal` row for the run, on the issue you would have taken (or none when the pipe
+is empty), `Rule: environment_broken`, naming what is missing. Claim nothing, write nothing else,
+end. The next run tries again.
+
+*Done when* every repository answers, or the run ended on its one signal.
+
+## 2. Track every open pull request
+
+For each repository, `gh pr list -R <fullName> --state open --json
+number,title,body,author,isDraft,headRefOid,url,createdAt`. Each open PR is tracked by exactly one
+issue: an issue whose `pullRequests` holds `owner/repo#N`.
+
+| The PR | Do |
+|---|---|
+| already in an issue's `pullRequests` | nothing |
+| its body says `Issue: <issue id>`, or `Closes #N` / `Fixes #N` matching an issue's `githubNumber` in the repository's project | add `owner/repo#N` to that issue's `pullRequests`, keeping its lines; an issue not Done and not Paused moves to `in_review` |
+| neither | create the issue (below) |
+
+**A created issue:** `title` the PR title, `project` the repository record, `status: in_review`,
+`origin: github`, `type` from the title's conventional prefix (`feat` feature, `fix` bug,
+`perf` or `refactor` enhancement, anything else chore), `pullRequests` its line, `body` a
+`## Request` section quoting the PR description with its author and date, `context` « Opened from
+<PR url> by <author> on <date>; no issue tracked it. ». It goes through no screening: the PR is the
+work.
+
+**The link on the PR:** a tracked PR's description opens with one line,
+`Standards issue: [<issue title>](https://app.standards.new/fr/~/issues/<issue id>)`. Add it
+when missing (`gh pr edit -R … --body`), keeping the rest of the description word for word.
+
+A draft is tracked and linked, never judged: its author is still working. It enters the pipe once
+marked ready.
+
+*Done when* every open PR of every repository is in exactly one issue's `pullRequests` and carries
+its link line.
+
+## 3. Take the next issue
+
+Woken by a pull request event, take that PR's issue first when it is in the pipe. Otherwise the
+pipe, in order:
+
+1. **A head to judge:** an In review issue whose open linked PR is not a draft and has a head with
+   no `verdict` row (`subject: github:owner/repo#N@<sha>`) and every check on it concluded.
 2. **A ruling to apply:** an In review issue whose newest `ruling` answers a Land checkpoint (its
    checkpoint's `Resume at:` is land) with anything but Merge it, and has no `verdict` row after it.
    Skip it while auto-merge is enabled on its PR or a Merge it Decision is open.
 3. **A go to retry:** an In review issue whose PR head has a go `verdict` and is neither merged,
    nor enqueued, nor named by an open or answered Merge it Decision (dequeued, the merge failed, or
-   its Merge it expired): run § 4 again.
-4. **Merged:** an In review issue whose every linked PR is merged. Set `status: done`,
-   `closeReason: done`, clear the claim, end.
+   its Merge it expired): run § 6 again.
+4. **Merged or closed:** an In review issue whose every linked PR is merged: `status: done`,
+   `closeReason: done`. Every linked PR closed unmerged and none open: `status: backlog`, with a
+   `released` row naming the closed PRs, so Screening decides what is left. Clear the claim, end.
 
-Claim the issue, then read it with `read-recipe.md`. Close it is `deciding-issues`' to apply: it
-closes the open PRs itself.
+**The lock on the PR:** the status comment (§ 4) names who works the PR and since when. A status
+comment saying another run judges or fixes this head, updated less than 30 minutes ago, means the
+PR is taken: take the next issue. Then claim the issue, write your own lock (§ 4) and read the
+issue with `read-recipe.md`. Close it is `deciding-issues`' to apply: it closes the open PRs itself.
 
 **The round** of the head: one more than the `verdict` rows on this PR newer than the latest
 person's gesture (a status move or a `ruling`). A person's gesture restarts the count.
 
-*Done when* you hold the claim on one issue and know its PR, head, round, and which pipe took it:
-pipe 3 goes to § 4; pipe 4 ends with the issue Done and the claim cleared.
+*Done when* you hold the claim and the lock on one issue and know its PR, head, round, and which
+pipe took it: pipe 3 goes to § 6; pipe 4 ends with the issue Done (or Backlog) and the claim
+cleared.
 
-## 2. Freeze the dossier
+## 4. The status comment
+
+One comment per PR, found by its first line `<!-- factory:land -->`, edited in place
+(`gh api -X PATCH repos/<o>/<r>/issues/comments/<id> -f body=…`), never posted twice. It says, in
+this order:
+
+- `**Land**: <state>` where state is one of `judging <sha>`, `fixing <sha>`, `waiting on checks`,
+  `go, enqueued`, `go, waiting on Merge it`, `merged`, `paused: <why>`;
+- `Issue: [<title>](https://app.standards.new/fr/~/issues/<issue id>)`;
+- `Round: <n> of 3`, the head sha, and the latest verdict in one line (go, or the count of
+  blocking and to fix entries);
+- `Updated: <ISO time> by <this run>`: the lock other runs read.
+
+Write it when you take the PR (the lock), and again at every exit of the round. Each round also
+posts its own verdict comment (§ 5) and the fixer its answers (§ 7): the status comment is the
+state, those are the history.
+
+## 5. Freeze the dossier, judge
 
 Pin the head sha. Read the repository's facts from `targetBranch`, never the head: a PR that edits
 `CODEOWNERS`, a workflow or `## Factory` is judged on the target's values. Gather, as
@@ -46,23 +112,21 @@ and each check's conclusion on the head.
 
 **Machinery red:** a failed check whose failing step the diff cannot reach (a refused artifact or
 download, a runner port already bound, a flake the repository tracks) is rerun once with the
-GitHub tools, failed jobs only, when its attempt number is 1. Then clear the claim and end: the
-next run judges the head once the rerun concludes.
+GitHub tools, failed jobs only, when its attempt number is 1. Update the status comment
+(`waiting on checks`), clear the claim and end: the next run judges the head once the rerun
+concludes.
 
 **A ruling to apply** (pipe 2) skips the judge and is consumed by a `verdict` row on the head
-(§ 3's shape and round), its body citing the ruling:
+(this section's shape and round), its body citing the ruling:
 
-- "Merge as it stands": `Outcome: go`, the person's approval of this head. Run § 4 from its first
+- "Merge as it stands": `Outcome: go`, the person's approval of this head. Run § 6 from its first
   row, reading `mode: human` as `direct`: withheld paths and required reviews still go to Merge it,
   and a queue repository enqueues.
 - any other answer: `Outcome: changes`, its words, quoted and attributed, the one entry, and the
-  fixer's brief (§ 5).
+  fixer's brief (§ 7).
 
-*Done when* the dossier names the frozen sha and every check's conclusion.
-
-## 3. Judge
-
-Dispatch the judge: a fresh subagent running `evaluating-changes` (`SOLO.md`) on the dossier.
+Otherwise dispatch the judge: a fresh subagent running `evaluating-changes` (`SOLO.md`) on the
+dossier.
 
 - **Round 1:** every count that sits on the target.
 - **Rounds 2 and 3:** the later-round form of `SOLO.md`: the previous verdict's entries, the
@@ -74,9 +138,14 @@ Write the `verdict` row from the judge's return: `subject: github:owner/repo#N@<
 opening `Outcome: go` or `Outcome: changes`, then `Round: <n>`, then the ranked findings and the
 counts that returned nothing. Go is no `blocking` and no `to fix`.
 
-*Done when* the `verdict` row exists on the frozen sha.
+Then post the verdict on the PR: one comment opening `<!-- factory:verdict <sha> -->` and
+`Land verdict, round <n>, on <sha>: go` (or `changes`), the findings as the row has them, each with
+its file and line. Before merging or pushing anything after it, re-read the head: a head that moved
+since you pinned it voids the verdict. Say so in the status comment and end.
 
-## 4. Go: merge by the mode
+*Done when* the `verdict` row exists on the frozen sha and its comment is on the PR.
+
+## 6. Go: merge by the mode
 
 Mark a draft PR ready. Then the first row that holds:
 
@@ -84,25 +153,26 @@ Mark a draft PR ready. Then the first row that holds:
 |---|---|
 | touches a `withheld` path, or `reviewers` requires a person's review of its changed paths (`any:<n>`, or a `user:` or `team:` line whose glob matches) | Merge it |
 | `gate` is `none` | Merge it, saying no check proves the change and the verdict is all there is |
-| `mode: queue` | enqueue: enable auto-merge with `method` |
+| `mode: queue` | enqueue: enable auto-merge with `method`, `--match-head-commit <sha>` |
 | `mode: human` | Merge it |
-| `mode: direct` | merge with `method` |
+| `mode: direct` | merge with `method`, `--match-head-commit <sha>` |
 
 **Merge it** is a Decision (`deciding-issues`, its recipient rule for Merge it): the verdict in
-two lines, each withheld path with its specific risk, the head, and the published link when
-`links` is true. Options: Merge it (the person merges on GitHub, recommended), Change (say what),
-I take it, Close it. The issue stays In review; the merge itself is the answer the pipe reads.
+two lines, each withheld path with its specific risk, the head, the PR link, and the published link
+when `links` is true. Options: Merge it (the person merges on GitHub, recommended), Change (say
+what), I take it, Close it. The issue stays In review; the merge itself is the answer the pipe reads.
 
-Enqueued, merged or Merge it sent: clear the claim. The issue goes Done when the pipe sees every linked PR
-merged.
+Enqueued, merged or Merge it sent: update the status comment and clear the claim. The issue goes
+Done when the pipe sees every linked PR merged.
 
-*Done when* the head is enqueued, merged, or waits on one open Merge it.
+*Done when* the head is enqueued, merged, or waits on one open Merge it, and the status comment
+says which.
 
-## 5. Not go: the fixer
+## 7. Not go: the fixer
 
-Round 1 or 2, or a ruling's words to apply: dispatch the fixer, a fresh subagent on the build
-model class when your tools let you choose, with a checkout of the branch at the pinned head and
-this brief:
+Round 1 or 2, or a ruling's words to apply: set the status comment to `fixing <sha>`, then
+dispatch the fixer, a fresh subagent on the build model class when your tools let you choose, with
+a checkout of the branch at the pinned head and this brief:
 
 - fix only the verdict's `blocking` and `to fix` entries, the red checks, or the person's words;
 - each behaviour fix is red-proven: its covering test seen failing on the unchanged branch, passing
@@ -111,24 +181,30 @@ this brief:
 - regenerate a `generated` path with the repository's command; keep `sensitiveData` out of
   everything;
 - keep every test and assertion as strict as you found it, and push through the hooks;
-- answer each entry in one PR comment headed by the judged sha: fixed (the test or the commit) or
-  refuted (the excerpt that refutes it);
-- run every `verify` command, push, return the new head sha and one line per change.
+- answer each entry in one PR comment opening `<!-- factory:answers <judged sha> -->`: fixed (the
+  test or the commit) or refuted (the excerpt that refutes it);
+- run every `verify` command scoped as the repository's rules allow, push, return the new head sha
+  and one line per change.
 
-Clear the claim and end: the next run takes the new head once its checks conclude.
+A PR from a fork or one you cannot push to gets no fixer: the verdict comment is the request to its
+author, the status comment says `changes requested`, and the next head is judged when it comes.
+
+Update the status comment (`waiting on checks`), clear the claim and end: the next run takes the
+new head once its checks conclude.
 
 *Done when* the fixer has pushed a new head with its answers, or returned the head unchanged.
 
-## 6. Round 3, still not go
+## 8. Round 3, still not go
 
 A round-3 verdict short of go, or a fixer that returned the head unchanged (an unresolvable
 conflict, a red it could not move): a `decision` checkpoint (`deciding-issues`), Paused, the open
 entries named, each withheld path with its risk. Options: Fix (say what), Merge as it stands,
-I take it, Close it. The answer returns the issue to In review, and pipe 2 applies it.
+I take it, Close it. The answer returns the issue to In review, and pipe 2 applies it. The status
+comment says `paused: waiting on <person>`.
 
-*Done when* the checkpoint is sent and the issue is Paused.
+*Done when* the checkpoint is sent, the issue is Paused and the status comment says so.
 
 ## Report
 
-One line: the issue, the PR, the head, the round, the verdict, and what happened (merged,
-enqueued, Merge it sent, fixer pushed, paused, or left and why).
+One line: the PRs newly tracked, then the issue, the PR, the head, the round, the verdict, and what
+happened (merged, enqueued, Merge it sent, fixer pushed, paused, or left and why).

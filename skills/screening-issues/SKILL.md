@@ -19,7 +19,7 @@ before anything here; a feature routed to preview goes on to `previewing-feature
 
 ## Scripts
 
-In `scripts/` of this skill (in your sandbox: `/workspace/skills/screening-issues/scripts/`). They
+In `scripts/` of this skill's folder (`environments.md` says where it is on your machine). They
 never call the workspace (the sandbox holds no workspace key): they read an export of issues you
 write with your own record tools, and git in a repository checkout. Never hand-assemble what a
 script prints.

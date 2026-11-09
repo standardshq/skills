@@ -12,7 +12,7 @@ A routine reads a row back from its `body`: it opens with the labelled lines the
 | `preview` | Screening, previewing a feature | `github:owner/repo@<sha>` | `Verdict:` candidate, park or reject; for a park, `Revisit when:` and `Expires:` (90 days at most) | a feature's value weighed against its durable debt |
 | `attempt` | the run that held the claim; the run taking over its lapsed claim | the PR head, when there is one | `Outcome:` failed, lapsed or timeout; `Holder:` the run that held the claim | a failed execution: what was tried, why it failed, what to try next. Each one increments `failedAttempts` |
 | `verdict` | Land's judge, never the author | `github:owner/repo#N@<sha>` | `Outcome:` go or changes; `Round:` 1 to 3 | the judgement of one PR head, its findings ranked |
-| `released` | the run taking over an expired claim outside In progress | none | `Holder:` the run that held it; `Expired:` its `leaseExpiresAt` | a claim that lapsed with no failure to count |
+| `released` | the run taking over an expired claim outside In progress; Land, when every linked PR of an In review issue closed unmerged | none | `Holder:` the run that held it; `Expired:` its `leaseExpiresAt`; or `Closed:` the PRs, unmerged | a claim that lapsed with no failure to count, or work given back to Screening |
 | `signal` | any run noticing a broken rule | what it is about, when any | `Rule:` a short name | something slipped through the structure |
 
 ## A `ruling` row, filled in
