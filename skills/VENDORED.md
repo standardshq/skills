@@ -26,8 +26,3 @@ Source: [mattpocock/skills](https://github.com/mattpocock/skills) at commit `4ae
 
 - `GLOSSARY.md` reference replaced by the repository's rules (`working-on-issues`, `scripts/discover-repository.mjs`).
 - `CREDITS.md` kept (Dex Horthy attribution).
-
-## evaluating-changes (excerpt)
-
-- The Fowler smell baseline in `CHARGES.md` § standards is copied from `skills/engineering/code-review/SKILL.md` (step 3, "smell baseline"), each smell's fix shortened; the rule that the repository's documented standards override it is kept. The rest of `code-review` is not vendored: its Spec axis is folded into the `spec` count.
-- `LICENSE.mattpocock` sits beside it.

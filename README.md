@@ -4,7 +4,7 @@ The official skills of [Standards](https://standards.new), in the [Agent Skills]
 
 ## The 14 skills
 
-`working-on-issues` is the shared base every routine reads. Four routines run a clock, each pulling one issue at a time. **Intake** listens on Slack (`curating-requests`, `triaging-issues`). **Screening** (`screening-issues`, `previewing-features`) re-checks an issue against the default branch. **Build** (`executing-issues`, with `implement`, `tdd`, `diagnosing-bugs`, `pr`) turns a screened issue into a pull request. **Land** (`landing-pull-requests`, `evaluating-changes`) takes it to merged. `deciding-issues` is the human interface: every question for the maintainer is a Decision, and `setting-up-the-factory` installs the whole loop.
+`working-on-issues` is the shared base every routine reads. Four routines run a clock, each pulling one issue at a time. **Intake** listens on Slack (`curating-requests`, `triaging-issues`). **Screening** (`screening-issues`, `previewing-features`) re-checks an issue against the default branch. **Build** (`executing-issues`, with `implement`, `tdd`, `diagnosing-bugs`, `pr`) turns a screened issue into a pull request. **Land** (`landing-pull-requests`, `evaluate`) takes it to merged. `deciding-issues` is the human interface: every question for the maintainer is a Decision, and `setting-up-the-factory` installs the whole loop.
 
 ## Adding a skill to a workspace
 
