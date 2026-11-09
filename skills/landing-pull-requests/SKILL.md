@@ -170,8 +170,15 @@ says which.
 
 ## 7. Not go: the fixer
 
-Round 1 or 2, or a ruling's words to apply: set the status comment to `fixing <sha>`, then
-dispatch the fixer, a fresh subagent on the build model class when your tools let you choose, with
+**Who fixes.** A PR whose body carries `<!-- factory:build -->` is the factory's own: the fixer
+always runs. Any other PR was opened by a person: the fixer runs only when `autoFix` is on for its
+repository record, read walking up to the root (the nearest record that sets it wins; unset is
+on). With `autoFix` off, write no fix: the verdict comment is the request to its author, the
+status comment says `changes requested`, and the next head the author pushes is judged as it
+comes. Round 3 still stops on § 8.
+
+Round 1 or 2, or a ruling's words to apply, when the fixer runs: set the status comment to
+`fixing <sha>`, then dispatch the fixer, a fresh subagent on the build model class when your tools let you choose, with
 a checkout of the branch at the pinned head and this brief:
 
 - fix only the verdict's `blocking` and `to fix` entries, the red checks, or the person's words;
@@ -183,10 +190,13 @@ a checkout of the branch at the pinned head and this brief:
 - keep every test and assertion as strict as you found it, and push through the hooks;
 - answer each entry in one PR comment opening `<!-- factory:answers <judged sha> -->`: fixed (the
   test or the commit) or refuted (the excerpt that refutes it);
+- one commit per entry, on top of the branch: never amend, rebase or force-push;
+- right before pushing, fetch the branch: a head that moved since the pinned sha means its author
+  is working. Push nothing, return the head unchanged and say so;
 - run every `verify` command scoped as the repository's rules allow, push, return the new head sha
   and one line per change.
 
-A PR from a fork or one you cannot push to gets no fixer: the verdict comment is the request to its
+A PR from a fork, or one you cannot push to, gets no fixer either: the verdict comment is the request to its
 author, the status comment says `changes requested`, and the next head is judged when it comes.
 
 Update the status comment (`waiting on checks`), clear the claim and end: the next run takes the
@@ -197,7 +207,7 @@ new head once its checks conclude.
 ## 8. Round 3, still not go
 
 A round-3 verdict short of go, or a fixer that returned the head unchanged (an unresolvable
-conflict, a red it could not move): a `decision` checkpoint (`deciding-issues`), Paused, the open
+conflict, a red it could not move; never a head its author moved, which is simply judged next): a `decision` checkpoint (`deciding-issues`), Paused, the open
 entries named, each withheld path with its risk. Options: Fix (say what), Merge as it stands,
 I take it, Close it. The answer returns the issue to In review, and pipe 2 applies it. The status
 comment says `paused: waiting on <person>`.

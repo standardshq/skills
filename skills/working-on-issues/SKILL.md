@@ -118,6 +118,9 @@ the latest `attempt` row.
 
 - Link each PR in `pullRequests`, one `owner/repo#N` per line, before the move to In review.
 - A PR body says `Issue: <issue id>`, and `Closes #<githubNumber>` for an imported issue.
+- A PR Build opens also carries the line `<!-- factory:build -->` in its body: the one mark of a
+  PR the factory wrote, since Build pushes as the person the run acts for. Never write it on a PR
+  you did not open.
 
 ## Repository facts
 

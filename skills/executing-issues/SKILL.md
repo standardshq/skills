@@ -104,7 +104,7 @@ Per repository changed:
 
 1. Push the branch and open the PR against `targetBranch`. Title as the repository's rules say (by
    default a conventional commit line). Body by `pr`, with the lines `working-on-issues`
-   § Pull requests requires, plus: each acceptance criterion and the test that holds it, the
+   § Pull requests requires (`<!-- factory:build -->` among them), plus: each acceptance criterion and the test that holds it, the
    `withheld` paths touched, and the assumptions made unasked, one per line.
 2. Add `owner/repo#N` to `pullRequests`, one per line, keeping the lines already there.
 
