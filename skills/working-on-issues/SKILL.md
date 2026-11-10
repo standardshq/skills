@@ -24,7 +24,8 @@ Read, in order, before acting:
    written.
 3. Claim it (below) before reading anything else of it, work it to one exit of your stage, and end.
    Screening's passes that ask nothing may take up to five issues; the first that needs a person
-   ends the run after its checkpoint. Land tracks every open PR before it takes its one issue.
+   ends the run after its checkpoint. Land tracks every open PR, then takes one and lands it to the
+   end in the same run.
 
 ## The claim
 
@@ -33,8 +34,9 @@ Read, in order, before acting:
 - **Check:** the claim is free when `leaseExpiresAt` is empty or past, by server time.
 - **Write:** `leaseHolder` = you, `leaseExpiresAt` = now + 30 min, in one update, then re-read. When
   `leaseHolder` is someone else, they won: take the next issue.
-- **Renew** to now + 30 min at least every 20 minutes of work. At 2 hours of work, finish as a
-  failure (`timeout`).
+- **Renew** to now + 30 min at least every 20 minutes of work, waiting included. At 2 hours of
+  work, finish as a failure (`timeout`); Land hands over instead (`landing-pull-requests` § Waiting
+  for checks), which is not a failure.
 - **Park:** a run that stops for a person keeps its claim, with `leaseExpiresAt` set to its
   question's expiry (sent + 24 h), and clears it when it resumes. Merge it releases the claim once
   sent, so Land's pipe can set Done after a person merges on GitHub.

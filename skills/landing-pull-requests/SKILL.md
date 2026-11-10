@@ -6,8 +6,12 @@ description: Land stage. Use when the Land routine wakes, on its clock or on a p
 # Landing pull requests
 
 Land alone takes a PR from open to merged, every open PR of the factory's repositories, whoever
-opened it. One run, one head, one round: a **judge** tries the head, then either the merge goes by
-the repository's mode or a **fixer** answers the verdict and pushes. The judge and the fixer are
+opened it. **One run lands one PR:** it takes a PR and works it round after round, waiting for
+each new head's checks inside the run, until the PR is merged, enqueued, waiting on a person, or
+paused after its rounds. In each round a **judge** tries the head, then either the merge goes by
+the repository's mode or a **fixer** answers the verdict and pushes. A run that dies mid-way leaves
+its claim and its lock to lapse; the next Land run takes the PR over from the ledger (§ Taking
+over). The judge and the fixer are
 distinct subagents, each from a fresh context; the one who wrote a fix never decides it is good.
 
 The PR is the source of truth and Standards keeps the ledger: everything Land decides is written
@@ -132,9 +136,8 @@ check's conclusion on the head; add the issue's `approved` mockup and its `evide
 
 **Machinery red:** a failed check whose failing step the diff cannot reach (a refused artifact or
 download, a runner port already bound, a flake the repository tracks) is rerun once with the
-GitHub tools, failed jobs only, when its attempt number is 1. Update the status comment
-(`waiting on checks`), clear the claim and end: the next run judges the head once the rerun
-concludes.
+GitHub tools, failed jobs only, when its attempt number is 1, then wait for it (§ Waiting for
+checks) and judge the head when it concludes.
 
 **A ruling to apply** (tier 2) skips the judge and is consumed by a `verdict` row on the head
 (this section's shape and round), its body citing the ruling:
@@ -161,7 +164,8 @@ counts that returned nothing. Go is no `blocking` and no `to fix`.
 Then post the verdict on the PR: one comment opening `<!-- factory:verdict <sha> -->` and
 `Land verdict, round <n>, on <sha>: go` (or `changes`), the findings as the row has them, each with
 its file and line. Before merging or pushing anything after it, re-read the head: a head that moved
-since you pinned it voids the verdict. Say so in the status comment and end.
+since you pinned it voids the verdict. Say so in the status comment, wait for the new head's checks
+(§ Waiting for checks) and judge it in this run.
 
 *Done when* the `verdict` row exists on the frozen sha and its comment is on the PR.
 
@@ -263,10 +267,34 @@ a checkout of the branch at the pinned head and this brief:
 A PR from a fork, or one you cannot push to, gets no fixer either: the verdict comment is the request to its
 author, the status comment says `changes requested`, and the next head is judged when it comes.
 
-Update the status comment (`waiting on checks`), clear the claim and end: the next run takes the
-new head once its checks conclude.
+Update the status comment (`waiting on checks`), wait for the new head's checks (§ Waiting for
+checks), and judge it in this run: § 5 on the delta, the next round.
 
-*Done when* the fixer has pushed a new head with its answers, or returned the head unchanged.
+*Done when* the fixer has pushed a new head with its answers and the run has moved on to judging
+it, or the head came back unchanged.
+
+## Waiting for checks
+
+Inside the run, never with a bare `sleep`: start a background loop on `gh pr checks -R <owner/repo>
+<N>` every minute, and read its result when it ends.
+
+- **Hold the PR while you wait:** renew the claim to now + 30 min and the status comment's
+  `Updated:` at least every 20 minutes. Both are what tells another run the PR is taken.
+- **A head someone else pushed** while you wait (its author, a person): pin the new head, wait for
+  its checks, judge it. The round counts as usual.
+- **Checks longer than 60 minutes**, or a run past 2 hours of work: hand over. Status comment
+  `waiting on checks` (or the state you are in), clear the claim, end. This is not a failure: the
+  next Land run, woken by the checks or the clock, takes the PR over.
+
+## Taking over
+
+A PR whose status comment says another run holds it, with `Updated:` older than 30 minutes, and
+whose issue's claim has lapsed, was left by a run that stopped. Take it: write `released`
+(`Holder:` the lapsed claim), then read the ledger before anything else: the `verdict` and
+`verify` rows of its heads, the fixer's answers, the status comment. Resume at the step they name
+for the current head: judge a head with no verdict, verify a go head with no `verify` row, fix a
+head whose verdict asked for changes and has no answers comment, merge a proven or unverifiable go.
+Never redo a step the ledger shows done on the same head.
 
 ## 8. Round 3, still not go or not proven
 
