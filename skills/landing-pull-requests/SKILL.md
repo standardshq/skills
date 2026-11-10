@@ -91,8 +91,15 @@ comment saying another run judges or fixes this head, updated less than 30 minut
 PR is taken: take the next issue. Then claim the issue, write your own lock (§ 4) and read the
 issue with `read-recipe.md`. Close it is `deciding-issues`' to apply: it closes the open PRs itself.
 
-**The round** of the head: one more than the `verdict` rows on this PR newer than the latest
-person's gesture (a status move or a `ruling`). A person's gesture restarts the count.
+**Two loops, two counts.** First the code: the judge and the fixer, until a go. Then the proof:
+the verifier and the fixer, until the go head is proven (§ 6). Each counts its own rounds, at most
+3, both restarted by a person's gesture (a status move or a `ruling`):
+
+- **the round** of the head: one more than the `verdict` rows on this PR newer than that gesture
+  and older than its first `not proven` `verify` row;
+- **the verify round:** one more than the `not proven` `verify` rows on this PR newer than that
+  gesture. Once the proof loop has started, a verdict on a fix it asked for belongs to it, not to
+  the judge's count.
 
 *Done when* you hold the claim and the lock on one PR's issue and know the PR, its head, its
 round, and which tier took it (tier 3 goes to § 6), or the pipe is empty and every merged or
@@ -107,7 +114,7 @@ this order:
 - `**Land**: <state>` where state is one of `judging <sha>`, `fixing <sha>`, `verifying <sha>`, `waiting on checks`,
   `go, enqueued`, `go, waiting on Merge it`, `merged`, `paused: <why>`;
 - `Issue: [<title>](https://app.standards.new/fr/~/issues/<issue id>)`;
-- `Round: <n> of 3`, the head sha, and the latest verdict in one line (go, or the count of
+- `Round: <n> of 3` (and `Verify round: <n> of 3` once the proof loop started), the head sha, and the latest verdict in one line (go, or the count of
   blocking and to fix entries);
 - `Updated: <ISO time> by <this run>`: the lock other runs read.
 
@@ -191,7 +198,7 @@ return, the link and the files. Then:
 | The verifier returned | Do |
 |---|---|
 | `proven` | attach the video to the issue's `evidence` (`kind: proof`); post on the PR one comment opening `<!-- factory:verify <sha> -->` with the link, the gesture and the video; announce it (below); then merge by the mode |
-| `not proven` | a `blocking` `experience` entry on this head, the video attached: the fixer (§ 7) takes it as a verdict entry, and the round counts |
+| `not proven` | the **proof loop**: a `blocking` `experience` entry on this head, the video attached, for the fixer (§ 7). Its new head is judged on the delta alone (the later-round form), then verified again. It counts verify rounds, never the judge's; a third `not proven` goes to § 8 |
 | `not run` | `not verified: <why>` in the status comment, then merge by the mode. An app that will not start because of this head is `not proven`, not `not run` |
 
 **The announcement** of a proven head, one message where the project says, read walking up to the
@@ -234,7 +241,7 @@ on). With `autoFix` off, write no fix: the verdict comment is the request to its
 status comment says `changes requested`, and the next head the author pushes is judged as it
 comes. Round 3 still stops on § 8.
 
-Round 1 or 2, or a ruling's words to apply, when the fixer runs: set the status comment to
+Round 1 or 2, verify round 1 or 2, or a ruling's words to apply, when the fixer runs: set the status comment to
 `fixing <sha>`, then dispatch the fixer, a fresh subagent on the build model class when your tools let you choose, with
 a checkout of the branch at the pinned head and this brief:
 
@@ -261,9 +268,10 @@ new head once its checks conclude.
 
 *Done when* the fixer has pushed a new head with its answers, or returned the head unchanged.
 
-## 8. Round 3, still not go
+## 8. Round 3, still not go or not proven
 
-A round-3 verdict short of go, or a fixer that returned the head unchanged (an unresolvable
+A round-3 verdict short of go, a third `not proven` (the video and the gesture's expected against
+observed attached to the checkpoint), or a fixer that returned the head unchanged (an unresolvable
 conflict, a red it could not move; never a head its author moved, which is simply judged next): a `decision` checkpoint (`deciding-issues`), Paused, the open
 entries named, each withheld path with its risk. Options: Fix (say what), Merge as it stands,
 I take it, Close it. The answer returns the issue to In review, and tier 2 applies it. The status
