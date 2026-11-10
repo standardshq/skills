@@ -41,10 +41,20 @@ The person reads it cold, perhaps weeks later, in the workspace's language, with
 
 ### 3. Mockups
 
-A `design` need is owed for new chrome, a new layout or a new interaction; restyling never needs
-one. Draw it as `mockups.md` says, one PNG per option, each attached to the issue's `mockups` with
-`option` its number and `status: proposed`, and ask: Approve (and Approve and launch, as § 2 says), Change (say what), No mockup needed,
-Close it. A `decision` whose question is a screen (Preview) carries its mockups the same way.
+**Show the screen.** A Decision whose options a person would see differently carries one mockup
+per option: where a control sits, a width or a spacing to pick, a new control, block or setting,
+a layout that reflows, a card that gains a field, two ways to show the same thing. The person
+rules by looking, so a `decision` about a screen (a checkpoint, a Preview) is drawn as a `design`
+one is. A question whose options look the same on screen (a key, a permission, a job's timing)
+stays prose.
+
+A `design` need is owed before building new chrome, a new layout or a new interaction. A restyle
+the issue already pins (a token, a spacing, a component named) is built without one.
+
+Draw it as `mockups.md` says, one PNG per option, each attached to the issue's `mockups` with
+`option` its number and `status: proposed`, and ask: Approve (and Approve and launch, as § 2
+says), Change (say what), No mockup needed, Close it. For a `decision` the options stay its own,
+each beside its PNG.
 
 A screen you cannot draw (no source for it, or a direction only a person can choose): send the
 `design` Decision without one, its options Draw it with me in a sitting, No mockup needed,

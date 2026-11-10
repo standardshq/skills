@@ -63,8 +63,8 @@ rollback, and the cost of every later change.
 Affected interfaces and modules, compatibility, security, tenancy, observability, test seams,
 rollout and rollback, **the smallest vertical slice**, and the product, UX, data or architecture
 decisions still open. Separate verified facts (with `file:line`), inferences and open questions.
-When the slice adds chrome, a layout or an interaction, the screen is the question: draw its
-mockup (`deciding-issues`, `mockups.md`).
+When the slice changes what a person sees, the screen is the question: draw one mockup per
+option (`deciding-issues` § 3, Show the screen).
 
 ## 4. Verdict
 
