@@ -222,9 +222,10 @@ return, the link and the files. Then:
 root: the `Verify channel:` line of the project's `context` (a Slack channel id), else the issue's
 `slackThread`, else no Slack message. Never the channel Intake listens to. It opens
 `Testable : <what a person can now do, one sentence, in their words>`, then where to try it (the
-screen and the gesture, and the published link while it still runs), the PR and the Standards issue
-link. It is one `slack_send`: that text, and `verify-<N>.mp4` in its `files`. A failed upload is one line in the report; the row stands. Then one `send`
-to the project's maintainers, with no question: the same sentence, the link and the video.
+screen and the gesture), the PR and the Standards issue link. The video is the proof: the
+published link stays out of the message. It is one `slack_send`: that text, and `verify-<N>.mp4`
+in its `files`. A failed upload is one line in the report; the row stands. Then one `send` to the
+project's maintainers, with no question: the same sentence and the video.
 
 ### Merge by the mode
 
