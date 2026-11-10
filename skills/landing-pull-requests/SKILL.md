@@ -193,9 +193,13 @@ never wrote nor judged this head, with a checkout of the pinned head and this br
 - open the published link in the browser and record the gesture at a person's pace, then take a
   screenshot of the end state. With `browser_launch`: `record start verify-<N>.mp4 --cursor`,
   play, `record stop`. With Playwright: a script beside the checkout that opens the app on its
-  local port in a context with `viewport: { width: 1440, height: 900 }` and `recordVideo: { dir,
-  size: { width: 1440, height: 900 } }` (left out, the size shrinks to 800 px wide and the text
-  blurs), plays the gesture, and closes the context to write the webm. Turn it into a sharp mp4,
+  local port. Launch Chromium with `args: ['--font-render-hinting=none']` (headless Linux
+  otherwise misplaces glyphs: « Follow -up », « Adda connection »), and record in a context with
+  `viewport: { width: 1440, height: 900 }`, `recordVideo: { dir, size: { width: 1440, height: 900 } }`
+  and `locale` set to the language of the issue's reporter (`fr-FR` for a French one). Sign in and
+  dismiss every onboarding tip, banner and tour in a first context, save its `storageState`, and
+  record in a second one started from it, on the gesture's first screen: the video opens where
+  the change is, with nothing over it. Play the gesture, and close the context to write the webm. Turn it into a sharp mp4,
   installing ffmpeg when `command -v ffmpeg` finds none (`sudo apt-get install -y ffmpeg`):
   `ffmpeg -i <video>.webm -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p -movflags +faststart
   verify-<N>.mp4`. Watch a frame of it (`ffmpeg -ss 2 -i verify-<N>.mp4 -frames:v 1 frame.png`):
