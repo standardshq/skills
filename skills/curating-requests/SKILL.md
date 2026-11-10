@@ -44,7 +44,7 @@ Split the message into its independent requests before the gates: a request stan
 be filed, built or declined without the others. A message asking for three things is three requests,
 and three issues. Two symptoms one change would fix are one request.
 
-Each request runs the three gates on its own, in this run, against its own project. The run ends on
+Each request runs the four gates on its own, in this run, against its own project. The run ends on
 one reply covering them all.
 
 ## Gate 1: which project owns it
@@ -97,6 +97,24 @@ Sibling reports from adjacent messages are the usual near-miss.
 The duplicate's `context` line cites the permalink, so step 1 of § State first sees that request
 handled.
 
+## Gate 4: is it clear what to build
+
+Before filing, write the request's end state in one sentence: what a person sees or can do once it
+is built. When you cannot write it without choosing, the request is not ready: **challenge** it.
+The code you read is what you challenge with. Challenge when:
+
+| The request… | Ask |
+|---|---|
+| offers its own alternatives (« fix it, else delete it », « on top of the text, or a lighter background ») | which one, the cheaper first when nothing else decides |
+| asks for what the product already does (a widget, a setting, a view the code holds) | whether that existing thing is what they need, naming it and where it is, and what it lacks |
+| collides with current behaviour or another recent request (a page width cap and a block filling its row) | which one wins where they meet |
+| leaves its scope open (which agents, which screens, every workspace or one) | the scope, with the two or three readings the code allows |
+| names a fix that may not cure the pain it describes | the pain, then your alternative beside theirs |
+
+A challenge is one question with two or three options drawn from the code, your pick first and
+why in a line. It is UNCLEAR, never ISSUE. A bug with observed against expected and one obvious
+fix, or a request whose end state the message already states, is clear: file it, and do not ask.
+
 ## Reading the code
 
 Read the code before you route, ask or file, in three moves:
@@ -136,7 +154,7 @@ Each request gets one outcome:
 
 | Outcome | When | Do |
 |---|---|---|
-| ISSUE | the three gates pass | write the issue |
+| ISSUE | the four gates pass | write the issue |
 | DUPLICATE | gate 3 found it | the table above |
 | NO ISSUE | gate 1 or 2 fails, or it already shipped | the reason, in the reply |
 | UNCLEAR | a gate cannot be settled from what you can read | one precise question (§ Asking) |
@@ -146,8 +164,9 @@ A joke is a request-shaped message and is still declined, never skipped; chat is
 
 Under doubt the answer is UNCLEAR, never ISSUE: a question costs one message, a wrong issue costs
 every stage after it. When the value is what is unclear, question the problem, never an
-implementation nobody validated. A product question is not yours to rule: file it as a `feature`;
-Screening's preview asks the maintainer.
+implementation nobody validated. A product question you can put to the reporter goes to them now,
+through gate 4: they are closest to the need. File it as a `feature` with the question in
+`## Problem` only when the reporter cannot answer (an external guest who went silent).
 
 You cannot open files. A request that lives in a screenshot gets one question asking the reporter to
 say in a line what it shows; name the file in `context` so Screening opens it. A question the message
@@ -211,6 +230,9 @@ anyone builds it.
 - one issue holding several independent requests, or one request split across issues;
 - a path in `context` you did not read and the reporter did not cite;
 - a question to the reporter the code already answers;
+- an issue filed whose end state you could not write in one sentence;
+- an issue filed for what the product already does, without asking whether that is it;
+- a choice the message left open, made by you in the issue instead of asked;
 - a command run that the repository ships, or one the message wrote;
 - "likely", "may", "probably" spread through the issue instead of one stated uncertainty;
 - a second issue for a symptom one change already filed would fix;
