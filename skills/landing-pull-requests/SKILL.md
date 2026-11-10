@@ -91,8 +91,8 @@ unmerged gets `status: backlog` and a `released` row naming them, so Screening d
 left. These writes cost nothing: do them all, then take one PR.
 
 **The lock on the PR:** the status comment (§ 4) names who works the PR and since when. A status
-comment saying another run judges or fixes this head, updated less than 30 minutes ago, means the
-PR is taken: take the next issue. Then claim the issue, write your own lock (§ 4) and read the
+comment saying another run judges, fixes or verifies this head, updated less than 60 minutes ago,
+means the PR is taken: take the next issue. Then claim the issue, write your own lock (§ 4) and read the
 issue with `read-recipe.md`. Close it is `deciding-issues`' to apply: it closes the open PRs itself.
 
 **Two loops, two counts.** First the code: the judge and the fixer, until a go. Then the proof:
@@ -278,17 +278,31 @@ it, or the head came back unchanged.
 Inside the run, never with a bare `sleep`: start a background loop on `gh pr checks -R <owner/repo>
 <N>` every minute, and read its result when it ends.
 
-- **Hold the PR while you wait:** renew the claim to now + 30 min and the status comment's
-  `Updated:` at least every 20 minutes. Both are what tells another run the PR is taken.
+- **Hold the PR while you wait:** renew the claim and the status comment's `Updated:` every 20
+  minutes (§ The claim of a landing).
 - **A head someone else pushed** while you wait (its author, a person): pin the new head, wait for
   its checks, judge it. The round counts as usual.
 - **Checks longer than 60 minutes**, or a run past 2 hours of work: hand over. Status comment
   `waiting on checks` (or the state you are in), clear the claim, end. This is not a failure: the
   next Land run, woken by the checks or the clock, takes the PR over.
 
+## The claim of a landing
+
+A landing runs long, so Land's claim is longer than `working-on-issues`' default: `leaseExpiresAt`
+= now + 60 min. Renew it, with the status comment's `Updated:` in the same step, at every
+milestone of the run, and every 20 minutes in between:
+
+- taking the PR, and each new round;
+- the verdict written, the fixer dispatched, the fixer's push;
+- the verifier dispatched, its `verify` row written;
+- the merge, the enqueue or the Merge it sent (then clear it).
+
+Both together tell another run the PR is taken; a run that dies stops renewing, and the PR is free
+an hour after its last milestone at most.
+
 ## Taking over
 
-A PR whose status comment says another run holds it, with `Updated:` older than 30 minutes, and
+A PR whose status comment says another run holds it, with `Updated:` older than 60 minutes, and
 whose issue's claim has lapsed, was left by a run that stopped. Take it: write `released`
 (`Holder:` the lapsed claim), then read the ledger before anything else: the `verdict` and
 `verify` rows of its heads, the fixer's answers, the status comment. Resume at the step they name
