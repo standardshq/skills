@@ -178,7 +178,8 @@ it when all of these hold, and skip to the merge otherwise, saying `not verified
 status comment:
 
 - the head changes a screen (`evaluate`'s definition), and the repository's facts say `links: true`;
-- you have `publish_port` and `browser_launch` (the Standards agent has them; a harness does not);
+- you have `publish_port` and a browser: `browser_launch` on the Standards agent; on a harness, the
+  machine's own Chromium through Playwright (`PLAYWRIGHT_BROWSERS_PATH` is set on the code machine);
 - no `verify` row exists yet for this head (a go retried by tier 3 is not verified twice).
 
 Set the status comment to `verifying <sha>`, then dispatch the **verifier**: a fresh subagent that
@@ -189,8 +190,12 @@ never wrote nor judged this head, with a checkout of the pinned head and this br
 - start the app with the repository's own commands (`## Verification`, or a `## Demo` section of
   its agent rules), install what it declares, and publish it with `publish_port` (the port, the
   command that starts it, its directory);
-- open the published link in the browser, `record start verify-<N>.mp4 --cursor`, play the
-  gesture at a person's pace, `record stop`, and take a screenshot of the end state;
+- open the published link in the browser and record the gesture at a person's pace, then take a
+  screenshot of the end state. With `browser_launch`: `record start verify-<N>.mp4 --cursor`,
+  play, `record stop`. With Playwright: a script beside the checkout that opens the app on its
+  local port in a context with `recordVideo: { dir }`, plays the gesture, closes the context to
+  write the video as `verify-<N>.webm`, sent as is (`ffmpeg -i … verify-<N>.mp4` only when
+  `command -v ffmpeg` finds one: Playwright's own build encodes webm alone);
 - return `proven`, `not proven` (the gesture runs and the end state is wrong: expected against
   observed, quoted from the screen) or `not run` (the app would not start, or the screen needs
   a model or a service the machine lacks, with the failing step's output), the link, the video and
