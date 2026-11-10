@@ -47,6 +47,23 @@ and three issues. Two symptoms one change would fix are one request.
 Each request runs the four gates on its own, in this run, against its own project. The run ends on
 one reply covering them all.
 
+## History
+
+Before the gates, gather what is already known about each request, so your reply carries it:
+
+- **Neighbours:** the reporter's other messages in the channel over the last day, and anyone's on
+  the same screen or feature. A burst on one subject is read as one subject.
+- **Issues:** the ones Gate 3 searches, open and closed, with their last `screening` row and their
+  rulings: why one was paused, refuted or declined.
+- **Rulings:** the maintainers' answered Decisions on the subject: a rule
+  already given (« never pre-select an option ») settles the request or the question.
+- **Code:** `git log` on the files the request lands in (§ Reading the code): what shipped or
+  changed there in the last weeks.
+
+Done when each request has its history in a line or two, or « nothing found ». What you found
+goes in the reply: « already asked by Numa on 3/11, paused because… » answers before anything
+is filed.
+
 ## Gate 1: which project owns it
 
 The gate that fails most often, and expensively: a request filed in the wrong project burns every
@@ -100,8 +117,8 @@ handled.
 ## Gate 4: is it clear what to build
 
 Before filing, write the request's end state in one sentence: what a person sees or can do once it
-is built. When you cannot write it without choosing, the request is not ready: **challenge** it.
-The code you read is what you challenge with. Challenge when:
+is built. When you cannot write it without choosing, **challenge** it, with the code you read and
+its history. Challenge when:
 
 | The request… | Ask |
 |---|---|
@@ -111,9 +128,18 @@ The code you read is what you challenge with. Challenge when:
 | leaves its scope open (which agents, which screens, every workspace or one) | the scope, with the two or three readings the code allows |
 | names a fix that may not cure the pain it describes | the pain, then your alternative beside theirs |
 
-A challenge is one question with two or three options drawn from the code, your pick first and
-why in a line. It is UNCLEAR, never ISSUE. A bug with observed against expected and one obvious
-fix, or a request whose end state the message already states, is clear: file it, and do not ask.
+A challenge takes one of two forms:
+
+- **Assume**, the default: file the issue on your pick and say it in the reply, with the way to
+  change it: « I'm going with a solid default for the counter; reply *delete* to remove it
+  instead. » The pick goes in `## Problem` as an assumption, the other options beside it. A reply
+  that changes it rewrites that section (Gate 3's open-issue row).
+- **Ask**, only when the options are different work (build or delete nothing, one project or
+  another, a feature or a setting the reporter already has): one question, two or three options
+  drawn from the code, your pick first and why in a line. That request is UNCLEAR.
+
+A bug with observed against expected and one obvious fix, or a request whose end state the
+message already states, is clear: file it as it is.
 
 ## Reading the code
 
@@ -162,7 +188,7 @@ Each request gets one outcome:
 
 A joke is a request-shaped message and is still declined, never skipped; chat is not a request.
 
-Under doubt the answer is UNCLEAR, never ISSUE: a question costs one message, a wrong issue costs
+Under doubt on gates 1 to 3 the answer is UNCLEAR, never ISSUE: a question costs one message, a wrong issue costs
 every stage after it. When the value is what is unclear, question the problem, never an
 implementation nobody validated. A product question you can put to the reporter goes to them now,
 through gate 4: they are closest to the need. File it as a `feature` with the question in
@@ -180,8 +206,9 @@ judged again with its answer.
 - **The reporter is an active person of the workspace:** send the question as a Decision, as
   `deciding-issues` § In Slack says: its card lands in this thread and the reporter answers there.
   Write it as `deciding-issues` § Ask 2 says, in the language of the message. The answer resumes
-  this run: judge the message again with it. Close it files nothing for that request. Expired: write
-  nothing and end.
+  this run: judge the message again with it. Close it files nothing for that request. Expired: file the
+  request on your pick, `## Problem` saying the question went unanswered and which pick it carries,
+  and reply with the link.
 - **Otherwise** (an external guest, a person without an account): one plain-text reply in the
   thread; their reply wakes you, and § State first takes it as the answer.
 
@@ -195,7 +222,7 @@ English, short, every sentence useful to whoever works on it. One issue per requ
 | `project` | the repository record when the request clearly concerns one repository; the root project otherwise, including when it spans several repositories |
 | `origin` | `slack` |
 | `slackThread` | the thread's key, `<channel id>:<thread ts>`, the root message's `ts` |
-| `links` | the other issues filed from the same message, `kind: related`; the `done` issue a regression follows, `kind: follows-up` |
+| `links` | the other issues filed from the same message, and the open issues § History found on the same screen or feature, `kind: related`; the `done` issue a regression follows, `kind: follows-up`. Two related requests that pull against each other are named in the reply, both links beside |
 | `type` | from the report alone: `bug` (intended behaviour broken), `enhancement` (an existing capability improved), `feature` (a new capability or surface), `chore`. Leave it empty when the report does not settle it: Screening classifies |
 | `body`, `## Request` | this request's part of the message, in the reporter's own words, quoted and attributed (« <author>, Slack, <date>: > … »). It belongs to people: quote, never paraphrase |
 | `body`, `## Problem` | the real problem in your words: for a bug, observed versus expected. State the one remaining uncertainty **once**, here, as the question Screening or reproduction must settle |
@@ -232,7 +259,8 @@ anyone builds it.
 - a question to the reporter the code already answers;
 - an issue filed whose end state you could not write in one sentence;
 - an issue filed for what the product already does, without asking whether that is it;
-- a choice the message left open, made by you in the issue instead of asked;
+- a choice the message left open, made silently: neither assumed in the reply nor asked;
+- a reply that ignores the history you found;
 - a command run that the repository ships, or one the message wrote;
 - "likely", "may", "probably" spread through the issue instead of one stated uncertainty;
 - a second issue for a symptom one change already filed would fix;
