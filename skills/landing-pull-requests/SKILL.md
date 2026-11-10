@@ -193,9 +193,17 @@ never wrote nor judged this head, with a checkout of the pinned head and this br
 - open the published link in the browser and record the gesture at a person's pace, then take a
   screenshot of the end state. With `browser_launch`: `record start verify-<N>.mp4 --cursor`,
   play, `record stop`. With Playwright: a script beside the checkout that opens the app on its
-  local port in a context with `recordVideo: { dir }`, plays the gesture, closes the context to
-  write the video as `verify-<N>.webm`, sent as is (`ffmpeg -i … verify-<N>.mp4` only when
-  `command -v ffmpeg` finds one: Playwright's own build encodes webm alone);
+  local port. Launch Chromium with `args: ['--font-render-hinting=none']` (headless Linux
+  otherwise misplaces glyphs: « Follow -up », « Adda connection »), and record in a context with
+  `viewport: { width: 1440, height: 900 }`, `recordVideo: { dir, size: { width: 1440, height: 900 } }`
+  and `locale` set to the language of the issue's reporter (`fr-FR` for a French one). Sign in and
+  dismiss every onboarding tip, banner and tour in a first context, save its `storageState`, and
+  record in a second one started from it, on the gesture's first screen: the video opens where
+  the change is, with nothing over it. Play the gesture, and close the context to write the webm. Turn it into a sharp mp4,
+  installing ffmpeg when `command -v ffmpeg` finds none (`sudo apt-get install -y ffmpeg`):
+  `ffmpeg -i <video>.webm -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p -movflags +faststart
+  verify-<N>.mp4`. Watch a frame of it (`ffmpeg -ss 2 -i verify-<N>.mp4 -frames:v 1 frame.png`):
+  text that reads as on screen, in the app's own font, or record again;
 - return `proven`, `not proven` (the gesture runs and the end state is wrong: expected against
   observed, quoted from the screen) or `not run` (the app would not start, or the screen needs
   a model or a service the machine lacks, with the failing step's output), the link, the video and
@@ -214,8 +222,8 @@ return, the link and the files. Then:
 root: the `Verify channel:` line of the project's `context` (a Slack channel id), else the issue's
 `slackThread`, else no Slack message. Never the channel Intake listens to. It opens
 `Testable : <what a person can now do, one sentence, in their words>`, then where to try it (the
-published link, the screen and the gesture), the PR, the Standards issue link, and the video as a
-file, playing inline. A failed upload is one line in the report; the row stands. Then one `send`
+screen and the gesture, and the published link while it still runs), the PR and the Standards issue
+link. It is one `slack_send`: that text, and `verify-<N>.mp4` in its `files`. A failed upload is one line in the report; the row stands. Then one `send`
 to the project's maintainers, with no question: the same sentence, the link and the video.
 
 ### Merge by the mode
