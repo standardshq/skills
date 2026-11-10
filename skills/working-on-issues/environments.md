@@ -53,8 +53,9 @@ every gate and juror: a refusal (`SKILL.md` § Refusals), `Rule: environment_bro
 missing. A routine run cannot ask for a key: `request_setup` offers keys only to a
 person in a conversation.
 
-**Published links** (`*.standards.run`): publish the running app, and attach its link to a `design`
-Decision or to Merge it, only when the repository's facts say `links: true`. No link is published
+**Published links** (`*.standards.run`, `publish_port`, on the Standards agent only): publish the
+running app, and attach its link to a `design` Decision, to Merge it or to Land's verify step, only
+when the repository's facts say `links: true`. No link is published
 otherwise.
 
 ## Choosing one

@@ -1,6 +1,6 @@
 ---
 name: landing-pull-requests
-description: Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, take its pipe from the open pull requests themselves, run one judging round on one head (judge, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged.
+description: Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, take its pipe from the open pull requests themselves, run one judging round on one head (judge, then an optional proof on the running app, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged.
 ---
 
 # Landing pull requests
@@ -104,7 +104,7 @@ One comment per PR, found by its first line `<!-- factory:land -->`, edited in p
 (`gh api -X PATCH repos/<o>/<r>/issues/comments/<id> -f body=…`), never posted twice. It says, in
 this order:
 
-- `**Land**: <state>` where state is one of `judging <sha>`, `fixing <sha>`, `waiting on checks`,
+- `**Land**: <state>` where state is one of `judging <sha>`, `fixing <sha>`, `verifying <sha>`, `waiting on checks`,
   `go, enqueued`, `go, waiting on Merge it`, `merged`, `paused: <why>`;
 - `Issue: [<title>](https://app.standards.new/fr/~/issues/<issue id>)`;
 - `Round: <n> of 3`, the head sha, and the latest verdict in one line (go, or the count of
@@ -159,6 +159,50 @@ since you pinned it voids the verdict. Say so in the status comment and end.
 *Done when* the `verdict` row exists on the frozen sha and its comment is on the PR.
 
 ## 6. Go: merge by the mode
+
+### Verify first, when it can
+
+A plus, never a gate: a go merges whether or not it was verified. Verify a go head before merging
+it when all of these hold, and skip to the merge otherwise, saying `not verified: <why>` in the
+status comment:
+
+- the head changes a screen (`evaluate`'s definition), and the repository's facts say `links: true`;
+- you have `publish_port` and `browser_launch` (the Standards agent has them; a harness does not);
+- no `verify` row exists yet for this head (a go retried by tier 3 is not verified twice).
+
+Set the status comment to `verifying <sha>`, then dispatch the **verifier**: a fresh subagent that
+never wrote nor judged this head, with a checkout of the pinned head and this brief:
+
+- write the **gesture** from the issue before reading the diff: `## Acceptance`, the approved
+  mockup, the reproduction for a bug. The route, the steps, the end state a person would see;
+- start the app with the repository's own commands (`## Verification`, or a `## Demo` section of
+  its agent rules), install what it declares, and publish it with `publish_port` (the port, the
+  command that starts it, its directory);
+- open the published link in the browser, `record start verify-<N>.mp4 --cursor`, play the
+  gesture at a person's pace, `record stop`, and take a screenshot of the end state;
+- return `proven`, `not proven` (the gesture runs and the end state is wrong: expected against
+  observed, quoted from the screen) or `not run` (the app would not start, or the screen needs
+  a model or a service the machine lacks, with the failing step's output), the link, the video and
+  the screenshot.
+
+Write a `verify` row: `subject: github:owner/repo#N@<sha>`, body `Outcome:` and the verifier's
+return, the link and the files. Then:
+
+| The verifier returned | Do |
+|---|---|
+| `proven` | attach the video to the issue's `evidence` (`kind: proof`); post on the PR one comment opening `<!-- factory:verify <sha> -->` with the link, the gesture and the video; announce it (below); then merge by the mode |
+| `not proven` | a `blocking` `experience` entry on this head, the video attached: the fixer (§ 7) takes it as a verdict entry, and the round counts |
+| `not run` | `not verified: <why>` in the status comment, then merge by the mode. An app that will not start because of this head is `not proven`, not `not run` |
+
+**The announcement** of a proven head, one message where the project says, read walking up to the
+root: the `Verify channel:` line of the project's `context` (a Slack channel id), else the issue's
+`slackThread`, else no Slack message. Never the channel Intake listens to. It opens
+`Testable : <what a person can now do, one sentence, in their words>`, then where to try it (the
+published link, the screen and the gesture), the PR, the Standards issue link, and the video as a
+file, playing inline. A failed upload is one line in the report; the row stands. Then one `send`
+to the project's maintainers, with no question: the same sentence, the link and the video.
+
+### Merge by the mode
 
 Mark a draft PR ready. Then the first row that holds:
 
@@ -229,5 +273,5 @@ comment says `paused: waiting on <person>`.
 
 ## Report
 
-One line: the PRs newly tracked, then the issue, the PR, the head, the round, the verdict, and what
-happened (merged, enqueued, Merge it sent, fixer pushed, paused, or left and why).
+One line: the PRs newly tracked, then the issue, the PR, the head, the round, the verdict, the
+verify outcome (proven, not proven, not run, or skipped and why), and what happened (merged, enqueued, Merge it sent, fixer pushed, paused, or left and why).

@@ -25,7 +25,7 @@
   },
   {
     "name": "landing-pull-requests",
-    "description": "Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, take its pipe from the open pull requests themselves, run one judging round on one head (judge, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged."
+    "description": "Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, take its pipe from the open pull requests themselves, run one judging round on one head (judge, then an optional proof on the running app, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged."
   },
   {
     "name": "pr",
