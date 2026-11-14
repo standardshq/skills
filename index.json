@@ -17,7 +17,7 @@
   },
   {
     "name": "executing-issues",
-    "description": "Build stage. Use when the Build routine takes the next In progress issue of its pipe and turns it into a pull request on a green gate, or into a Decision that names what is missing."
+    "description": "Build stage. Use when the Build routine is woken or launched on an In progress issue and turns it into a pull request on a green gate, or into a Decision that names what is missing."
   },
   {
     "name": "implement",
@@ -25,7 +25,11 @@
   },
   {
     "name": "landing-pull-requests",
-    "description": "Land stage. Use when the Land routine wakes, on its clock or on a pull request event, to track every open pull request of the factory's repositories as an In review issue, take its pipe from the open pull requests themselves, run one judging round on one head (judge, then an optional proof on the running app, then merge or fixer) and say it on the pull request, or close an issue whose every linked PR is merged."
+    "description": "Land stage. Use when the Land routine wakes on a pull request event, a launch or its clock, to track that pull request as an In review issue, land it round after round (judge, fixer, an optional proof on the running app, merge) for at most six rounds short of go, label it and say each step on it, or close an issue whose every linked PR is merged."
+  },
+  {
+    "name": "operating-the-factory",
+    "description": "Ops stage. Use when the Ops routine runs a tick over the factory, to relaunch a run that died, hand stranded work back to the stage that owns it, launch Ready issues under a standing order, or run the daily evaluation of the routines."
   },
   {
     "name": "pr",
@@ -37,7 +41,7 @@
   },
   {
     "name": "screening-issues",
-    "description": "Use when the Screening routine takes the next issue of its pipe, on a ruling, a person's release, a new issue or a refresh, and on its Monday sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision."
+    "description": "Use when the Screening routine wakes on an issue created in or returned to Backlog, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision."
   },
   {
     "name": "setting-up-the-factory",
@@ -53,6 +57,6 @@
   },
   {
     "name": "working-on-issues",
-    "description": "Contract of every factory run. Use when a routine takes the next issue of its pipe, claims or releases it, stops for a person, writes a timeline row, or reads a repository's rules."
+    "description": "Contract of every factory run. Use when a routine takes the issue or pull request its wake names, checks its neighbours, stops for a person, writes a timeline row, labels a pull request, or reads a repository's rules."
   }
 ]

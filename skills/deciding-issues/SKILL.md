@@ -70,7 +70,7 @@ exists and a person moved the issue out of Paused after it was sent: with no `ru
 that move yet, write the ruling « proceed as last scoped » as Screening does (`screening-issues`
 § Release and rulings) and go on without asking; with one, a checkpoint on new evidence is sent as
 a new Decision, the old card superseded by that ruling. Otherwise the issue waits on it: send
-nothing, clear your claim, end.
+nothing, end.
 
 Call `send` with `questions`:
 
@@ -119,7 +119,7 @@ The answer resumes the run that asked. `read decision:<id>` for the answer, `ans
 | any other answer | the `ruling` | Backlog: Screening takes rulings first and routes by `Resume at:` |
 
 Every answer but I take it, superseded included, clears `waitingOn`; a move out of Paused also
-clears `need`, in one update. Then clear any claim and
+clears `need`, in one update. Then
 end: a run never continues its own stage after its question.
 
 **The `ruling` row** (`timeline-kinds.md`): `subject: decisions:<id>`; `Decision-maker:` who
@@ -134,8 +134,7 @@ them all. One write of `mockups` with `{ id, props }` per file, so the files sta
 **Answered with a question:** answer it from the codebase and evidence, then ask again (§ Ask)
 with the missing context, writing no ruling.
 
-**Expired** (24 hours, the run resumes with no answer): change nothing, clear your
-claim, end. The issue stays Paused, for a sitting or a person's move to Ready.
+**Expired** (24 hours, the run resumes with no answer): change nothing, end. The issue stays Paused, for a sitting or a person's move to Ready.
 
 **A person's gesture while a Decision is open** (a move to Ready, Mine or Done): only the run that
 asked closes its question. Answered later, the first row above records it
@@ -156,7 +155,7 @@ Every other routine's Decisions go to Decisions, never to the channel.
 A person starts this skill in a conversation to clear what no run can answer. You ask, they rule,
 you write it down; you never implement, and a ruling from a sitting never launches code.
 
-1. **Select** Paused issues with no live claim whose latest Decision expired or that never had one,
+1. **Select** Paused issues whose latest Decision expired or that never had one,
    and Paused `design` issues whose checkpoint says `Mockups: none`. Skip any other issue with an
    open Decision: its card is where it gets answered. Order by `priority`, empty last, then oldest.
 2. **Re-resolve** each as § Ask 1, reading the checkpoint and every row after it, and the target
@@ -168,7 +167,7 @@ you write it down; you never implement, and a ruling from a sitting never launch
    (`status: proposed`); their approval sets it `approved`, as § Answer says.
    Their approval, their change, or their « no mockup needed » is the ruling; a mockup they never
    saw is not.
-5. **Record** each answer as § Answer, under a claim (`working-on-issues` § The claim):
+5. **Record** each answer as § Answer:
    `subject` the expired Decision or none, `Recorded by:` the sitting, `Source:` the conversation
    and its date.
 6. **Report** one table: issue, ruling, what happens next (Screening, Mine, Done, still Paused).

@@ -1,7 +1,7 @@
 # Read recipe
 
-Read the issue you claimed in this order. Stop as soon as it is not yours to act on (another live
-claim, not your stage's pipe, not launched): clear your claim and take the next.
+Read the issue of your wake in this order. Stop as soon as it is not yours to act on (a neighbour
+got there first, not your stage's pipe, not launched): write nothing and end.
 
 1. **The issue:** `title`, `status`, `priority`, `type`, `origin`, `closeReason`, `need`,
    `waitingOn`, `slackThread`.

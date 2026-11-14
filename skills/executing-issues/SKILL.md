@@ -1,6 +1,6 @@
 ---
 name: executing-issues
-description: Build stage. Use when the Build routine takes the next In progress issue of its pipe and turns it into a pull request on a green gate, or into a Decision that names what is missing.
+description: Build stage. Use when the Build routine is woken or launched on an In progress issue and turns it into a pull request on a green gate, or into a Decision that names what is missing.
 ---
 
 # Executing issues
@@ -9,21 +9,25 @@ One issue, one change, one run, ending at the pull request: from In review on, t
 The acceptance criteria and seams exist in the agent brief before the diff does, so the judge has
 something to compare against that the implementation could not have chosen.
 
-`working-on-issues` owns the state below (the claim, § Stopping for a person, § Three tries,
-§ Pull requests, § Repository facts) and wins when this skill disagrees.
+`working-on-issues` owns the state below (§ One wake, one piece of work, § Neighbours, § Stopping
+for a person, § Three tries, § Pull requests, § Repository facts) and wins when this skill
+disagrees.
 
-## 1. Take the next issue
+## 1. Take the issue of your wake
 
-The pipe (`workflow.md`, Build): In progress issues with no live claim whose latest move into In
-progress passes `workflow.md` § Launch, and with no open linked PR. One with an open linked PR
-enters only because a run died between opening it and moving the issue: claim it, finish § 6's
-last writes, end; Build starts no second implementation.
+The issue your wake names (`workflow.md`, Build): In progress, its latest move into In progress
+passing `workflow.md` § Launch, and with no open linked PR. One with an open linked PR is yours only
+because a run died between opening it and moving the issue: finish § 6's last writes, end; Build
+starts no second implementation.
 An issue that has tasks (`childIds`) is never work; one with a `blockedBy` issue not Done waits,
 with nothing written.
 
-Claim it, then read it with `read-recipe.md`.
+A launch whose context carries a `Next:` line (Ops relaunching a run that died) starts from it: the
+branch or the patch it names, before anything is rebuilt.
 
-*Done when* you hold the claim on one launched leaf issue, or the pipe is empty and the run ends.
+Read the issue with `read-recipe.md`.
+
+*Done when* you have read one launched leaf issue that is yours, or nothing is and the run ends.
 
 ## 2. Before the code
 
@@ -64,8 +68,6 @@ showed, with Close it recommended when the evidence says the bug is gone.
 Run `implement`, which drives `tdd` at the seams the brief's `## Seams` lists. Each criterion of
 `## Acceptance` gets a test asserting its exact value; a bug's red test turns green.
 
-Renew the claim as `working-on-issues` § The claim says.
-
 | The change touches | Do |
 |---|---|
 | a `generated` path | regenerate it with the repository's own command |
@@ -86,7 +88,9 @@ the work:
 Run every command of `verify` on the branch: commands only, green or red, no judgment. Judging the
 code against the repository's conventions is Land's, once, by a judge that did not write it.
 
-Red: read the failure, fix it, run the whole gate again. Red on the third run: a `decision`
+Red: read the failure, fix it, run the whole gate again. A failure in a package the diff leaves
+alone is checked on the unmodified `targetBranch`, same machine: red there too, it is the target's,
+named in the PR body and not counted. Red on the third run that counts: a `decision`
 checkpoint with the three failures quoted (trimmed, no `sensitiveData`), options retry with a
 stated change (Approve, or Approve and launch), I take it, Close it.
 
@@ -102,24 +106,27 @@ mockup or the reproduction.
 
 Per repository changed:
 
-1. Push the branch and open the PR against `targetBranch`. Title as the repository's rules say (by
+1. Re-read the repository's open PRs for one that cites this issue (`working-on-issues`
+   § Neighbours): one there means a neighbour opened it, so push nothing and end. Otherwise push the
+   branch and open the PR against `targetBranch`. Title as the repository's rules say (by
    default a conventional commit line). Body by `pr`, with the lines `working-on-issues`
    § Pull requests requires (`<!-- factory:build -->` among them), plus: each acceptance criterion and the test that holds it, the
    `withheld` paths touched, and the assumptions made unasked, one per line.
 2. Add `owner/repo#N` to `pullRequests`, one per line, keeping the lines already there.
 
-Then `status: in_review`, clear the claim, re-read the issue, at once: never wait for the PR's CI.
+Then `status: in_review`, re-read the issue, at once: the PR's CI is not yours to wait for.
 The CI is Land's to read, and an issue left In progress beside its open PR is one Land has to
 repair.
 
-*Done when* the re-read shows every PR in `pullRequests`, the issue In review, and the claim
-empty. A write that failed is named in your report, never claimed.
+*Done when* the re-read shows every PR in `pullRequests` and the issue In review. A write that
+failed is named in your report as failed.
 
 ## When a run fails
 
-A run that cannot deliver (a tool missing mid-way, a timeout, a branch it cannot push) writes the
-`attempt` row (`Outcome:` failed or timeout; what was tried, why it failed, what to try next;
-`subject` the branch head when there is one), increments `failedAttempts`, clears the claim. At 3,
-`working-on-issues` § Three tries.
+A run that cannot deliver writes the `attempt` row (`timeline-kinds.md`): `Outcome:` failed or
+timeout, `Cause:` change (a red gate, a refused change) or environment (a tool missing mid-way, a
+timeout, a branch it cannot push), what was tried, and `Next:` the step the next run starts from;
+`subject` the branch head when there is one. A branch it cannot push leaves its patch attached to
+the issue. `working-on-issues` § Three tries says which cause counts.
 
 Both endings count: a PR on a green gate, or a checkpoint that names exactly what is missing.
