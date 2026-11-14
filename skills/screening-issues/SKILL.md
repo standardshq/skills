@@ -1,6 +1,6 @@
 ---
 name: screening-issues
-description: Use when the Screening routine takes the next issue of its pipe, on a ruling, a person's release, a new issue or a refresh, and on its Monday sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision.
+description: Use when the Screening routine wakes on an issue created in or returned to Backlog, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision.
 ---
 
 # Screening issues
@@ -71,8 +71,9 @@ another project's repository goes in your `screening` row; the issue keeps its `
 
 ## Which issue
 
-Screening's pipe, in this order; inside each tier by `priority` then age, the claim first
-(`working-on-issues` § One issue per run):
+Screening works the issue of its wake (`working-on-issues` § One wake, one piece of work). A burst
+of issues created together wakes it once: it then takes them in this order, inside each tier by
+`priority` then age:
 
 1. **Rulings and releases:** a `backlog` issue with a `ruling` row newer than its latest
    `screening` row; a `ready` issue whose latest move to `ready` was a person's and is newer than
@@ -83,8 +84,10 @@ Screening's pipe, in this order; inside each tier by `priority` then age, the cl
 
 Up to 5 issues per run while each one asks nothing; the first that sends a Decision ends the run.
 
-The first run after Monday 06:00 UTC (the one starting before 06:15) runs § Weekly sweep before
-its pipe.
+A run Ops launches with the context « weekly sweep » runs § Weekly sweep and nothing else; one it
+launches on a named issue (a person's release, a refresh due) screens that issue.
+
+Every issue left Ready carries a `priority`: Build's net and Ops order the pipe by it.
 
 ## The fence
 

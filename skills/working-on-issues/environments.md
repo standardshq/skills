@@ -30,6 +30,19 @@ code in (`curating-requests` § Reading the code).
 Where a skill names the skills folder, a path under `/workspace/skills/`, or a verb such as
 `write`, read it through this table.
 
+## Runs
+
+A run reads the runs of a routine and, for Ops, starts one. Use the tool your list holds:
+
+| To | Today | Once agents and routines live in the verbs |
+|---|---|---|
+| find a routine's id | `list_agents` | `search` with `kinds: ["routine"]` |
+| read a routine's runs (status, start, end, source, error) | `list_routine_runs` | `read` of `routine:<id>` with `include: ["runs"]` |
+| start a run with a context | `launch_routine` (`id`, `prompt`) | `start` with `target: "routine:<id>"` and `text`; add `on: "github:<owner>/<repo>#<N>"` to run on a pull request's own conversation |
+
+A run with neither tool reads no runs: on its clock wake it acts as if alone, and says so in its
+report.
+
 **`gh` outside a checkout:** your working directory is rarely a clone, so pass `-R <owner/repo>`
 to every `gh pr` and `gh issue` command. The machine's `gh` may be older than its docs: a JSON
 field it refuses is read with `gh api` instead, never guessed.

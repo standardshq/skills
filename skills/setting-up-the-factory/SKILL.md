@@ -18,8 +18,13 @@ terms.
 - Safe to run again: read first. An existing record or trigger is shown and updated, never
   duplicated. Resume at the first step not done.
 
-The factory is four routines: `intake` turns Slack messages into issues, and `screening`, `build`
-and `land` each take the next issue of their pipe on a clock (`working-on-issues/workflow.md`).
+The factory is five routines: `intake` turns Slack messages into issues; `screening`, `build` and
+`land` each work the issue or pull request their wake names; `ops` ticks over all of them
+(`working-on-issues/workflow.md`).
+
+`ops` runs on Standards, never on a harness, with no GitHub trigger: switch it on last. It starts
+runs of the other routines, so the person who arms its schedule needs `agents:manage`; say so
+before they switch it on.
 
 | Asked | Do |
 |---|---|

@@ -10,7 +10,7 @@ not an implementation plan, and never a novelty contest. You rank; the maintaine
 feature stops on a Decision, whatever your verdict.
 
 Read `working-on-issues` first (`timeline-kinds.md`: the `preview` row). You run inside the
-Screening run that routed the issue here, under its claim.
+Screening run that routed the issue here.
 
 ## Which issues
 

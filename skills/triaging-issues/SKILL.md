@@ -8,7 +8,7 @@ description: Use when a Screening run takes an issue whose `type` is empty or co
 Triage routes the report; it does not diagnose it or design the fix. It is the first step of the
 Screening run that took the issue, which goes on to `screening-issues` once `type` is set.
 
-Read `working-on-issues` first. The claim, the `screening` row and stopping for a person are its.
+Read `working-on-issues` first. The wake, the `screening` row and stopping for a person are its.
 
 ## Evidence boundary
 
