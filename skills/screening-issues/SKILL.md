@@ -1,6 +1,6 @@
 ---
 name: screening-issues
-description: Use when the Screening routine wakes on an issue created in or returned to Backlog, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision.
+description: Use when the Screening routine wakes on an issue created in or returned to Backlog or on its clock, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision.
 ---
 
 # Screening issues
@@ -72,8 +72,8 @@ another project's repository goes in your `screening` row; the issue keeps its `
 ## Which issue
 
 Screening works the issue of its wake (`working-on-issues` § One wake, one piece of work). A burst
-of issues created together wakes it once: it then takes them in this order, inside each tier by
-`priority` then age:
+of issues created together wakes it once, and a clock wake names none: it then takes them in this
+order, inside each tier by `priority` then age:
 
 1. **Rulings and releases:** a `backlog` issue with a `ruling` row newer than its latest
    `screening` row; a `ready` issue whose latest move to `ready` was a person's and is newer than
