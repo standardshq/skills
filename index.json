@@ -41,7 +41,7 @@
   },
   {
     "name": "screening-issues",
-    "description": "Use when the Screening routine wakes on an issue created in or returned to Backlog, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision."
+    "description": "Use when the Screening routine wakes on an issue created in or returned to Backlog or on its clock, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision."
   },
   {
     "name": "setting-up-the-factory",
