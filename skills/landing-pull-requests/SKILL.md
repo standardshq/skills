@@ -54,7 +54,7 @@ Then align the issue's status with its open PR, whoever left it behind:
 | In review | nothing |
 | Backlog, Ready, In progress or Done | `status: in_review`: the open PR is the work, whoever left the issue behind |
 | Paused | nothing: it waits on a person (§ 3 reads its answer) |
-| Mine | nothing: a person took it. Its status comment says so, and Land never judges it |
+| Mine | the person who took it opened the PR for review: once the PR is not a draft, `status: in_review`, `waitingOn` cleared, and it is judged like any other. A draft stays Mine: its author is still working |
 
 **A created issue:** `title` the PR title, `project` the repository record, `status: in_review`,
 `origin: github`, `type` from the title's conventional prefix (`feat` feature, `fix` bug,
