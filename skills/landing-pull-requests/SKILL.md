@@ -83,7 +83,8 @@ head of this order, inside each tier by its issue's `priority`, then the PR's ag
 whatever state its issue was left in.
 
 1. **A head to judge:** a PR that is not a draft, whose issue is In review, whose head has no
-   `verdict` row (`subject: github:owner/repo#N@<sha>`) and every check on it concluded.
+   `verdict` row (`subject: github:owner/repo#N@<sha>`), its checks concluded or still running
+   (§ 5 judges first).
 2. **A ruling to apply:** a PR whose issue's newest `ruling` answers a Land checkpoint (its
    checkpoint's `Resume at:` is land) with anything but Merge it, and has no `verdict` row after it.
    Skip it while auto-merge is enabled on it or a Merge it Decision is open.
@@ -153,8 +154,8 @@ in the status comment, write one `signal` (`Rule: target_red`) naming the check,
 
 **Machinery red:** a failed check whose failing step the diff cannot reach (a refused artifact or
 download, a runner port already bound, a flake the repository tracks) is rerun once with the
-GitHub tools, failed jobs only, when its attempt number is 1, then wait for it (§ Waiting for
-checks) and judge the head when it concludes.
+GitHub tools, failed jobs only, when its attempt number is 1, then waited for (§ Waiting for
+checks) like any check still running.
 
 **A ruling to apply** (tier 2) skips the judge and is consumed by a `verdict` row on the head
 (this section's shape and round), its body citing the ruling:
@@ -174,6 +175,19 @@ says.
 
 A red required check is a `blocking` entry of any round, with its failed step quoted.
 
+**The review first, the checks after.** Dispatch the judge as soon as the head is pinned, at
+every round, whatever state its checks are in: the dossier carries the checks concluded so far and
+names the ones still running. A verdict that asks for changes sends the fixer, whose push starts
+the checks again on a new head, so waiting for the old ones first buys nothing. On the judge's
+return:
+
+- **entries** (`blocking` or `to fix`): write the `changes` verdict now and go to the fixer (§ 7),
+  which also answers the checks already red on this head. What the checks find after that comes
+  on the new head, as entries of the next round;
+- **none:** wait for the head's checks (§ Waiting for checks), then write the verdict: go when
+  every required check is green, `changes` with one `blocking` entry per red required check
+  otherwise. Target red and Machinery red above apply as on any head.
+
 Write the `verdict` row from the judge's return: `subject: github:owner/repo#N@<sha>`, `stage:
 land`, `outcome` and `round` as attributes, body opening `Outcome: go` or `Outcome: changes`, then
 `Round: <n>`, then the ranked findings and the counts that returned nothing. Go is no `blocking`
@@ -182,8 +196,8 @@ and no `to fix`. Set `factory:go` or `factory:changes` on the PR.
 Then post the verdict on the PR: one comment opening `<!-- factory:verdict <sha> -->` and
 `Land verdict, round <n>, on <sha>: go` (or `changes`), the findings as the row has them, each with
 its file and line. Before merging or pushing anything after it, re-read the head: a head that moved
-since you pinned it voids the verdict. Say so in the status comment, wait for the new head's checks
-(§ Waiting for checks) and judge it in this run.
+since you pinned it voids the verdict. Say so in the status comment, pin the new head and judge it
+in this run.
 
 *Done when* the `verdict` row exists on the frozen sha and its comment is on the PR.
 
@@ -202,6 +216,21 @@ status comment:
   (`PLAYWRIGHT_BROWSERS_PATH` is set on the code machine). Read your tool list for these names; a
   tool named in an older text (`publish_port`) is gone, never a reason to skip;
 - no `verify` row exists yet for this head (a go retried by tier 3 is not verified twice).
+
+**Start it during the wait.** The verifier needs the head, not the checks. When the judge returned
+no entry and you start waiting for the checks of a head these conditions hold for (§ 5), dispatch
+its verifier at once, beside the wait, and keep its return until the verdict. The status comment
+stays `waiting on checks`. One verifier per head, never a second.
+
+- **the checks end green, the verdict is go:** wait for a verifier still running, the status
+  comment saying `verifying <sha>`, then write the `verify` row and follow the table below;
+- **a required check ends red, the verdict is `changes`:** the head is dead. Stop a verifier
+  still running and write no `verify` row. A `not proven` it already returned is one more
+  `blocking` `experience` entry of that verdict, its video attached, for the same fixer in the
+  same round; a `proven` or a `not run` is dropped. The next head gets its own verifier.
+
+A go head whose verifier never started (a head taken over or retried, checks that had already
+concluded, tools that cannot run a subagent beside the wait) is verified after the go.
 
 Set the status comment to `verifying <sha>`, then dispatch the **verifier**: a fresh subagent that
 never wrote nor judged this head, with a checkout of the pinned head and this brief:
@@ -325,8 +354,7 @@ a checkout of the branch at the pinned head and this brief:
 A PR from a fork, or one you cannot push to, gets no fixer either: the verdict comment is the request to its
 author, the status comment says `changes requested`, and the next head is judged when it comes.
 
-Update the status comment (`waiting on checks`), wait for the new head's checks (§ Waiting for
-checks), and judge it in this run: § 5 on the delta, the next round.
+Judge the new head at once in this run, its checks running: § 5 on the delta, the next round.
 
 *Done when* the fixer has pushed a new head with its answers and the run has moved on to judging
 it, or the head came back unchanged.
@@ -337,8 +365,8 @@ Inside the run, never with a bare `sleep`: start a background loop on `gh pr che
 <N>` every minute, and read its result when it ends.
 
 - **Hold the PR while you wait:** rewrite the status comment's `Updated:` every 20 minutes.
-- **A head someone else pushed** while you wait (its author, a person): pin the new head, wait for
-  its checks, judge it. The round counts as usual.
+- **A head someone else pushed** while you wait (its author, a person): stop the verifier of the
+  old head, pin the new head and judge it (§ 5). The round counts as usual.
 - **Checks longer than 60 minutes**, or a run past 2 hours of work: hand over. Status comment
   `waiting on checks` (or the state you are in), remove `factory:landing`, end. This is not a failure: the
   next Land run, woken by the checks or the clock, takes the PR over.
