@@ -54,7 +54,7 @@ Then align the issue's status with its open PR, whoever left it behind:
 | In review | nothing |
 | Backlog, Ready, In progress or Done | `status: in_review`: the open PR is the work, whoever left the issue behind |
 | Paused | nothing: it waits on a person (§ 3 reads its answer) |
-| Mine | nothing: a person took it. Its status comment says so, and Land never judges it |
+| Mine | the person who took it opened the PR for review: once the PR is not a draft, `status: in_review`, `waitingOn` cleared, and it is judged like any other. A draft stays Mine: its author is still working |
 
 **A created issue:** `title` the PR title, `project` the repository record, `status: in_review`,
 `origin: github`, `type` from the title's conventional prefix (`feat` feature, `fix` bug,
@@ -77,7 +77,8 @@ line and `factory:tracked`.
 
 ## 3. Take the pull request
 
-Woken on a pull request, that PR is your work: find its tier below and go on. The net takes the
+Woken on a pull request, that PR is your work: find its tier below and go on. A wake because the
+merge queue removed it (`dequeued`) is tier 3 at once. The net takes the
 head of this order, inside each tier by its issue's `priority`, then the PR's age. A PR is judged
 whatever state its issue was left in.
 
@@ -96,7 +97,8 @@ every linked PR closed unmerged gets `status: backlog` and a `released` row nami
 Screening decides what is left. These writes cost nothing: do them all, then take one PR.
 
 **A PR a neighbour is on:** `factory:landing` with a status comment (§ 4) updated less than 60
-minutes ago. Leave it and end the run; the net takes the next PR of the order instead. Otherwise
+minutes ago. A run woken on it leaves it and ends; the net skips it and takes the next PR of the
+order, ending only when every PR of the order is held or none is left. Otherwise
 the PR is yours: add `factory:landing`, write the status comment, and read the issue with
 `read-recipe.md`. Close it is `deciding-issues`' to apply: it closes the open PRs itself.
 
@@ -249,12 +251,29 @@ Mark a draft PR ready. Then the first row that holds:
 
 | The head | Do |
 |---|---|
-| conflicts with `targetBranch` (`mergeStateStatus` `DIRTY`), or left the merge queue unmerged | the fixer merges `targetBranch` into it (§ 7); the new head is judged on the delta, on the same round |
+| conflicts with `targetBranch` (`mergeStateStatus` `DIRTY`) | the fixer merges `targetBranch` into it (§ 7); the new head is judged on the delta, on the same round |
+| left the merge queue unmerged, and does not conflict | § *Dropped by the queue* below |
 | touches a `withheld` path, or `reviewers` requires a person's review of its changed paths (`any:<n>`, or a `user:` or `team:` line whose glob matches) | Merge it |
 | `gate` is `none` | Merge it, saying no check proves the change and the verdict is all there is |
 | `mode: queue` | enqueue: enable auto-merge with `method`, `--match-head-commit <sha>` |
 | `mode: human` | Merge it |
 | `mode: direct` | merge with `method`, `--match-head-commit <sha>` |
+
+### Dropped by the queue
+
+The queue's checks run on the head merged with what was queued ahead of it, so a drop is either
+noise or a real clash. Read why before touching the branch: the latest failed run of the queue
+branch that named this PR (`gh run list -R <owner/repo> --event merge_group --json
+databaseId,headBranch,conclusion` and keep the `gh-readonly-queue/<targetBranch>/pr-<N>-…`
+branches), and the failed steps of its failed jobs.
+
+| The failed steps | Do |
+|---|---|
+| none the diff can reach, and the same checks are green on the head (a timeout, a runner or download failure, a test the diff does not touch) | enqueue the head again at once, as the `mode: queue` row says: no fixer, no verdict, no round. Write one `signal`, `Rule: flaky_check`, subject the head, naming the job, the test or step and the run; when no open issue tracks that flake, file one as a bug quoting the failed step, and name it in the signal |
+| one the diff can reach, or the head was already enqueued again twice (two `flaky_check` signals on this head) | the fixer merges `targetBranch` into it and answers the failed steps (§ 7); the new head is judged on the delta, on the same round |
+| no failed run found (removed by a person, or the queue gave no reason) | enqueue the head again once, saying so in the status comment; a second drop of the same head goes to its fixer |
+
+A requeue is a milestone of the status comment (`go, enqueued again: <the flake>`).
 
 **Merge it** is a Decision (`deciding-issues`, its recipient rule for Merge it): the verdict in
 two lines, each withheld path with its specific risk, the head, the PR link, and the published link
