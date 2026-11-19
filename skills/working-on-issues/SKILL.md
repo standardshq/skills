@@ -188,3 +188,18 @@ Install the package manager the repository declares before running its commands.
 | `boot`, `apps`, `reset`, `consumes`, `deployWorkflows` | how to run it, seed it, and what it depends on |
 
 Lists are one entry per line; empty means nothing found, never unlimited.
+
+## Project settings
+
+A project's settings are attributes of its `projects` record, read walking up to the root: the
+nearest record that sets one wins, an unset one takes its default. Repository facts say what the
+code allows; settings say what the workspace chose. Both hold: a setting never widens a fact.
+
+| Setting | Values (default) | Read by |
+|---|---|---|
+| `autoLaunch`, `autoLaunchSize` | on, off (off); `small`, `standard` (`small`) | Screening § Launch |
+| `trackPullRequests` | `all`, `factory`, `none` (`all`) | Land § 2 |
+| `reviewMine` | on, off (on) | Land § 2 |
+| `autoFix` | on, off (on) | Land § 7 |
+| `verify` | `off`, `screens`, `required` (`screens`) | Land § 6 |
+| `announceChannel` | a Slack channel id (none) | Land § 6 |
