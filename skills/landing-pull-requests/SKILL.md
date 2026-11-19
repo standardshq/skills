@@ -196,8 +196,11 @@ it when all of these hold, and skip to the merge otherwise, saying `not verified
 status comment:
 
 - the head changes a screen (`evaluate`'s definition), and the repository's facts say `links: true`;
-- you have `publish_port` and a browser: `browser_launch` on the Standards agent; on a harness, the
-  machine's own Chromium through Playwright (`PLAYWRIGHT_BROWSERS_PATH` is set on the code machine);
+- you can publish a port and drive a browser. Publishing is the `start` verb with `target:
+  "server"` (on a harness, the tool `standards_start`); the browser is `browser_launch` on the
+  Standards agent, and on a harness the machine's own Chromium through Playwright
+  (`PLAYWRIGHT_BROWSERS_PATH` is set on the code machine). Read your tool list for these names; a
+  tool named in an older text (`publish_port`) is gone, never a reason to skip;
 - no `verify` row exists yet for this head (a go retried by tier 3 is not verified twice).
 
 Set the status comment to `verifying <sha>`, then dispatch the **verifier**: a fresh subagent that
@@ -205,9 +208,12 @@ never wrote nor judged this head, with a checkout of the pinned head and this br
 
 - write the **gesture** from the issue before reading the diff: `## Acceptance`, the approved
   mockup, the reproduction for a bug. The route, the steps, the end state a person would see;
-- start the app with the repository's own commands (`## Verification`, or a `## Demo` section of
-  its agent rules), install what it declares, and publish it with `publish_port` (the port, the
-  command that starts it, its directory);
+- start the app with the repository's own commands: the `## Demo` section of its agent rules
+  when it has one, else `## Verification`; install what it declares. A machine whose Docker
+  daemon is not running starts it (`sudo dockerd >/tmp/dockerd.log 2>&1 &`, then wait for
+  `docker info`) before saying the app cannot start: a stopped daemon, a missing `node_modules` or
+  an unbuilt package is setup to do, never a `not run`. Then publish it with `start`, `target:
+  "server"` (the port, the command that starts it, its directory);
 - open the published link in the browser and record the gesture at a person's pace, then take a
   screenshot of the end state. With `browser_launch`: `record start verify-<N>.mp4 --cursor`,
   play, `record stop`. With Playwright: a script beside the checkout that opens the app on its
@@ -223,7 +229,7 @@ never wrote nor judged this head, with a checkout of the pinned head and this br
   verify-<N>.mp4`. Watch a frame of it (`ffmpeg -ss 2 -i verify-<N>.mp4 -frames:v 1 frame.png`):
   text that reads as on screen, in the app's own font, or record again;
 - return `proven`, `not proven` (the gesture runs and the end state is wrong: expected against
-  observed, quoted from the screen) or `not run` (the app would not start, or the screen needs
+  observed, quoted from the screen) or `not run` (the app would not start after the setup above, or the screen needs
   a model or a service the machine lacks, with the failing step's output), the link, the video and
   the screenshot.
 
