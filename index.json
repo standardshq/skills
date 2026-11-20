@@ -25,7 +25,7 @@
   },
   {
     "name": "landing-pull-requests",
-    "description": "Land stage. Use when the Land routine wakes on a pull request event, a launch or its clock, to track that pull request as an In review issue, land it round after round (judge, fixer, an optional proof on the running app, merge) for at most six rounds short of go, label it and say each step on it, or close an issue whose every linked PR is merged."
+    "description": "Land stage. Use when the Land routine wakes on a pull request event, a launch or its clock, to track that pull request as an In review issue, land it round after round (judge, fixer, merge) for at most six rounds short of go, label it and say each step on it, or close an issue whose every linked PR is merged."
   },
   {
     "name": "operating-the-factory",
