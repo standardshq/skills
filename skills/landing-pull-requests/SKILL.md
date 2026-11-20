@@ -37,6 +37,10 @@ is empty), `Rule: environment_broken`, naming what is missing. Write nothing els
 A run woken on a pull request tracks that one. The net (a clock wake) tracks every open PR of every
 repository.
 
+The project's `trackPullRequests` decides which open PRs are tracked: `all`, every one; `factory`,
+a PR whose body carries `<!-- factory:build -->` or that an issue's `pullRequests` already names;
+`none`, only the latter. Land leaves every other PR to its author: no issue, no label, no verdict.
+
 For each repository, `gh pr list -R <fullName> --state open --json
 number,title,body,author,isDraft,headRefOid,url,createdAt`. Each open PR is tracked by exactly one
 issue: an issue whose `pullRequests` holds `owner/repo#N`.
@@ -54,7 +58,7 @@ Then align the issue's status with its open PR, whoever left it behind:
 | In review | nothing |
 | Backlog, Ready, In progress or Done | `status: in_review`: the open PR is the work, whoever left the issue behind |
 | Paused | nothing: it waits on a person (§ 3 reads its answer) |
-| Mine | the person who took it opened the PR for review: once the PR is not a draft, `status: in_review`, `waitingOn` cleared, and it is judged like any other. A draft stays Mine: its author is still working |
+| Mine | with the project's `reviewMine` on and the PR ready: `status: in_review`, `waitingOn` cleared, judged like any other. A draft, or `reviewMine` off: the person keeps it |
 
 **A created issue:** `title` the PR title, `project` the repository record, `status: in_review`,
 `origin: github`, `type` from the title's conventional prefix (`feat` feature, `fix` bug,
@@ -205,11 +209,14 @@ in this run.
 
 ### Verify first, when it can
 
-A plus, never a gate: a go merges whether or not it was verified. Verify a go head before merging
-it when all of these hold, and skip to the merge otherwise, saying `not verified: <why>` in the
-status comment:
+The project's `verify` sets what the proof weighs. With `screens`, it is a plus: a go merges
+whether or not it was verified. With `required`, a go head that changes a screen merges once
+`proven`; a `not run` goes to Merge it, naming why it could not be filmed. Verify a go head before
+merging it when all of these hold, and skip to the merge otherwise, saying `not verified: <why>` in
+the status comment:
 
-- the head changes a screen (`evaluate`'s definition), and the repository's facts say `links: true`;
+- the head changes a screen (`evaluate`'s definition), the repository's facts say `links: true`,
+  and `verify` is `screens` or `required`;
 - you can publish a port and drive a browser. Publishing is the `start` verb with `target:
   "server"` (on a harness, the tool `standards_start`); the browser is `browser_launch` on the
   Standards agent, and on a harness the machine's own Chromium through Playwright
@@ -271,9 +278,8 @@ return, the link and the files. Then:
 | `not proven` | the **proof loop**: a `blocking` `experience` entry on this head, the video attached, for the fixer (§ 7). Its new head is judged on the delta alone (the later-round form), then verified again. It counts verify rounds, never the judge's; a third `not proven` goes to § 8 |
 | `not run` | `not verified: <why>` in the status comment, then merge by the mode. An app that will not start because of this head is `not proven`, not `not run` |
 
-**The announcement** of a proven head, one message where the project says, read walking up to the
-root: the `Verify channel:` line of the project's `context` (a Slack channel id), else the issue's
-`slackThread`, else no Slack message. Never the channel Intake listens to. It opens
+**The announcement** of a proven head, one message to the project's `announceChannel`, else the
+issue's `slackThread`, else no Slack message. Never the channel Intake listens to. It opens
 `Testable : <what a person can now do, one sentence, in their words>`, then where to try it (the
 screen and the gesture), the PR and the Standards issue link. The video is the proof: the
 published link stays out of the message. It is one `slack_send`: that text, and `verify-<N>.mp4`
@@ -324,9 +330,8 @@ says which.
 ## 7. Not go: the fixer
 
 **Who fixes.** A PR whose body carries `<!-- factory:build -->` is the factory's own: the fixer
-always runs. Any other PR was opened by a person: the fixer runs only when `autoFix` is on for its
-repository record, read walking up to the root (the nearest record that sets it wins; unset is
-on). With `autoFix` off, write no fix: the verdict comment is the request to its author, the
+always runs. Any other PR was opened by a person: the fixer runs only when the project's
+`autoFix` is on. With `autoFix` off, write no fix: the verdict comment is the request to its author, the
 status comment says `changes requested`, and the next head the author pushes is judged as it
 comes. Round 6 still stops on § 8.
 

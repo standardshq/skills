@@ -214,20 +214,21 @@ waits in Ready for a person.
 
 | Case | Who granted it | Condition Screening checks |
 |---|---|---|
-| Small and safe | the project's `autoLaunch` switch, last set by a maintainer of the project (read from the record's history), off by default | the issue was created by a maintainer, or moved to Ready by one; `type` bug or enhancement; smallest size tier; no withheld path; no migration; no new chrome, layout or interaction; no open blocker |
+| Small and safe | the project's `autoLaunch`, last set by a maintainer of the project (read from the record's history) | requested or released by a maintainer; `type` bug or enhancement; size within `autoLaunchSize` (`small`, or `small` and `standard` for `standard`); no withheld path; no migration; no new chrome, layout or interaction; no open blocker |
 | Approved and launched | a maintainer's answer "Approve and launch" to a Decision | the `ruling` row names `decisions:<id>`, that Decision was answered by a maintainer of the project with that option, and the scope is unchanged since |
 
 A maintainer is a person in the project's `maintainers`, walking up to the root. Check each
 person, never assume one:
 
-- **created or released by a maintainer:** the issue's `createdBy`, or the actor of its latest
+- **requested or released by a maintainer:** the person the issue's `## Request` quotes (Intake
+  writes the issue, the requester asked for it), else its `createdBy`, or the actor of its latest
   move to `ready`;
 - **the grant:** the last writer of `autoLaunch` in the project record's history;
 - **the answer:** the person who answered the Decision the `ruling` names, with exactly that
   option; scope unchanged means no newer `ruling`, `preview` row or person's edit of `body`.
 
-The smallest tier is `small` (§ 4); withheld paths are the repository's `withheld` globs. A
-feature never launches on `autoLaunch`; a ruling from a sitting never launches code.
+Size tiers are § 4's; withheld paths are the repository's `withheld` globs. A ruling from a
+sitting never launches code.
 
 To launch: the § 5 `screening` row, the run's only one for the issue, carries `Launch:` the case
 and its grant (`autoLaunch` set by whom and when, or `decisions:<id>` answered by whom); then
