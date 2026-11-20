@@ -1,6 +1,6 @@
 ---
 name: landing-pull-requests
-description: Land stage. Use when the Land routine wakes on a pull request event, a launch or its clock, to track that pull request as an In review issue, land it round after round (judge, fixer, an optional proof on the running app, merge) for at most six rounds short of go, label it and say each step on it, or close an issue whose every linked PR is merged.
+description: Land stage. Use when the Land routine wakes on a pull request event, a launch or its clock, to track that pull request as an In review issue, land it round after round (judge, fixer, merge) for at most six rounds short of go, label it and say each step on it, or close an issue whose every linked PR is merged.
 ---
 
 # Landing pull requests
@@ -107,17 +107,10 @@ order, ending only when every PR of the order is held or none is left. Otherwise
 the PR is yours: add `factory:landing`, write the status comment, and read the issue with
 `read-recipe.md`. Close it is `deciding-issues`' to apply: it closes the open PRs itself.
 
-**Two loops, two counts.** First the code: the judge and the fixer, until a go. Then the proof:
-the verifier and the fixer, until the go head is proven (§ 6). Both counts restart on a person's
-gesture (a status move or a `ruling`):
-
-- **the round** of the head, at most 6: one more than the `changes` `verdict` rows on this PR newer
-  than that gesture and older than its first `not proven` `verify` row. A go costs no round: a head
-  that moves after a go (a bot rewriting it, its author pushing, the target branch merged in) is
-  judged again on the same round;
-- **the verify round**, at most 3: one more than the `not proven` `verify` rows on this PR newer
-  than that gesture. Once the proof loop has started, a verdict on a fix it asked for belongs to it,
-  not to the judge's count.
+**The round** of the head, at most 6: one more than the `changes` `verdict` rows on this PR newer
+than the last person's gesture (a status move or a `ruling`). A go costs no round: a head that
+moves after a go (a bot rewriting it, its author pushing, the target branch merged in) is judged
+again on the same round.
 
 *Done when* the PR carries your `factory:landing` and status comment and you know its head, its
 round, and which tier took it (tier 3 goes to § 6), or nothing is yours and every merged or closed
@@ -129,15 +122,15 @@ One comment per PR, found by its first line `<!-- factory:land -->`, edited in p
 (`gh api -X PATCH repos/<o>/<r>/issues/comments/<id> -f body=…`), never posted twice. It says, in
 this order:
 
-- `**Land**: <state>` where state is one of `judging <sha>`, `fixing <sha>`, `verifying <sha>`, `waiting on checks`,
+- `**Land**: <state>` where state is one of `judging <sha>`, `fixing <sha>`, `waiting on checks`,
   `go, enqueued`, `go, waiting on Merge it`, `merged`, `paused: <why>`;
 - `Issue: [<title>](https://app.standards.new/fr/~/issues/<issue id>)`;
-- `Round: <n> of 6` (and `Verify round: <n> of 3` once the proof loop started), the head sha, and the latest verdict in one line (go, or the count of
+- `Round: <n> of 6`, the head sha, and the latest verdict in one line (go, or the count of
   blocking and to fix entries);
 - `Updated: <ISO time> by <this run>`: the heartbeat neighbours read beside `factory:landing`.
 
 Write it when you take the PR, again at every milestone (a new round, the verdict, the fixer
-dispatched and its push, the verifier dispatched and its row, the merge), and every 20 minutes
+dispatched and its push, the merge), and every 20 minutes
 while you wait. At every exit of the run, remove `factory:landing` and set the label of the state
 you leave (`working-on-issues` § Pull requests). Each round also
 posts its own verdict comment (§ 5) and the fixer its answers (§ 7): the status comment is the
@@ -207,87 +200,6 @@ in this run.
 
 ## 6. Go: merge by the mode
 
-### Verify first, when it can
-
-The project's `verify` sets what the proof weighs. With `screens`, it is a plus: a go merges
-whether or not it was verified. With `required`, a go head that changes a screen merges once
-`proven`; a `not run` goes to Merge it, naming why it could not be filmed. Verify a go head before
-merging it when all of these hold, and skip to the merge otherwise, saying `not verified: <why>` in
-the status comment:
-
-- the head changes a screen (`evaluate`'s definition), the repository's facts say `links: true`,
-  and `verify` is `screens` or `required`;
-- you can publish a port and drive a browser. Publishing is the `start` verb with `target:
-  "server"` (on a harness, the tool `standards_start`); the browser is `browser_launch` on the
-  Standards agent, and on a harness the machine's own Chromium through Playwright
-  (`PLAYWRIGHT_BROWSERS_PATH` is set on the code machine). Read your tool list for these names; a
-  tool named in an older text (`publish_port`) is gone, never a reason to skip;
-- no `verify` row exists yet for this head (a go retried by tier 3 is not verified twice).
-
-**Start it during the wait.** The verifier needs the head, not the checks. When the judge returned
-no entry and you start waiting for the checks of a head these conditions hold for (§ 5), dispatch
-its verifier at once, beside the wait, and keep its return until the verdict. The status comment
-stays `waiting on checks`. One verifier per head, never a second.
-
-- **the checks end green, the verdict is go:** wait for a verifier still running, the status
-  comment saying `verifying <sha>`, then write the `verify` row and follow the table below;
-- **a required check ends red, the verdict is `changes`:** the head is dead. Stop a verifier
-  still running and write no `verify` row. A `not proven` it already returned is one more
-  `blocking` `experience` entry of that verdict, its video attached, for the same fixer in the
-  same round; a `proven` or a `not run` is dropped. The next head gets its own verifier.
-
-A go head whose verifier never started (a head taken over or retried, checks that had already
-concluded, tools that cannot run a subagent beside the wait) is verified after the go.
-
-Set the status comment to `verifying <sha>`, then dispatch the **verifier**: a fresh subagent that
-never wrote nor judged this head, with a checkout of the pinned head and this brief:
-
-- write the **gesture** from the issue before reading the diff: `## Acceptance`, the approved
-  mockup, the reproduction for a bug. The route, the steps, the end state a person would see;
-- start the app with the repository's own commands: the `## Demo` section of its agent rules
-  when it has one, else `## Verification`; install what it declares. A machine whose Docker
-  daemon is not running starts it (`sudo dockerd >/tmp/dockerd.log 2>&1 &`, then wait for
-  `docker info`) before saying the app cannot start: a stopped daemon, a missing `node_modules` or
-  an unbuilt package is setup to do, never a `not run`. Then publish it with `start`, `target:
-  "server"` (the port, the command that starts it, its directory);
-- open the published link in the browser and record the gesture at a person's pace, then take a
-  screenshot of the end state. With `browser_launch`: `record start verify-<N>.mp4 --cursor`,
-  play, `record stop`. With Playwright: a script beside the checkout that opens the app on its
-  local port. Launch Chromium with `args: ['--font-render-hinting=none']` (headless Linux
-  otherwise misplaces glyphs: « Follow -up », « Adda connection »), and record in a context with
-  `viewport: { width: 1440, height: 900 }`, `recordVideo: { dir, size: { width: 1440, height: 900 } }`
-  and `locale` set to the language of the issue's reporter (`fr-FR` for a French one). Sign in and
-  dismiss every onboarding tip, banner and tour in a first context, save its `storageState`, and
-  record in a second one started from it, on the gesture's first screen: the video opens where
-  the change is, with nothing over it. Play the gesture, and close the context to write the webm. Turn it into a sharp mp4,
-  installing ffmpeg when `command -v ffmpeg` finds none (`sudo apt-get install -y ffmpeg`):
-  `ffmpeg -i <video>.webm -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p -movflags +faststart
-  verify-<N>.mp4`. Watch a frame of it (`ffmpeg -ss 2 -i verify-<N>.mp4 -frames:v 1 frame.png`):
-  text that reads as on screen, in the app's own font, or record again;
-- return `proven`, `not proven` (the gesture runs and the end state is wrong: expected against
-  observed, quoted from the screen) or `not run` (the app would not start after the setup above, or the screen needs
-  a model or a service the machine lacks, with the failing step's output), the link, the video and
-  the screenshot.
-
-Write a `verify` row: `subject: github:owner/repo#N@<sha>`, body `Outcome:` and the verifier's
-return, the link and the files. Then:
-
-| The verifier returned | Do |
-|---|---|
-| `proven` | attach the video to the issue's `evidence` (`kind: proof`); post on the PR one comment opening `<!-- factory:verify <sha> -->` with the link, the gesture and the video; announce it (below); then merge by the mode |
-| `not proven` | the **proof loop**: a `blocking` `experience` entry on this head, the video attached, for the fixer (§ 7). Its new head is judged on the delta alone (the later-round form), then verified again. It counts verify rounds, never the judge's; a third `not proven` goes to § 8 |
-| `not run` | `not verified: <why>` in the status comment, then merge by the mode. An app that will not start because of this head is `not proven`, not `not run` |
-
-**The announcement** of a proven head, one message to the project's `announceChannel`, else the
-issue's `slackThread`, else no Slack message. Never the channel Intake listens to. It opens
-`Testable : <what a person can now do, one sentence, in their words>`, then where to try it (the
-screen and the gesture), the PR and the Standards issue link. The video is the proof: the
-published link stays out of the message. It is one `slack_send`: that text, and `verify-<N>.mp4`
-in its `files`. A failed upload is one line in the report; the row stands. Then one `send` to the
-project's maintainers, with no question: the same sentence and the video.
-
-### Merge by the mode
-
 Mark a draft PR ready. Then the first row that holds:
 
 | The head | Do |
@@ -335,7 +247,7 @@ always runs. Any other PR was opened by a person: the fixer runs only when the p
 status comment says `changes requested`, and the next head the author pushes is judged as it
 comes. Round 6 still stops on § 8.
 
-Rounds 1 to 5, verify round 1 or 2, a go head to bring up to `targetBranch`, or a ruling's words to
+Rounds 1 to 5, a go head to bring up to `targetBranch`, or a ruling's words to
 apply, when the fixer runs: set the status comment to
 `fixing <sha>`, then dispatch the fixer, a fresh subagent on the build model class when your tools let you choose, with
 a checkout of the branch at the pinned head and this brief:
@@ -370,8 +282,8 @@ Inside the run, never with a bare `sleep`: start a background loop on `gh pr che
 <N>` every minute, and read its result when it ends.
 
 - **Hold the PR while you wait:** rewrite the status comment's `Updated:` every 20 minutes.
-- **A head someone else pushed** while you wait (its author, a person): stop the verifier of the
-  old head, pin the new head and judge it (§ 5). The round counts as usual.
+- **A head someone else pushed** while you wait (its author, a person): pin the new head and
+  judge it (§ 5). The round counts as usual.
 - **Checks longer than 60 minutes**, or a run past 2 hours of work: hand over. Status comment
   `waiting on checks` (or the state you are in), remove `factory:landing`, end. This is not a failure: the
   next Land run, woken by the checks or the clock, takes the PR over.
@@ -380,16 +292,14 @@ Inside the run, never with a bare `sleep`: start a background loop on `gh pr che
 
 A PR carrying `factory:landing` whose status comment's `Updated:` is older than 60 minutes was left
 by a run that stopped. Take it: rewrite the status comment as yours, then read the ledger before
-anything else: the `verdict` and `verify` rows of its heads, the fixer's answers, the status
-comment. Resume at the step they name for the current head: judge a head with no verdict, verify a
-go head with no `verify` row, fix a head whose verdict asked for changes and has no answers
-comment, merge a proven or unverifiable go. A step the ledger shows done on the same head stays
+anything else: the `verdict` rows of its heads, the fixer's answers, the status comment. Resume
+at the step they name for the current head: judge a head with no verdict, fix a head whose verdict
+asked for changes and has no answers comment, merge a go. A step the ledger shows done on the same head stays
 done.
 
-## 8. Round 6, still not go or not proven
+## 8. Round 6, still not go
 
-A round-6 verdict short of go, a third `not proven` (the video and the gesture's expected against
-observed attached to the checkpoint), or a fixer that returned the head unchanged (an unresolvable
+A round-6 verdict short of go, or a fixer that returned the head unchanged (an unresolvable
 conflict, a red it could not move; never a head its author moved, which is simply judged next): a `decision` checkpoint (`deciding-issues`), Paused, the open
 entries named, each withheld path with its risk. Options: Fix (say what), Merge as it stands,
 I take it, Close it. The answer returns the issue to In review, and tier 2 applies it. The status
@@ -403,5 +313,4 @@ so.
 
 ## Report
 
-One line: the PRs newly tracked, then the issue, the PR, the head, the round, the verdict, the
-verify outcome (proven, not proven, not run, or skipped and why), and what happened (merged, enqueued, Merge it sent, fixer pushed, paused, or left and why).
+One line: the PRs newly tracked, then the issue, the PR, the head, the round, the verdict, and what happened (merged, enqueued, Merge it sent, fixer pushed, paused, or left and why).

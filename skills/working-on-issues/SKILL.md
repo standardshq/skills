@@ -201,5 +201,3 @@ code allows; settings say what the workspace chose. Both hold: a setting never w
 | `trackPullRequests` | `all`, `factory`, `none` (`all`) | Land § 2 |
 | `reviewMine` | on, off (on) | Land § 2 |
 | `autoFix` | on, off (on) | Land § 7 |
-| `verify` | `off`, `screens`, `required` (`screens`) | Land § 6 |
-| `announceChannel` | a Slack channel id (none) | Land § 6 |
