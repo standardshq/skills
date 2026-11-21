@@ -15,19 +15,26 @@ disagrees.
 
 ## 1. Take the issue of your wake
 
-The issue your wake names (`workflow.md`, Build): In progress, its latest move into In progress
-passing `workflow.md` § Launch, and with no open linked PR. One with an open linked PR is yours only
-because a run died between opening it and moving the issue: finish § 6's last writes, end; Build
-starts no second implementation.
-An issue that has tasks (`childIds`) is never work; one with a `blockedBy` issue not Done waits,
-with nothing written.
+The issue your wake names (`workflow.md`, Build), read with `read-recipe.md`. It is yours to build
+when it is In progress, its latest move into In progress passes `workflow.md` § Launch, it is a
+leaf (no `childIds`), every `blockedBy` issue is Done, and no open PR is linked.
+
+Any other issue takes the first exit that matches:
+
+| The issue | Exit |
+|---|---|
+| is no longer In progress | a person or a neighbour moved it: end, and say so in your report |
+| has an open linked PR | a run died between opening it and moving the issue: finish § 6's last writes, end; Build starts no second implementation |
+| entered In progress on a move no launch backs | a refusal, `Rule: unlaunched` |
+| has tasks (`childIds`) | a refusal, `Rule: umbrella`: its tasks are the work |
+| has a `blockedBy` issue not Done | a refusal, `Rule: blocked`, naming each open one |
+
+A refusal is `working-on-issues` § Refusals: its `signal` the first time, a Decision the second.
 
 A launch whose context carries a `Next:` line (Ops relaunching a run that died) starts from it: the
 branch or the patch it names, before anything is rebuilt.
 
-Read the issue with `read-recipe.md`.
-
-*Done when* you have read one launched leaf issue that is yours, or nothing is and the run ends.
+*Done when* you hold one launched leaf issue that is yours, or its exit is written and the run ends.
 
 ## 2. Before the code
 
@@ -129,4 +136,12 @@ timeout, a branch it cannot push), what was tried, and `Next:` the step the next
 `subject` the branch head when there is one. A branch it cannot push leaves its patch attached to
 the issue. `working-on-issues` § Three tries says which cause counts.
 
-Both endings count: a PR on a green gate, or a checkpoint that names exactly what is missing.
+## Every ending leaves a row
+
+A run ends with its issue In review (a PR linked on a green gate), Paused (a `checkpoint` that
+names exactly what is missing), or still In progress under a row this run wrote: an `attempt`, or
+a refusal's `signal`. The first two are the endings that count.
+
+A run about to end on none of the three writes the `attempt` first: `Cause: environment`, what it
+read, and why it stopped. Ops reads an In progress issue with no row as a run that did nothing, and
+relaunches it.

@@ -70,7 +70,10 @@ exists and a person moved the issue out of Paused after it was sent: with no `ru
 that move yet, write the ruling « proceed as last scoped » as Screening does (`screening-issues`
 § Release and rulings) and go on without asking; with one, a checkpoint on new evidence is sent as
 a new Decision, the old card superseded by that ruling. Otherwise the issue waits on it: send
-nothing, end.
+nothing, and end with the issue as a sent Decision leaves it (*Done when*, below). An issue found
+anywhere else (the run that asked died before pausing it, or a routine moved it since) gets a new
+`checkpoint` row naming that Decision, with your own `Reason:` and `Evidence:`, and its status,
+`need` and `waitingOn` set.
 
 Call `send` with `questions`:
 

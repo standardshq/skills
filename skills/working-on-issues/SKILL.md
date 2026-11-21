@@ -97,10 +97,11 @@ to, never rewritten: its permalinks stop a message being handled twice.
 
 ## Refusals
 
-A run that cannot act on the issue of its wake (no facts, a missing tool, an unlaunched move) writes a
-`signal` with its `Rule:` and ends. It writes that signal on an
-issue once: a run meeting the same refusal while that signal is the issue's newest row, with no
-person's gesture since, stops for a person with a `decision` checkpoint instead.
+A run that cannot act on the issue of its wake (no facts, a missing tool, an unlaunched move, an
+umbrella, a blocked issue) writes a `signal` with its `Rule:` and ends. It writes that signal on an
+issue once: a run meeting the same refusal while that signal is the issue's newest row whose
+`stage` is not `ops`, with no person's gesture since, stops for a person with a `decision`
+checkpoint instead. Ops writes a row before each relaunch, so its rows never reset the count.
 
 ## Only screening queues
 
