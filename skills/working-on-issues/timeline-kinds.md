@@ -26,6 +26,8 @@ short name, added here in the same change.
 |---|---|
 | `environment_broken` | a tool, a clone, a login or a skill the run needs is missing |
 | `unlaunched` | an issue In progress whose move no launch backs (`workflow.md` § Launch) |
+| `umbrella` | an issue In progress that has tasks: its tasks are the work |
+| `blocked` | an issue In progress with a `blockedBy` issue not Done |
 | `two_runs` | two neighbours on one issue or one pull request |
 | `pr_tracked_twice` | one pull request in two issues' `pullRequests` |
 | `duplicate_pull_request` | two open pull requests for one issue |
