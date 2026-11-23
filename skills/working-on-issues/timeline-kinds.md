@@ -14,9 +14,8 @@ also sets as attributes, the same value as its labelled line, so rows are counte
 | `preview` | Screening, previewing a feature | `github:owner/repo@<sha>` | `Verdict:` candidate, park or reject; for a park, `Revisit when:` and `Expires:` (90 days at most) | `outcome` the verdict | a feature's value weighed against its durable debt |
 | `attempt` | the run that could not deliver; Ops, for a run that died without a row | the PR or branch head, when there is one | `Outcome:` failed or timeout; `Cause:` change or environment; `Next:` what the next run should do | `outcome` | a failed execution: what was tried, why it failed, what to try next. Only `Cause: change` increments `failedAttempts` (`SKILL.md` § Three tries) |
 | `progress` | Build, on a parent, ending a run | the branch head | `Done:` the tasks taken to In review in this run, or none; `Next:` the next task to take, or the ones that wait on a person | none | work that advanced and continues at the next run; never a failure |
-| `stuck` | Build, when the work cannot go on and no test or command would change that | the branch head, when there is one | `Missing:` what stops the work; `Tried:` what was checked | none | an honest stop, sent to a person through its checkpoint; leaves `failedAttempts` as it was |
 | `verdict` | Land's judge, never the author | `github:owner/repo#N@<sha>` | `Outcome:` go or changes; `Round:` 1 to 6; `Risk:` low, medium or high | `outcome`, `round` | the judgement of one PR head, its findings ranked |
-| `released` | Land, when every linked PR of an In review issue closed unmerged | none | `Closed:` the PRs, unmerged | none | work given back to Screening |
+| `released` | Land, when every linked PR of an In review issue, or of a parent In progress, closed unmerged | none | `Closed:` the PRs, unmerged | none | work given back to Screening |
 | `signal` | any run noticing a broken rule | what it is about, when any | `Rule:` a name from the list below | `rule` | something slipped through the structure |
 
 ## Signal rules
@@ -30,7 +29,6 @@ short name, added here in the same change.
 | `unlaunched` | an issue In progress whose move no launch backs (`workflow.md` § Launch) |
 | `umbrella` | an issue In progress whose tasks carry an `origin` other than `design`: its tasks are the work |
 | `blocked` | an issue In progress with a `blockedBy` issue not Done |
-| `undesigned` | a `full` issue In progress with no task: its design was never approved |
 | `two_runs` | two neighbours on one issue or one pull request |
 | `pr_tracked_twice` | one pull request in two issues' `pullRequests` |
 | `duplicate_pull_request` | two open pull requests for one issue |

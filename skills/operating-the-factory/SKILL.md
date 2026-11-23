@@ -21,7 +21,7 @@ and the date of the last evaluation; read them first.
 
 ### 1. Read the runs
 
-For each of Intake, Screening, Build and Land, read its runs since the last tick
+For each of Intake, Screening, Build, Land and Pulse, read its runs since the last tick
 (`working-on-issues/environments.md` § Runs). Sort them into **live** (pending, running) and
 **dead** (failed, cancelled, or running for more than 3 hours).
 
@@ -68,7 +68,8 @@ work no live run holds.
 
 ### 5. Report
 
-In this order: a red target branch; dead runs and what was relaunched; work relaunched for another
+In this order: a project whose `context` still holds a `Standing order:` line, which nothing
+executes any more (« set a goal instead »); a red target branch; dead runs and what was relaunched; work relaunched for another
 reason; merged and opened since the last tick; what waits on a person (Merge it, Decisions,
 mockups), oldest first; what Ops could not repair. Issues by title, pull requests by link. Then
 write the tick's time in memory.
@@ -88,6 +89,7 @@ with the context « weekly sweep ».
 | a dead Build run, its issue In progress with no open pull request | Build | the `Next:` of the issue's newest `attempt` row; without one, « start from the branch `<name>` if it exists, else from the brief » |
 | a dead Land run, its pull request open | Land | « take over from the ledger » (`landing-pull-requests` § Taking over) |
 | a dead Screening or Intake run | Screening, or nobody | Screening: « screen this issue »; Intake: report the Slack message, a person asks again |
+| a dead Pulse run, or no Pulse run for an hour | nobody | report it first: nothing else watches the factory or serves the goals |
 | an issue In progress for 30 minutes with no open pull request, held by no run | Build | « build this issue » |
 | a parent In progress with a task it can take (Ready, its `blockedBy` tasks In review or Done), no push for 30 minutes, held by no run | Build | « continue from the newest `progress` row » |
 | a parent In progress whose every remaining task waits on a person | nobody | report the tasks and what each waits on |

@@ -183,7 +183,7 @@ lives in, every other repository read listed with its sha in `body`), then act:
 | `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `done`. File the residual as a new issue when it is real, in `links` with `kind: follows-up` |
 | `close`, `closeReason: duplicate` | § 2 kept the other issue | `done`. The body names the kept issue, `issues:<id>` |
 | `checkpoint` | a symptom (§ 3) | `decision`: fix the family first (recommended), or patch this one |
-| `design` | `full` (§ 4), with no `ruling` answering Approve or Approve and launch to the Decision of `designing-issues` § 4,; a feature only once a ruling answered Design it to its preview | `designing-issues`, in this run |
+| `design` | `full` (§ 4), with no `ruling` answering Approve or Approve and launch to the Decision of `designing-issues` § 4; a feature only once a ruling answered Design it to its preview | `designing-issues`, in this run |
 | `checkpoint` | the right fix changes a public contract, a security posture or an agent's authority; or the route needs a fact or an artifact only a person has | `decision`: the one question that forks the work |
 | `preview` | `type: feature`, not released by a person, with no ruling answering its latest `preview` row | `previewing-features`, in this run |
 | `park` | a ruling parked the feature its latest `preview` row named | stays `backlog` until its `Expires:` |

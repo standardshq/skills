@@ -85,7 +85,7 @@ net:
 
 | Every linked PR of the issue is | Write |
 |---|---|
-| merged | `status: done`, `closeReason: done`; for a parent, the same on each of its tasks |
+| merged | `status: done`, `closeReason: done`; for a parent, the same on each of its tasks In review |
 | closed unmerged, the issue In review, or a parent In progress | `status: backlog` and a `released` row naming them, so Screening decides what is left; for a parent, its tasks In review return to `ready` |
 
 *Done when* each PR this run tracks is in exactly one issue's `pullRequests` and carries its link

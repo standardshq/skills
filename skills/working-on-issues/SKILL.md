@@ -141,9 +141,8 @@ made each move.
 ## Three tries
 
 The run that writes an `attempt` row (`timeline-kinds.md`, filled in) updates `failedAttempts`
-right after it: `Cause: change` (a red gate, a refused change) adds 1; `Cause: environment` (a
-missing tool, a timeout, a push refused, a run that died) leaves it as it was, since the machine
-failed and the issue did not. Ops does the same for the row it writes for a run that died. At 3,
+right after it: `Cause: change` adds 1; `Cause: environment` leaves it as it was, since the machine
+failed and the issue did not. A checkpoint for stuck work writes no `attempt` and leaves it too. Ops does the same for the row it writes for a run that died. At 3,
 stop for a person
 with a `decision` checkpoint summarising the three: retry with a stated change, I take it, or Close
 it. Reset `failedAttempts` to 0 when a person's gesture (a status move or an answered Decision) is

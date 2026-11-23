@@ -85,11 +85,10 @@ Call `send` with `questions`:
 |---|---|
 | `to` | one recipient, below |
 | `title` | the decision in a few words, at most 120 characters, naming the issue by its title |
-| `why` | one sentence, at most 200 characters: why the run cannot go on without it |
-| `change` | one sentence, at most 200 characters, in the future: what answering makes possible |
-| `links` | `record:<issue id>`, any record the question is about, the published link when there is one |
+| `links` | `record:<issue id>`, and any record the question is about |
+| `urls` | the published link, when there is one |
 | `attachments` | the mockups, when there are any |
-| the question | § 2: situation, question, options |
+| the question | § 2, inside what a card shows: the question in 200 characters, the situation in its context in 200 more, and each option's label with its description, which has no bound. What does not fit is in the issue the card links |
 
 **The recipient** is the project's first active maintainer (`maintainers`, walking up to the
 root), unless:

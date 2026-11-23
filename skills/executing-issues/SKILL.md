@@ -31,7 +31,7 @@ Any other issue takes the first exit that matches:
 | is no longer In progress | a person or a neighbour moved it: end, and say so in your report |
 | has an open linked PR that is not Build's draft on it | a run died between opening it and moving the issue: finish § 6's last writes, end; Build starts no second implementation |
 | entered In progress on a move no launch backs | a refusal, `Rule: unlaunched` |
-| is `full` by its newest `screening` row and has no task | a refusal, `Rule: undesigned` |
+| is `full` by its newest `screening` row and has no task | a `decision` checkpoint, `Resume at: screening`: Design it first (recommended), Build it as one change (Approve and launch), Close it |
 | has tasks that carry another `origin` | a refusal, `Rule: umbrella`: its tasks are the work |
 | has a `blockedBy` issue not Done | a refusal, `Rule: blocked`, naming each open one |
 
@@ -98,10 +98,9 @@ the work:
 
 **Stuck.** The work cannot go on, and no test you could write or command you could run would
 change that: an acceptance criterion the code cannot meet as written, a dependency that is absent,
-two criteria that contradict. Stop there: write a `stuck` row (`timeline-kinds.md`) naming what is
-missing, then a `decision` checkpoint, `Resume at: build`, whose options are the change that would
-free the work (Approve, or Approve and launch), I take it, Close it. It leaves `failedAttempts` as
-it was. A criterion or a test's expectation changes only on that person's ruling.
+two criteria that contradict. Stop there with a `decision` checkpoint, `Resume at: build`, whose `Reason:` names what is
+missing and `Evidence:` what you checked; its options are the change that would free the work
+(Approve, or Approve and launch), I take it, Close it. A criterion or a test's expectation changes only on that person's ruling.
 
 *Done when* every acceptance criterion holds in a passing test, and the bug's red test is green.
 
@@ -114,13 +113,16 @@ yours to move.
 
 **Each run**, in order:
 
-1. Read the tasks and their statuses, the parent's newest `progress` row, and `git log` of the
-   branch; they outrank what you remember.
+1. Read your routine's runs (`working-on-issues/environments.md` § Runs): another live run on this
+   parent holds it, so write a `signal`, `Rule: two_runs`, and end. Then read the tasks and their
+   statuses, the parent's newest `progress` row, and `git log` of the branch; they outrank what
+   you remember. A task found In progress is a run's that ended: set it `ready`.
 2. Run the repository's quickest check from `verify` on the branch before adding anything: red
    here is fixed first.
-3. A task in Mine, or Done for a reason other than `done`: pause the parent as `workflow.md`, A
-   large issue and its tasks, says, after step 6's writes. Otherwise take the first task that is
-   Ready and whose `blockedBy` tasks are all In review or Done: set
+3. A task in Mine, or Done for a reason other than `done`, that no ruling on the parent has left
+   out: pause the parent as `workflow.md`, A large issue and its tasks, says, after step 6's
+   writes. Otherwise take the first task that is Ready and whose `blockedBy` tasks are all In
+   review, Done or left out: set
    it `in_progress`, then build it as § 3 and § 4 say, against its own `## Acceptance`. Tasks that
    share no file and need nothing from each other may go to parallel subagents, one each, with the
    task, its acceptance lines and the seams; each returns what it changed and the commands it ran.
@@ -129,18 +131,19 @@ yours to move.
 5. A task that does not get there is written on the task, never on the parent. A red you could
    not turn green: an `attempt` row and the task's own `failedAttempts` (`working-on-issues`
    § Three tries), then the task back to `ready` for the next run, or Paused under its checkpoint
-   at 3. Stuck (§ 4): a `stuck` row and its checkpoint, which leaves the task Paused. Go on with
-   the tasks that do not need it.
-6. At 100 minutes of work, or when no task is left to take, end the run with three writes, in this
+   at 3. Stuck (§ 4): its checkpoint, which leaves the task Paused. Go on with the tasks that do
+   not need it.
+6. At 100 minutes of work, or when no task is left to take, end the run with two writes, in this
    order: a `progress` row on the parent (`timeline-kinds.md`), its `subject` the commit you are
-   about to push; the push; then the pull request's body, one line per task under `## Tasks` (its
-   title, its status). The push is the run's last act on the branch: it wakes the next run.
+   about to push; then the push, the run's last act: it wakes the next run. A push the remote
+   refuses means the branch moved under you: write an `attempt` on the parent, `Cause:
+   environment`, and set the tasks this run took to In review back to `ready`.
 
 The first run pushes its first task's commit as soon as it is made and opens the pull request as a
 draft, body by `pr`, linked in the parent's `pullRequests`: the draft must exist for the run's
 last push to wake the next one.
 
-**The last run**, every task In review: § 5 on the whole branch, the push, the draft marked ready,
+**The last run**, every task In review or left out: § 5 on the whole branch, the push, the draft marked ready,
 then § 6 from step 2 for the parent. Its body gains `Rollback:` the way back (a revert, a flag
 to switch off, a migration's down path); a change a person can see ships behind the flag the
 design names, when it names one.
@@ -201,8 +204,8 @@ For Build the endings are:
 | delivered | the issue In review, a PR linked on a green gate |
 | needs a person | the issue Paused under its `checkpoint`, which names exactly what is missing |
 | worked a parent (§ A parent and its tasks) | the parent In progress under this run's `progress` row |
-| is stuck (§ 4) | the issue Paused under a `stuck` row and its `checkpoint`; `failedAttempts` as it was |
-| could not deliver | the issue In progress under an `attempt` row copied from the filled-in one in `timeline-kinds.md`: `Cause:` change (a red gate, a refused change) or environment (a tool missing mid-way, a timeout, a branch it cannot push), and `Next:` the step the next run starts from; then `failedAttempts` updated as `working-on-issues` § Three tries says |
+| is stuck (§ 4) | the issue Paused under its `checkpoint` |
+| could not deliver | the issue In progress under an `attempt` row copied from the filled-in one in `timeline-kinds.md`, then `failedAttempts` updated as `working-on-issues` § Three tries says |
 
 A branch the run cannot push leaves its patch attached to the issue.
 

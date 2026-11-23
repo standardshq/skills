@@ -10,7 +10,7 @@ Save each stage's runs of the window to a file, `{ "<routine>": [<run rows>] }`,
 routine and per source (trigger, schedule, launch): runs, runs under 2 minutes, failed runs with
 their errors grouped, the most runs at once, and hours of work.
 
-*Done when* the table covers all four stages.
+*Done when* the table covers every stage, Pulse included.
 
 ## 2. Measure the ledger
 
@@ -19,7 +19,8 @@ With `query` and `aggregate` on `timeline`, rows of the window:
 | Count | Group by | Reads as |
 |---|---|---|
 | `kind: verdict` | `round`, `outcome` | how many rounds a go takes; a round 4 to 6 that ends go earns the six-round cap |
-| `kind: signal` | `rule`, `stage` | which rule broke, and where |
+| `kind: signal` | `rule`, `stage` | which rule broke, and where; `goal_launch` counts the launches Pulse made |
+| `kind: progress` | `issue` | how many runs a parent takes |
 | `kind: attempt` | `outcome`, and `Cause:` read from the body | failures of the change against failures of the machine |
 | `kind: checkpoint` | `stage` | how often each stage stops for a person |
 
@@ -47,7 +48,7 @@ A stage with no numbers gets one of three answers in the report: « no eval list
 empty), « counts unavailable » (`counts: "unavailable"`), « evals not readable » (your tools refuse
 the include).
 
-*Done when* each of the four stages has its numbers per list, or one of the three answers.
+*Done when* each stage has its numbers per list, or one of the three answers.
 
 ## 4. Read three conversations
 

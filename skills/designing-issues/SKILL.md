@@ -42,12 +42,15 @@ changes for the person.
 Write every card for the person who asked, in their words. Name things by what they are for the
 person (« the list of meetings on your dashboard »), and say what each answer changes for them.
 
+A card shows each question in 200 characters and its context in 200 more (`deciding-issues`
+§ 4); what you found and cannot fit goes into the issue's `context`, which the card links.
+
 Send the next card that still has something open, one per run, in this order:
 
 | Card | To | Holds |
 |---|---|---|
-| **What and why** | the person the `## Request` quotes when they are an active person of the workspace, else the project's first active maintainer | the request said back in a few lines: what they want, who it is for, why, as far as they said; what you found that bears on it (a limit, a conflict, a cheaper path); then the one open question that matters most, with free text as its answer |
-| **Which way** | the same person | two or three ways to build it, each concrete enough to picture, with what it costs them; the one you recommend, first, with the reason. Up to three other choices that do not depend on this one, each with its recommended option first. When the ways look different on screen, one mockup per way (`deciding-issues` § 3) |
+| **What and why** | the person the `## Request` quotes when they are an active person of the workspace, else the project's first active maintainer | in the context, the request said back in two sentences: what they want, who it is for, why, as far as they said, and the one thing you found that bears on it most (a limit, a conflict, a cheaper path); then the one open question that matters most, with free text as its answer |
+| **Which way** | the same person | two or three ways to build it as the options of one question, each description concrete enough to picture, with what it costs them; the one you recommend, first, with the reason. Up to three other choices that do not depend on this one, each with its recommended option first. When the ways look different on screen, one mockup per way (`deciding-issues` § 3) |
 | **The design** | the project's first active maintainer | § 4 |
 
 Skip a card with nothing open: a request that already says what and why gets no first card; one
@@ -109,9 +112,9 @@ one piece of `### Tasks`.
 ## 4. Stop for approval
 
 One Decision to the project's first active maintainer (`working-on-issues` § Stopping for a
-person, `Resume at: screening`). It says in three lines what will be built and the way picked,
-names the pieces of `### Tasks` in order, lists your own calls so they can be corrected, and carries the reader's questions that are theirs,
-if any. Options: Approve and launch (recommended), Approve, Change (say what), I take it, Close it.
+person, `Resume at: screening`). Its context says what will be built and the way picked; the issue
+it links holds the pieces of `### Tasks` in order and your own calls, so they can be corrected. The
+reader's questions that are theirs, if any, are further questions of the same card. Options: Approve and launch (recommended), Approve, Change (say what), I take it, Close it.
 
 Change returns here: apply it to the design, run the fresh reader again, ask again.
 
