@@ -1,6 +1,6 @@
 ---
 name: screening-issues
-description: Use when the Screening routine wakes on an issue created in or returned to Backlog or on its clock, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision.
+description: Use when the Screening routine wakes on an issue created in or returned to Backlog or on its clock, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview, to design or to a Decision.
 ---
 
 # Screening issues
@@ -11,11 +11,12 @@ costs it before anyone can tell: the claim reads as well as the day it was filed
 
 Screening resolves those claims **by command, not by reading**. Reading is a perceptual task done
 under the pull of a plausible claim; a lookup is not. Every screening ends in one verdict:
-**close**, **checkpoint**, **preview**, **park** or **ready**, and only `ready` work can be launched.
+**close**, **checkpoint**, **preview**, **design**, **park** or **ready**, and only `ready` work can be launched.
 
 Read `working-on-issues` first: `workflow.md` gives Screening's pipe and exits, `timeline-kinds.md`
 the `screening` and `ruling` rows. An issue with an empty `type` goes through `triaging-issues`
-before anything here; a feature routed to preview goes on to `previewing-features` in the same run.
+before anything here; a feature routed to preview goes on to `previewing-features` in the same run,
+and a `full` issue routed to design to `designing-issues`.
 
 ## Scripts
 
@@ -87,14 +88,15 @@ Up to 5 issues per run while each one asks nothing; the first that sends a Decis
 A run Ops launches with the context « weekly sweep » runs § Weekly sweep and nothing else; one it
 launches on a named issue (a person's release, a refresh due) screens that issue.
 
-Every issue left Ready carries a `priority`: Build's net and Ops order the pipe by it.
+Every issue left Ready carries a `priority`: Build's net and Pulse order the pipe by it.
 
 ## The fence
 
 | The issue | Do |
 |---|---|
 | `mine`, `done`, `paused`, `in_progress`, `in_review` | not in the pipe; a ruling on a `mine` or `done` issue is history: leave it |
-| an umbrella (some issue has it as `parent`) | a container, never work: screen its tasks, never route or close it |
+| a task of a parent (`origin: design`, a `parent` set) | settled by its parent's design (`working-on-issues/workflow.md`, A large issue and its tasks). Its only move here: found in Backlog under a `ruling`, it returns to Ready, `need` and `waitingOn` cleared |
+| an older umbrella (its tasks carry another `origin`) | a container, never work: screen its tasks, never route or close it |
 
 Screening closes on repository evidence alone. These stay open whatever the scripts print, because
 their evidence lives outside the repository: an issue with a `ruling`; one a person edited after
@@ -111,12 +113,14 @@ it was filed (activity); one whose only defect is age. For them, stop for a pers
 2. Clear `need` and `waitingOn`; its open Decision stays (`deciding-issues`, A person's gesture).
 3. Screen it in this run (§ 1 to § 5), naming the ruling in `Ruling consumed:`. The release is the
    approval of that scope, a feature never previewed included: it skips preview. A released issue
-   leaves screening only three ways: it stays `ready` (with its brief, § 6), it launches
-   (§ Launch), or, when the evidence contradicts it (delivered, refuted, overtaken, a duplicate,
-   a symptom, `full`), a `decision` checkpoint sent as a new Decision (`deciding-issues` § Ask 4)
+   leaves screening only four ways: it stays `ready` (with its brief, § 6), it launches
+   (§ Launch), a `full` one with no approved design goes to `designing-issues`, or, when the
+   evidence contradicts it (delivered, refuted, overtaken, a duplicate,
+   a symptom), a `decision` checkpoint sent as a new Decision (`deciding-issues` § Ask 4)
    takes it to Paused, Close it among the options. Screening never closes a released issue itself.
 
-**A `ruling` row** routes by its `Resume at:`: `screening` and `preview` run here; `build` is
+**A `ruling` row** routes by its `Resume at:`: `screening`, `preview` and `design` run here
+(`design` goes on to `designing-issues` once § 1 to § 5 are done); `build` is
 screened, then reached through Ready or a launch (§ Launch); `land` is not screening's
 (`deciding-issues` returns those issues to In review). Any other target is a refusal
 (`working-on-issues` § Refusals), `Rule: unroutable_ruling`. A ruling marked `Superseded by:` is
@@ -153,13 +157,17 @@ caller must use.
 
 Estimate the size the change will land at, from the files the issue cites, a scout's *Cost* line,
 and the triggers: concurrency, shared state, external input, a public contract, a migration, a
-permission or tenancy rule, more than one repository.
+permission or tenancy rule, more than one repository. Size is how much must be settled before the
+code, so a vague request counts as much as a long one.
 
-| Size | Bound |
-|---|---|
-| `small` | about 50 changed lines, no withheld path, no trigger |
-| `standard` | one reviewable pull request, no trigger |
-| `full` | several pull requests, or any trigger with a design still open: beyond the factory |
+| Size | Bound | Before the code |
+|---|---|---|
+| `small` | about 50 changed lines, no withheld path, no trigger, nothing vague | the brief (§ 6) |
+| `standard` | one reviewable change, no trigger | the brief, with a `## Plan` of a few lines: the way taken and why |
+| `full` | several days of work, a request that leaves open what the person wants, or any trigger with a design still open | a design the maintainer approved (`designing-issues`) |
+
+A `full` issue stays one issue for every person and every stage: its design cuts it into tasks
+that Build alone works, on one pull request per repository.
 
 A task of an umbrella (it has a `parent`) skips this step: its size was settled on the umbrella.
 Put the size and the line that drove it in the `screening` row.
@@ -175,11 +183,11 @@ lives in, every other repository read listed with its sha in `body`), then act:
 | `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `done`. File the residual as a new issue when it is real, in `links` with `kind: follows-up` |
 | `close`, `closeReason: duplicate` | § 2 kept the other issue | `done`. The body names the kept issue, `issues:<id>` |
 | `checkpoint` | a symptom (§ 3) | `decision`: fix the family first (recommended), or patch this one |
-| `checkpoint` | `full` (§ 4) | `decision`, I take it first, the split into one-change issues proposed |
+| `design` | `full` (§ 4), with no `ruling` answering Approve or Approve and launch to the Decision of `designing-issues` § 4; a feature only once a ruling answered Design it to its preview | `designing-issues`, in this run |
 | `checkpoint` | the right fix changes a public contract, a security posture or an agent's authority; or the route needs a fact or an artifact only a person has | `decision`: the one question that forks the work |
 | `preview` | `type: feature`, not released by a person, with no ruling answering its latest `preview` row | `previewing-features`, in this run |
 | `park` | a ruling parked the feature its latest `preview` row named | stays `backlog` until its `Expires:` |
-| `ready` | every claim resolves, no family owns it, it is not `full`, and a feature has a ruling approving its preview, or a person's release | § 6, then § Launch, else `ready` |
+| `ready` | every claim resolves, no family owns it, a `full` issue has a ruling answering Approve or Approve and launch to the Decision of `designing-issues` § 4, and a feature has a ruling approving its preview or that design, or a person's release | for a `full` issue with no task yet, `designing-issues` § 5 first; then § 6, then § Launch, else `ready` |
 
 A checkpoint stops for a person (`working-on-issues` § Stopping for a person) with the question
 `deciding-issues` phrases, `Resume at: screening`.
@@ -204,13 +212,16 @@ section at a time, each other section written back word for word:
 | `## Seams` | the public seams the change is driven and tested through: types, function signatures, commands, routes, config shapes. `tdd` reads its seams here |
 | `## Out of scope` | the adjacent changes Build leaves alone |
 
+A `full` issue arrives with its five sections written by `designing-issues`: check them against
+today's target branch and leave them as approved.
+
 Write it to stay true while the code moves: interfaces and behaviour, never paths or line numbers;
 what the system does, never how to edit it. A ruling outranks the sections it contradicts.
 
 ## Launch
 
 Screening moves a `ready`-routed issue to `in_progress` in exactly two cases. Every other issue
-waits in Ready for a person.
+waits in Ready for a person, or for Pulse under a goal (`watching-the-factory`).
 
 | Case | Who granted it | Condition Screening checks |
 |---|---|---|

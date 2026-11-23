@@ -11,7 +11,8 @@ that took no issue.
 3. **The project:** `project`, then its `context` and `maintainers`, walking up to the root. When your
    stage acts on a repository, read its facts (`SKILL.md` § Repository facts) and its own agent rules
    (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`) at run time; leave them out of the issue.
-4. **The last checkpoint:** the newest `checkpoint` row, and whether its Decision is open, answered or
+4. **Its route:** the newest `screening` row: its `Verdict:`, its `Size:`, its `Launch:`.
+   **The last checkpoint:** the newest `checkpoint` row, and whether its Decision is open, answered or
    expired.
 5. **Rulings:** every `ruling` row, newest first. A ruling outranks the sections it contradicts;
    update them to match. A ruling older than a person's later status move is superseded: history,

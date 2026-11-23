@@ -74,7 +74,7 @@ the searches.
 
 | Verdict | When | Recommended answer |
 |---|---|---|
-| `candidate` | value clearly outweighs debt | Approve the smallest slice (named) |
+| `candidate` | value clearly outweighs debt | Approve the smallest slice (named); for a `full` feature, Design it |
 | `park` | worth building only once something concrete happens | Park it until the trigger, to its expiry |
 | `reject` | debt outweighs value, or it is already present | Close it |
 
@@ -90,14 +90,14 @@ expiry, screening closes it unless the trigger fired.
 Every feature stops here (`working-on-issues` § Stopping for a person): a `decision` Decision to
 the project's first active maintainer, the mockups attached when the screen is the question,
 `Resume at: screening`. `deciding-issues` phrases it. The options, the verdict's first: Approve
-the smallest slice, with Approve and launch beside it; Park it, naming the trigger and the expiry;
-Close it; and I take it first when the feature is really a programme (several slices, several
-repositories, a public contract redesign). Open decisions from § 3 are folded into the options or
+the smallest slice, with Approve and launch beside it (for a feature screening sized `full`:
+Design it, which sends it to `designing-issues`); Park it, naming the trigger and the expiry;
+Close it; and I take it, first only for a public contract redesign. Open decisions from § 3 are folded into the options or
 stated as defaults, never relayed as a list.
 
 The answer comes back through `deciding-issues` as a `ruling`, and screening routes it: an
-approval goes to Ready with its brief, or launches on Approve and launch; a park stays in Backlog
-until its expiry.
+approval goes to Ready with its brief, or launches on Approve and launch; Design it goes to the
+design conversation; a park stays in Backlog until its expiry.
 
 ## Red flags
 

@@ -41,15 +41,19 @@ A **neighbour** is another live run of the factory. Two neighbours on one piece 
 fault this section removes.
 
 - **Before the first outward write** on an issue (a branch pushed, a pull request opened, a
-  Decision sent), re-read the issue and its repository: an open pull request that cites the issue,
+  Decision sent), re-read the issue and its repository: an open pull request that cites the issue
+  (other than the draft Build itself opened on a parent),
   a newer `checkpoint` row, or a status your stage does not own means a neighbour got there first.
   Write nothing more on it and end; say so in your report.
 - **A pull request says where it stands** through its `factory:` labels (§ Pull requests): a run
   reads them before taking a PR and sets them as it works.
 - **Ops sees every run.** It launches the owner on work no live run is on, and relaunches a run
-  that died (`operating-the-factory`). A stage run never launches another routine.
+  that died (`operating-the-factory`). Pulse tells a person when a stage stops answering
+  (`watching-the-factory`). A stage run never launches another routine.
 - **Two hours of work** ends a Build or Screening run as a failure (`timeout`); Land hands over
-  instead (`landing-pull-requests` § Waiting for checks), which is not a failure.
+  instead (`landing-pull-requests` § Waiting for checks), and Build on a parent ends on a
+  `progress` row at 100 minutes (`executing-issues` § A parent and its tasks): neither is a
+  failure.
 - **Two neighbours found on one piece of work** is a `signal`, `Rule: two_runs`, written by the one
   that noticed, which then ends.
 
@@ -80,7 +84,9 @@ Once it is sent:
 1. Write the `checkpoint` row.
 2. Set `waitingOn` (the recipient) and, except for Merge it, which leaves the issue In review,
    `status: paused` with `need` (`decision` for a ruling, `design` for a mockup), in one update.
-3. Re-read the issue, then end your turn. The Decision carries its own expiry.
+3. Re-read the issue, then end your turn. The Decision carries its own expiry. Build holding a
+   parent, after stopping one of its tasks, goes on with the other tasks and ends as
+   `executing-issues` § A parent and its tasks says.
 
 *Done when* the re-read shows `waitingOn` set and, except for Merge it, `status: paused` with
 `need`, under a `checkpoint` row whose `subject` is the Decision. Every stage skill that pauses an
@@ -120,7 +126,7 @@ to, never rewritten: its permalinks stop a message being handled twice.
 ## Refusals
 
 A run that cannot act on the issue of its wake (no facts, a missing tool, an unlaunched move, an
-umbrella, a blocked issue) writes a `signal` with its `Rule:` and ends. It writes that signal on an
+older umbrella, a blocked issue) writes a `signal` with its `Rule:` and ends. It writes that signal on an
 issue once: a run meeting the same refusal while that signal is the issue's newest row whose
 `stage` is not `ops`, with no person's gesture since, stops for a person with a `decision`
 checkpoint instead. Ops writes a row before each relaunch, so its rows never reset the count.
@@ -135,9 +141,8 @@ made each move.
 ## Three tries
 
 The run that writes an `attempt` row (`timeline-kinds.md`, filled in) updates `failedAttempts`
-right after it: `Cause: change` (a red gate, a refused change) adds 1; `Cause: environment` (a
-missing tool, a timeout, a push refused, a run that died) leaves it as it was, since the machine
-failed and the issue did not. Ops does the same for the row it writes for a run that died. At 3,
+right after it: `Cause: change` adds 1; `Cause: environment` leaves it as it was, since the machine
+failed and the issue did not. A checkpoint for stuck work writes no `attempt` and leaves it too. Ops does the same for the row it writes for a run that died. At 3,
 stop for a person
 with a `decision` checkpoint summarising the three: retry with a stated change, I take it, or Close
 it. Reset `failedAttempts` to 0 when a person's gesture (a status move or an answered Decision) is

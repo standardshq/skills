@@ -18,9 +18,11 @@ terms.
 - Safe to run again: read first. An existing record or trigger is shown and updated, never
   duplicated. Resume at the first step not done.
 
-The factory is five routines: `intake` turns Slack messages into issues; `screening`, `build` and
-`land` each work the issue or pull request their wake names; `ops` ticks over all of them
-(`working-on-issues/workflow.md`).
+The factory is six routines: `intake` turns Slack messages into issues; `screening`, `build` and
+`land` each work the issue or pull request their wake names; `ops` ticks over all of them; `pulse`
+tells a person when a stage stops and launches Ready issues under their goals
+(`working-on-issues/workflow.md`). A bundle that brings no `pulse` routine or no `goals` object
+predates them: say so, and that issues then start only on a person's move to In progress.
 
 `ops` runs on Standards, never on a harness, with no GitHub trigger: switch it on last. It starts
 runs of the other routines, so the person who arms its schedule needs `agents:manage`; say so
@@ -171,7 +173,7 @@ on save; a private one needs `/invite @Standards` before the card. Read `intake`
 
 ## 8. GitHub access
 
-Add GitHub to `screening`, `build` and `land`, one `upsert_agent` card each, grouped in one message
+Add GitHub to `screening`, `build`, `land` and, when it exists, `pulse`, one `upsert_agent` card each, grouped in one message
 so they can approve them in a row. `toolGroups` replaces the whole list: read each routine with
 `get_agents` (`id`) and send its list plus `github:<id>` for **every** installation in `resources`,
 with its `revision`. A routine granted a different installation than the person's link gets no
@@ -227,6 +229,7 @@ must choose **Link my account** first, and those routines then act as them.
 - **Screening** checks each new issue against the code and readies it, or asks a ruling.
 - **Build** turns a launched issue into a pull request.
 - **Land** judges pull requests, fixes red ones, merges or asks a person to.
+- **Pulse** tells you when a stage stops, and starts Ready issues under the goals you set.
 
 Questions to people arrive in **Decisions**.
 

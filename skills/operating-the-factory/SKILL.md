@@ -1,6 +1,6 @@
 ---
 name: operating-the-factory
-description: Ops stage. Use when the Ops routine runs a tick over the factory, to relaunch a run that died, hand stranded work back to the stage that owns it, launch Ready issues under a standing order, or run the daily evaluation of the routines.
+description: Ops stage. Use when the Ops routine runs a tick over the factory, to relaunch a run that died, hand stranded work back to the stage that owns it, or run the daily evaluation of the routines.
 ---
 
 # Operating the factory
@@ -21,7 +21,7 @@ and the date of the last evaluation; read them first.
 
 ### 1. Read the runs
 
-For each of Intake, Screening, Build and Land, read its runs since the last tick
+For each of Intake, Screening, Build, Land and Pulse, read its runs since the last tick
 (`working-on-issues/environments.md` § Runs). Sort them into **live** (pending, running) and
 **dead** (failed, cancelled, or running for more than 3 hours).
 
@@ -29,7 +29,8 @@ For each of Intake, Screening, Build and Land, read its runs since the last tick
 
 ### 2. Read the pipe
 
-- **Issues:** every issue that is not Done, with `status`, `priority`, `blockedBy`, `pullRequests`,
+- **Issues:** every issue that is not Done and is not a task of a parent (`workflow.md`, A large
+  issue and its tasks), and for each parent the statuses of its tasks, with `status`, `priority`, `blockedBy`, `pullRequests`,
   `need`, `waitingOn`, `assignee`, and the time of its latest status move; the newest `attempt`,
   `signal` and `screening` row of each In progress, In review and Ready issue.
 - **Pull requests** of each repository of the factory: the open ones with their `factory:` labels,
@@ -47,7 +48,7 @@ A piece of work is **held** when a live run is on it:
 | Live run | Holds |
 |---|---|
 | Land | the pull request carrying `factory:landing` whose status comment was updated in the last 60 minutes |
-| Build, started by a trigger | the issue whose move to In progress is the last one before the run started |
+| Build, started by a trigger | the issue whose move to In progress is the last one before the run started; started by a push, the issue whose `pullRequests` names that draft |
 | Screening, started by a trigger | the issue created or returned to Backlog last before the run started |
 | any run Ops launched | the target of the `ops_relaunch` signal Ops wrote for it |
 
@@ -65,24 +66,17 @@ work no live run holds.
 
 *Done when* each row has a result in the report: nothing found, or the relaunch with its target.
 
-### 5. Launch, under a standing order
+### 5. Report
 
-With a **standing order** in force (§ The standing order), move the head of the launchable Ready
-issues to In progress: by `priority`, empty last, then oldest. One move per tick, since each move
-wakes a Build run. An issue is launchable when § Holds names nothing for it.
-
-*Done when* one issue is launched, or the report says why none is.
-
-### 6. Report
-
-In this order: a red target branch; dead runs and what was relaunched; work relaunched for another
+In this order: a project whose `context` still holds a `Standing order:` line, which nothing
+executes any more (« set a goal instead »); a red target branch; dead runs and what was relaunched; work relaunched for another
 reason; merged and opened since the last tick; what waits on a person (Merge it, Decisions,
 mockups), oldest first; what Ops could not repair. Issues by title, pull requests by link. Then
 write the tick's time in memory.
 
 *Done when* every relaunch of this tick and every wait on a person appears in the report.
 
-### 7. Evaluate, once a day
+### 6. Evaluate, once a day
 
 On the first tick after 06:00 UTC whose date is newer than the last evaluation in memory, run
 `evaluating.md` after the report, then write the date in memory. On a Monday, also launch Screening
@@ -95,7 +89,11 @@ with the context « weekly sweep ».
 | a dead Build run, its issue In progress with no open pull request | Build | the `Next:` of the issue's newest `attempt` row; without one, « start from the branch `<name>` if it exists, else from the brief » |
 | a dead Land run, its pull request open | Land | « take over from the ledger » (`landing-pull-requests` § Taking over) |
 | a dead Screening or Intake run | Screening, or nobody | Screening: « screen this issue »; Intake: report the Slack message, a person asks again |
+| a dead Pulse run, or no Pulse run for an hour | nobody | report it first: nothing else watches the factory or serves the goals |
 | an issue In progress for 30 minutes with no open pull request, held by no run | Build | « build this issue » |
+| a parent In progress with a task it can take (Ready, its `blockedBy` tasks In review or Done), no push for 30 minutes, held by no run | Build | « continue from the newest `progress` row » |
+| a parent In progress whose every remaining task waits on a person | nobody | report the tasks and what each waits on |
+| a task of a parent in Backlog under a `ruling` for 30 minutes | Screening | « return this task to Ready » |
 | an open pull request, not a draft, its checks concluded, no verdict on its head for 30 minutes, held by no run | Land | « judge this head » |
 | a pull request with `factory:changes` and no answers comment for 30 minutes, held by no run | Land | « fix what the verdict asks, then judge » |
 | a pull request with `factory:go` on its head, neither merged, enqueued nor `factory:waiting`, for 10 minutes | Land | « merge by the mode »; « merge the target branch in first » when it is `DIRTY` or left the queue |
@@ -121,7 +119,6 @@ ops_relaunch`, the target, the symptom), then launch with one paragraph of facts
   10:13 », « run b5c1 failed after 41 minutes: bridge closed »).
 - **Step:** the quoted step of § Repairs, with the `Next:` line or the conflicted files when there
   are any.
-- **Order:** the standing order this acts on, quoted with its date, when one applies.
 
 Five relaunches per tick at most, dead runs first. A target relaunched at the last tick with no row
 from its owner since is not relaunched again: it opens the report as « relaunch brought nothing ».
@@ -137,13 +134,6 @@ A Ready issue stays Ready while one of these holds it:
   file or module (the issue's `## Seams` against the pull request's file list).
 - **Release:** the fix needs a published version of a package its repository consumes.
 - **Assigned:** its `assignee` is set: a person holds it.
-
-## The standing order
-
-A maintainer's words, quoted with their date in the run's launch context or in the project's
-`context` under `Standing order:` (« launch everything Ready tonight », « launch p1 and p2 bugs »).
-It allows § 5 and nothing else; it ends at the date it names, or after 24 hours. With none in
-force, Ops repairs and reports, and its report ends with the launches it would make.
 
 ## Filing
 

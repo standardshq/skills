@@ -1,20 +1,21 @@
 # Timeline kinds
 
 Every row: `issue`, `kind`, `project` (the issue's), `stage` (the stage whose run writes it:
-`intake`, `screening`, `build`, `land` or `ops`), `body`, and `subject` where the table names one.
+`intake`, `screening`, `build`, `land`, `ops` or `pulse`), `body`, and `subject` where the table names one.
 A routine reads a row back from its `body`: it opens with the labelled lines the table lists, one
 `Label: value` per line, then prose a person reads. The **Attributes** column names what the row
 also sets as attributes, the same value as its labelled line, so rows are counted by query.
 
 | `kind` | Written by | `subject` | Body opens with | Attributes | Means |
 |---|---|---|---|---|---|
-| `screening` | Screening | `github:owner/repo@<sha>` of the default branch read | `Verdict:` ready, close, checkpoint, preview or park; `Ruling consumed:` the `ruling` row, or none; `Launch:` small and safe or approved and launched, with its grant, when it launched | `outcome` the verdict | what the issue asserts, re-resolved against today's branch, and the route taken |
+| `screening` | Screening | `github:owner/repo@<sha>` of the default branch read | `Verdict:` ready, close, checkpoint, preview, design or park; `Ruling consumed:` the `ruling` row, or none; `Launch:` small and safe or approved and launched, with its grant, when it launched; `Size:` small, standard or full | `outcome` the verdict | what the issue asserts, re-resolved against today's branch, and the route taken |
 | `checkpoint` | the run that sent a Decision | `decisions:<id>` | the labelled lines of `SKILL.md` § The checkpoint row | `round` for a Land checkpoint | a run stopped for a person |
 | `ruling` | the run that asked, or the sitting, on an answer; Screening, for a person's move to Ready | `decisions:<id>`, or none for a move | `Decision-maker:`, `Recorded by:`, `Source:` (`decisions:<id>` and the date, or the conversation and its date), `Resume at:`; `Superseded by:` the gesture, when one came first | none | a person's answer, quoted verbatim under the question, with the defaults taken unasked one per line. A move to Ready is written as "proceed as last scoped", with who moved it and when |
 | `preview` | Screening, previewing a feature | `github:owner/repo@<sha>` | `Verdict:` candidate, park or reject; for a park, `Revisit when:` and `Expires:` (90 days at most) | `outcome` the verdict | a feature's value weighed against its durable debt |
 | `attempt` | the run that could not deliver; Ops, for a run that died without a row | the PR or branch head, when there is one | `Outcome:` failed or timeout; `Cause:` change or environment; `Next:` what the next run should do | `outcome` | a failed execution: what was tried, why it failed, what to try next. Only `Cause: change` increments `failedAttempts` (`SKILL.md` § Three tries) |
-| `verdict` | Land's judge, never the author | `github:owner/repo#N@<sha>` | `Outcome:` go or changes; `Round:` 1 to 6 | `outcome`, `round` | the judgement of one PR head, its findings ranked |
-| `released` | Land, when every linked PR of an In review issue closed unmerged | none | `Closed:` the PRs, unmerged | none | work given back to Screening |
+| `progress` | Build, on a parent, ending a run | the branch head | `Done:` the tasks taken to In review in this run, or none; `Next:` the next task to take, or the ones that wait on a person | none | work that advanced and continues at the next run; never a failure |
+| `verdict` | Land's judge, never the author | `github:owner/repo#N@<sha>` | `Outcome:` go or changes; `Round:` 1 to 6; `Risk:` low, medium or high | `outcome`, `round` | the judgement of one PR head, its findings ranked |
+| `released` | Land, when every linked PR of an In review issue, or of a parent In progress, closed unmerged | none | `Closed:` the PRs, unmerged | none | work given back to Screening |
 | `signal` | any run noticing a broken rule | what it is about, when any | `Rule:` a name from the list below | `rule` | something slipped through the structure |
 
 ## Signal rules
@@ -26,7 +27,7 @@ short name, added here in the same change.
 |---|---|
 | `environment_broken` | a tool, a clone, a login or a skill the run needs is missing |
 | `unlaunched` | an issue In progress whose move no launch backs (`workflow.md` § Launch) |
-| `umbrella` | an issue In progress that has tasks: its tasks are the work |
+| `umbrella` | an issue In progress whose tasks carry an `origin` other than `design`: its tasks are the work |
 | `blocked` | an issue In progress with a `blockedBy` issue not Done |
 | `two_runs` | two neighbours on one issue or one pull request |
 | `pr_tracked_twice` | one pull request in two issues' `pullRequests` |
@@ -37,7 +38,8 @@ short name, added here in the same change.
 | `target_red` | a required check red on the target branch itself |
 | `flaky_check` | a check red on a step the diff cannot reach, twice |
 | `run_died` | a run that failed or was interrupted with its work unfinished (written by Ops) |
-| `ops_relaunch` | Ops launched or relaunched a stage, with its context and the standing order when one applies |
+| `ops_relaunch` | Ops relaunched a stage on work no live run held, with its context |
+| `goal_launch` | Pulse moved a Ready issue to In progress, quoting the goal it serves or the person's answer that picked it |
 
 ## A `ruling` row, filled in
 
