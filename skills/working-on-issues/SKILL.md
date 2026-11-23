@@ -14,7 +14,8 @@ Read, in order, before acting:
 2. `environments.md`: which tools and paths you have here.
 3. `read-recipe.md`: how to read the issue you took.
 
-`timeline-kinds.md` holds every timeline kind and the shape of its body.
+4. `timeline-kinds.md`, before you write a row: every kind, the lines its body opens with, and a
+   filled-in `ruling` and `attempt` to copy.
 
 ## One wake, one piece of work
 
@@ -29,7 +30,7 @@ on an issue to hold it.
    neighbour, or Ops, has the pipe. Alone, list your stage's pipe (`workflow.md`), ordered by
    `priority` (`p1_urgent` to `p4_low`, empty last), then `createdAt`, oldest first, and take the
    head.
-3. An empty pipe ends the run with nothing written.
+3. An empty pipe ends the run: its report says the pipe was empty.
 
 Screening's passes that ask nothing may take up to five issues; the first that needs a person ends
 the run after its checkpoint. Land lands the pull request of its wake to the end in the same run.
@@ -52,6 +53,23 @@ fault this section removes.
 - **Two neighbours found on one piece of work** is a `signal`, `Rule: two_runs`, written by the one
   that noticed, which then ends.
 
+## Every run ends on a row
+
+A run that took an issue leaves it in one of three states, and re-reads the issue to check which:
+
+| Ending | What the issue shows |
+|---|---|
+| an exit of your stage (`workflow.md`) | the status that exit names, and the row your stage's skill writes for it |
+| a stop for a person | Paused as § Stopping for a person says, under its `checkpoint` row |
+| neither | an `attempt` row (`timeline-kinds.md`, filled in), or a refusal's `signal` |
+
+A run about to end on none of the three writes the `attempt` first, `Cause: environment`, with
+what it read and why it stopped. Ops reads an issue whose run left no row as a run that did
+nothing, and relaunches it.
+
+A run that took no issue (an empty pipe, a neighbour on the pipe, an issue that was not its
+stage's) says so in its report.
+
 ## Stopping for a person
 
 A run stops for a person only through a Decision, sent as `deciding-issues` says. Any instruction to ask someone, including "ask the user" in a borrowed skill (`implement`, `tdd`,
@@ -62,7 +80,11 @@ Once it is sent:
 1. Write the `checkpoint` row.
 2. Set `waitingOn` (the recipient) and, except for Merge it, which leaves the issue In review,
    `status: paused` with `need` (`decision` for a ruling, `design` for a mockup), in one update.
-3. End your turn. The Decision carries its own expiry; nothing on the issue holds it.
+3. Re-read the issue, then end your turn. The Decision carries its own expiry.
+
+*Done when* the re-read shows `waitingOn` set and, except for Merge it, `status: paused` with
+`need`, under a `checkpoint` row whose `subject` is the Decision. Every stage skill that pauses an
+issue ends its step on this criterion.
 
 The answer resumes this run; `deciding-issues` says what each answer does. Whoever moves the issue
 out of Paused clears `need` and `waitingOn`, except the move to Mine on I take it, which keeps
@@ -112,9 +134,11 @@ made each move.
 
 ## Three tries
 
-An `attempt` row whose `Cause:` is `change` (a red gate, a refused change) increments
-`failedAttempts`. One whose `Cause:` is `environment` (a missing tool, a timeout, a push refused, a
-run that died) leaves it as it was: the machine failed, the issue did not. At 3, stop for a person
+The run that writes an `attempt` row (`timeline-kinds.md`, filled in) updates `failedAttempts`
+right after it: `Cause: change` (a red gate, a refused change) adds 1; `Cause: environment` (a
+missing tool, a timeout, a push refused, a run that died) leaves it as it was, since the machine
+failed and the issue did not. Ops does the same for the row it writes for a run that died. At 3,
+stop for a person
 with a `decision` checkpoint summarising the three: retry with a stated change, I take it, or Close
 it. Reset `failedAttempts` to 0 when a person's gesture (a status move or an answered Decision) is
 newer than the latest `attempt` row.

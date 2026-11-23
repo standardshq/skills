@@ -26,3 +26,4 @@ Source: [mattpocock/skills](https://github.com/mattpocock/skills) at commit `4ae
 
 - `GLOSSARY.md` reference replaced by the repository's rules (`working-on-issues`, `scripts/discover-repository.mjs`).
 - `CREDITS.md` kept (Dex Horthy attribution).
+- The template opens with the lines `working-on-issues` § Pull requests requires.

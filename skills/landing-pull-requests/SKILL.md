@@ -76,8 +76,20 @@ older, close yours as `duplicate`, and write a `signal`, `Rule: pr_tracked_twice
 A draft is tracked and linked, never judged: its author is still working. It enters the pipe once
 marked ready.
 
+### Settle what merged or closed
+
+Every run does this before it takes a pull request, and again right after a merge it made. From
+`pullRequests`, for the issue of its wake, or for every issue that is not Done when the run is the
+net:
+
+| Every linked PR of the issue is | Write |
+|---|---|
+| merged | `status: done`, `closeReason: done` |
+| closed unmerged, the issue In review | `status: backlog` and a `released` row naming them, so Screening decides what is left |
+
 *Done when* each PR this run tracks is in exactly one issue's `pullRequests` and carries its link
-line and `factory:tracked`.
+line and `factory:tracked`, and no issue this run read still shows In review with every linked PR
+merged or closed.
 
 ## 3. Take the pull request
 
@@ -95,11 +107,6 @@ whatever state its issue was left in.
 3. **A go to retry:** a PR whose head has a go `verdict` and is neither merged, nor enqueued, nor
    named by an open or answered Merge it Decision (dequeued, the merge failed, or its Merge it
    expired): run § 6 again.
-
-Then the issues the list no longer shows, from `pullRequests`: an issue of any status but Done
-whose every linked PR is merged gets `status: done`, `closeReason: done`; an In review one whose
-every linked PR closed unmerged gets `status: backlog` and a `released` row naming them, so
-Screening decides what is left. These writes cost nothing: do them all, then take one PR.
 
 **A PR a neighbour is on:** `factory:landing` with a status comment (§ 4) updated less than 60
 minutes ago. A run woken on it leaves it and ends; the net skips it and takes the next PR of the
@@ -234,7 +241,7 @@ when `links` is true. Options: Merge it (the person merges on GitHub, recommende
 what), I take it, Close it. The issue stays In review; the merge itself is the answer the pipe reads.
 
 Enqueued, merged or Merge it sent: update the status comment and the labels (`factory:waiting` on
-Merge it). The issue goes Done when a Land run sees every linked PR merged.
+Merge it). After a merge you made, settle the issue yourself (§ 2, Settle what merged or closed).
 
 *Done when* the head is enqueued, merged, or waits on one open Merge it, and the status comment
 says which.
@@ -308,7 +315,8 @@ comment says `paused: waiting on <person>`, and the PR carries `factory:waiting`
 Before round 6, a head that is not go keeps going to the fixer: open entries are work, not a
 reason to ask. Stop earlier only for what a fixer cannot move (this section's unchanged head).
 
-*Done when* the checkpoint is sent, the issue is Paused, and the status comment and the label say
+*Done when* the issue is stopped as `working-on-issues` § Stopping for a person ends (Paused,
+`need` and `waitingOn` set, under its `checkpoint` row), and the status comment and the label say
 so.
 
 ## Report

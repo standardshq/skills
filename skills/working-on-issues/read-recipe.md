@@ -2,7 +2,8 @@
 
 Read the issue of your wake in this order. Stop as soon as it is not yours to act on (a neighbour
 got there first, not your stage's pipe, not launched) and take the exit your stage's skill names
-for that case; where it names none, end with nothing written.
+for that case; where it names none, end as `SKILL.md` § Every run ends on a row says for a run
+that took no issue.
 
 1. **The issue:** `title`, `status`, `priority`, `type`, `origin`, `closeReason`, `need`,
    `waitingOn`, `slackThread`.

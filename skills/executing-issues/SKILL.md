@@ -125,23 +125,22 @@ Then `status: in_review`, re-read the issue, at once: the PR's CI is not yours t
 The CI is Land's to read, and an issue left In progress beside its open PR is one Land has to
 repair.
 
-*Done when* the re-read shows every PR in `pullRequests` and the issue In review. A write that
-failed is named in your report as failed.
+*Done when* `gh pr view` shows each PR's body carrying the `Standards issue:` line and
+`<!-- factory:build -->`, and the re-read shows every PR in `pullRequests` and the issue In
+review. A write that failed is named in your report as failed.
 
-## When a run fails
+## 7. End on a row
 
-A run that cannot deliver writes the `attempt` row (`timeline-kinds.md`): `Outcome:` failed or
-timeout, `Cause:` change (a red gate, a refused change) or environment (a tool missing mid-way, a
-timeout, a branch it cannot push), what was tried, and `Next:` the step the next run starts from;
-`subject` the branch head when there is one. A branch it cannot push leaves its patch attached to
-the issue. `working-on-issues` § Three tries says which cause counts.
+Whatever step the run stops at, it ends as `working-on-issues` § Every run ends on a row says.
+For Build the three endings are:
 
-## Every ending leaves a row
+| The run | Leaves |
+|---|---|
+| delivered | the issue In review, a PR linked on a green gate |
+| needs a person | the issue Paused under its `checkpoint`, which names exactly what is missing |
+| could not deliver | the issue In progress under an `attempt` row copied from the filled-in one in `timeline-kinds.md`: `Cause:` change (a red gate, a refused change) or environment (a tool missing mid-way, a timeout, a branch it cannot push), and `Next:` the step the next run starts from; then `failedAttempts` updated as `working-on-issues` § Three tries says |
 
-A run ends with its issue In review (a PR linked on a green gate), Paused (a `checkpoint` that
-names exactly what is missing), or still In progress under a row this run wrote: an `attempt`, or
-a refusal's `signal`. The first two are the endings that count.
+A branch the run cannot push leaves its patch attached to the issue.
 
-A run about to end on none of the three writes the `attempt` first: `Cause: environment`, what it
-read, and why it stopped. Ops reads an In progress issue with no row as a run that did nothing, and
-relaunches it.
+*Done when* a re-read of the issue shows one of the three, and for the third, an `attempt` row
+whose body holds `Outcome:`, `Cause:` and `Next:`.
