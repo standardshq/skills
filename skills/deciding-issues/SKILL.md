@@ -28,6 +28,10 @@ Of the open questions, ask the one whose answers produce different work. Fold th
 defaults, written in the checkpoint's `Recommendation:` and later in the ruling as taken unasked.
 A second blocking question waits for the first answer.
 
+The cards of a design conversation carry more: `designing-issues` § 2 says what each holds, up to
+four questions on one card. The rules below apply to each of them, except Close it and I take it,
+which the design's approval card alone offers.
+
 The person reads it cold, perhaps weeks later, in the workspace's language, with no em dash:
 
 | Part | Rule |
@@ -36,7 +40,7 @@ The person reads it cold, perhaps weeks later, in the workspace's language, with
 | Names | Every issue, PR, commit, file or flag named by what it is: « the pull request that adds undo per tab (merged on 4 October) », never a bare id. |
 | Options | Each says the work it produces, for a user or for the code, then its cost: size tier, a withheld path, a breaking change. The recommended option comes first, marked recommended; the recommendation comes from the evidence, never a fresh opinion. |
 | Close it | Always offered: an issue that no longer deserves building is a legitimate, cheap ruling. |
-| I take it | First and recommended for a programme (tier `full`, several slices, several repositories, a public contract redesign): the person builds it in their own lane, Mine. |
+| I take it | Always offered on an approval. First and recommended only for a public contract redesign: the person builds it in their own lane, Mine. |
 | Approve and launch | Beside Approve when the approval is all that stands between the issue and Build, Build's own `design` and gate-red Decisions included (`screening-issues` § Launch, approved and launched). |
 
 ### 3. Mockups

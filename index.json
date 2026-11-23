@@ -8,6 +8,10 @@
     "description": "Decisions, the one way a factory run asks a person. Use when a run must stop for a ruling or a mockup, when its question is answered or expires, when Intake asks a reporter in Slack, or when a person starts a sitting to clear Paused issues."
   },
   {
+    "name": "designing-issues",
+    "description": "Use when screening routes a full issue to design, or a ruling resumes one at design. Holds the design conversation with the person who asked, on cards, then writes the design into the issue and stops on a Decision for its approval."
+  },
+  {
     "name": "diagnosing-bugs",
     "description": "Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow."
   },
@@ -17,7 +21,7 @@
   },
   {
     "name": "executing-issues",
-    "description": "Build stage. Use when the Build routine is woken or launched on an In progress issue and turns it into a pull request on a green gate, or into a Decision that names what is missing."
+    "description": "Build stage. Use when the Build routine is woken or launched on an In progress issue, or on a push to the draft pull request it opened, and turns the issue into a pull request on a green gate, or into a Decision that names what is missing."
   },
   {
     "name": "implement",
@@ -29,7 +33,7 @@
   },
   {
     "name": "operating-the-factory",
-    "description": "Ops stage. Use when the Ops routine runs a tick over the factory, to relaunch a run that died, hand stranded work back to the stage that owns it, launch Ready issues under a standing order, or run the daily evaluation of the routines."
+    "description": "Ops stage. Use when the Ops routine runs a tick over the factory, to relaunch a run that died, hand stranded work back to the stage that owns it, or run the daily evaluation of the routines."
   },
   {
     "name": "pr",
@@ -41,7 +45,7 @@
   },
   {
     "name": "screening-issues",
-    "description": "Use when the Screening routine wakes on an issue created in or returned to Backlog or on its clock, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview or to a Decision."
+    "description": "Use when the Screening routine wakes on an issue created in or returned to Backlog or on its clock, or is launched by Ops on a person's release, a refresh or the weekly sweep. Re-resolves what the issue asserts against the target branch, closes what no longer holds, and routes the rest to Ready with an agent brief, to a launch, to preview, to design or to a Decision."
   },
   {
     "name": "setting-up-the-factory",
@@ -54,6 +58,10 @@
   {
     "name": "triaging-issues",
     "description": "Use when a Screening run takes an issue whose `type` is empty or contradicted by a ruling. Classifies it as bug, enhancement, feature or chore from the issue's own text, keeps the reporter's cause as a hypothesis, and stops for a person when the text cannot settle the type."
+  },
+  {
+    "name": "watching-the-factory",
+    "description": "Pulse stage. Use when the Pulse routine ticks, or when a goal is created. Tells a person when a stage of the factory has stopped, launches Ready issues under an active goal, and proposes the day's launches on one card."
   },
   {
     "name": "working-on-issues",

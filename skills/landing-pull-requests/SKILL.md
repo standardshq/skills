@@ -55,6 +55,7 @@ Then align the issue's status with its open PR, whoever left it behind:
 
 | The issue of an open PR is | Do |
 |---|---|
+| any status, its only open PR a draft whose body carries `<!-- factory:build -->` | nothing: Build is still working on it (`executing-issues` § A `full` issue) |
 | In review | nothing |
 | Backlog, Ready, In progress or Done | `status: in_review`: the open PR is the work, whoever left the issue behind |
 | Paused | nothing: it waits on a person (§ 3 reads its answer) |
@@ -151,6 +152,26 @@ Pin the head sha. Read the repository's facts from `targetBranch`, never the hea
 check's conclusion on the head; add the issue's `approved` mockup and its `evidence`, the
 `withheld` paths, and what `sensitiveData` names, which the dossier never quotes.
 
+**The oracle is yours to guard.** The judge works from the diff and the issue, and from nothing
+Build said about its own work. Before dispatching it, read the issue's activity since its launch:
+an edit of `## Acceptance` by Build is a `blocking` entry of this verdict, quoting the line before
+and after; write the section back word for word from the issue's history. So is a diff that
+changes what an existing test expects with neither a line of `## Acceptance` nor a `ruling` asking
+for it.
+
+**Proof on a screen.** At round 1, and at a later round whose delta touches a screen, a change a
+person can see is run on the head (the repository's `boot` and
+`apps`) and driven in a browser through each line of `## Acceptance` that names a screen. Attach
+the captures to `evidence` (`kind: proof`). A line the running app does not show is a `blocking`
+entry. A repository with no `boot`: say so in the verdict, and the checks are all there is.
+
+**Risk.** Rate the head `low`, `medium` or `high`, by what a person loses if it is wrong and how
+hard it is to undo, whatever the size of the diff: `high` for a migration, a permission or tenancy
+rule, a public contract, money, or data that cannot be restored; `medium` for a change a person
+sees or a path many features share; `low` for the rest. A `withheld` path is at least `medium`.
+Rate at round 1; a later round raises the rating when its delta calls for it, and keeps it
+otherwise.
+
 **Target red:** a required check red on the head that is also red on the latest run of
 `targetBranch` is the target's fault, and no entry of this verdict. Say `waiting on <targetBranch>`
 in the status comment, write one `signal` (`Rule: target_red`) naming the check, and hand over
@@ -194,7 +215,8 @@ return:
 
 Write the `verdict` row from the judge's return: `subject: github:owner/repo#N@<sha>`, `stage:
 land`, `outcome` and `round` as attributes, body opening `Outcome: go` or `Outcome: changes`, then
-`Round: <n>`, then the ranked findings and the counts that returned nothing. Go is no `blocking`
+`Round: <n>`, then `Risk: <low | medium | high>` with its one-line reason, then the ranked findings
+and the counts that returned nothing. Go is no `blocking`
 and no `to fix`. Set `factory:go` or `factory:changes` on the PR.
 
 Then post the verdict on the PR: one comment opening `<!-- factory:verdict <sha> -->` and
@@ -214,6 +236,7 @@ Mark a draft PR ready. Then the first row that holds:
 | conflicts with `targetBranch` (`mergeStateStatus` `DIRTY`) | the fixer merges `targetBranch` into it (§ 7); the new head is judged on the delta, on the same round |
 | left the merge queue unmerged, and does not conflict | § *Dropped by the queue* below |
 | touches a `withheld` path, or `reviewers` requires a person's review of its changed paths (`any:<n>`, or a `user:` or `team:` line whose glob matches) | Merge it |
+| its verdict says `Risk: high` | Merge it, the reason for the rating in its first line, and the `Rollback:` line of the PR body quoted when it has one |
 | `gate` is `none` | Merge it, saying no check proves the change and the verdict is all there is |
 | `mode: queue` | enqueue: enable auto-merge with `method`, `--match-head-commit <sha>` |
 | `mode: human` | Merge it |
@@ -236,8 +259,8 @@ branches), and the failed steps of its failed jobs.
 A requeue is a milestone of the status comment (`go, enqueued again: <the flake>`).
 
 **Merge it** is a Decision (`deciding-issues`, its recipient rule for Merge it): the verdict in
-two lines, each withheld path with its specific risk, the head, the PR link, and the published link
-when `links` is true. Options: Merge it (the person merges on GitHub, recommended), Change (say
+two lines, its `Risk:` and why, each withheld path with its specific risk, the head, the PR link,
+and the published link when `links` is true, so the person can try the change before merging. Options: Merge it (the person merges on GitHub, recommended), Change (say
 what), I take it, Close it. The issue stays In review; the merge itself is the answer the pipe reads.
 
 Enqueued, merged or Merge it sent: update the status comment and the labels (`factory:waiting` on

@@ -1,11 +1,13 @@
 ---
 name: executing-issues
-description: Build stage. Use when the Build routine is woken or launched on an In progress issue and turns it into a pull request on a green gate, or into a Decision that names what is missing.
+description: Build stage. Use when the Build routine is woken or launched on an In progress issue, or on a push to the draft pull request it opened, and turns the issue into a pull request on a green gate, or into a Decision that names what is missing.
 ---
 
 # Executing issues
 
-One issue, one change, one run, ending at the pull request: from In review on, the PR is Land's.
+One issue, one pull request per repository, ending at the pull request: from In review on, the PR
+is Land's. A `small` or `standard` issue takes one run; a `full` one takes several (§ A `full`
+issue).
 The acceptance criteria and seams exist in the agent brief before the diff does, so the judge has
 something to compare against that the implementation could not have chosen.
 
@@ -17,14 +19,15 @@ disagrees.
 
 The issue your wake names (`workflow.md`, Build), read with `read-recipe.md`. It is yours to build
 when it is In progress, its latest move into In progress passes `workflow.md` § Launch, it is a
-leaf (no `childIds`), every `blockedBy` issue is Done, and no open PR is linked.
+leaf (no `childIds`), every `blockedBy` issue is Done, and no open PR is linked, or the only open
+PR is the draft Build opened on this issue (§ A `full` issue).
 
 Any other issue takes the first exit that matches:
 
 | The issue | Exit |
 |---|---|
 | is no longer In progress | a person or a neighbour moved it: end, and say so in your report |
-| has an open linked PR | a run died between opening it and moving the issue: finish § 6's last writes, end; Build starts no second implementation |
+| has an open linked PR that is not Build's draft on it | a run died between opening it and moving the issue: finish § 6's last writes, end; Build starts no second implementation |
 | entered In progress on a move no launch backs | a refusal, `Rule: unlaunched` |
 | has tasks (`childIds`) | a refusal, `Rule: umbrella`: its tasks are the work |
 | has a `blockedBy` issue not Done | a refusal, `Rule: blocked`, naming each open one |
@@ -47,9 +50,10 @@ still missing. The work already landed, or the premise is gone: a `decision` che
 `feat/<slug>` or `chore/<slug>`), and read its agent rules there (`AGENTS.md`, `CLAUDE.md`,
 `.cursor/rules`).
 
-**The scope.** The brief's `## Problem`, `## Acceptance`, `## Seams` and `## Out of scope`; for a
-feature, the slice its approving `ruling` names; for a task, its umbrella's sections and rulings
-too. A ruling outranks the section it contradicts.
+**The scope.** The brief's `## Problem`, `## Plan`, `## Acceptance`, `## Seams` and
+`## Out of scope`; for a feature, the slice or the design its approving `ruling` names; for a task,
+its umbrella's sections and rulings too. A ruling outranks the section it contradicts.
+`## Acceptance` is the oracle you are judged on: it is read, and left exactly as it is.
 
 **A mockup owed.** The change brings new chrome, a new layout or a new interaction, and no file of
 `mockups` is `approved`: before any code, a `design` Decision through `deciding-issues`
@@ -85,10 +89,53 @@ Run `implement`, which drives `tdd` at the seams the brief's `## Seams` lists. E
 the work:
 
 - the right fix changes a public contract, a security posture or an agent's authority;
-- the issue is several changes, not one: I take it first, as `deciding-issues` § Ask 2 says for a
-  programme.
+- the issue turns out larger or vaguer than its brief says, and no design was approved: the
+  question is « design it first », `Resume at: screening`, so Screening sizes it `full`.
+
+**Stuck.** The work cannot go on, and no test you could write or command you could run would
+change that: an acceptance criterion the code cannot meet as written, a dependency that is absent,
+two criteria that contradict. Stop there: write a `stuck` row (`timeline-kinds.md`) naming what is
+missing, then a `decision` checkpoint, `Resume at: build`, whose options are the change that would
+free the work (Approve, or Approve and launch), I take it, Close it. It leaves `failedAttempts` as
+it was. A criterion or a test's expectation changes only on that person's ruling.
 
 *Done when* every acceptance criterion holds in a passing test, and the bug's red test is green.
+
+## A `full` issue
+
+An issue is `full` when its newest `screening` row says `Size: full`. It carries an approved design
+and is built over several runs on one branch, one pull request per repository.
+
+**The plan.** The first run (`## Plan` holds no `### Tasks` yet) cuts the design into tasks and
+appends them to `## Plan` under `### Tasks`, a checklist: each task named by the behaviour it adds,
+with the `## Acceptance` lines it carries, ordered by what each needs from the others. Every line
+of `## Acceptance` sits in exactly one task. From then on the checklist changes in one way: a box
+is ticked.
+
+**Each run**, in order:
+
+1. Read `### Tasks`, the newest `progress` row and `git log` of the branch; they outrank what you
+   remember.
+2. Run the repository's quickest check from `verify` on the branch before adding anything: red
+   here is fixed first.
+3. Take the next unticked tasks. Tasks that share no file and need nothing from each other go to
+   parallel subagents, one each, with the task, its acceptance lines and the seams; each returns
+   what it changed and the commands it ran. You read the diff and run the tests yourself.
+4. Commit each task once its tests ran green in this run, and tick its box on the issue.
+5. At 100 minutes of work, or when every box is ticked, end the run with three writes, in this
+   order: the `progress` row (`timeline-kinds.md`), its `subject` the commit you are about to push;
+   the push; then the pull request. The first run opens it as a draft, body by `pr`, with the
+   checklist copied under `## Tasks`, and links it in `pullRequests`; a later run ticks the same
+   boxes in that body. The push is the run's last act on the branch: it wakes the next run.
+
+**The last run**, every box ticked: § 5 on the whole branch, then § 6 from step 2, marking the
+draft ready first. Its body gains `Rollback:` the way back (a revert, a flag to switch off, a
+migration's down path); a change a person can see ships behind the flag the design names, when it
+names one.
+
+*Done when* a re-read shows the issue under this run's `progress` row, the boxes it names ticked on
+the issue and on the draft, and the draft's head equal to the row's `subject`; or one of § 7's
+endings.
 
 ## 5. The gate
 
@@ -132,15 +179,17 @@ review. A write that failed is named in your report as failed.
 ## 7. End on a row
 
 Whatever step the run stops at, it ends as `working-on-issues` § Every run ends on a row says.
-For Build the three endings are:
+For Build the endings are:
 
 | The run | Leaves |
 |---|---|
 | delivered | the issue In review, a PR linked on a green gate |
 | needs a person | the issue Paused under its `checkpoint`, which names exactly what is missing |
+| advanced a `full` issue (§ A `full` issue) | the issue In progress under a `progress` row whose `Done:` names at least one task |
+| is stuck (§ 4) | the issue Paused under a `stuck` row and its `checkpoint`; `failedAttempts` as it was |
 | could not deliver | the issue In progress under an `attempt` row copied from the filled-in one in `timeline-kinds.md`: `Cause:` change (a red gate, a refused change) or environment (a tool missing mid-way, a timeout, a branch it cannot push), and `Next:` the step the next run starts from; then `failedAttempts` updated as `working-on-issues` § Three tries says |
 
 A branch the run cannot push leaves its patch attached to the issue.
 
-*Done when* a re-read of the issue shows one of the three, and for the third, an `attempt` row
+*Done when* a re-read of the issue shows one of these endings, and for the last, an `attempt` row
 whose body holds `Outcome:`, `Cause:` and `Next:`.

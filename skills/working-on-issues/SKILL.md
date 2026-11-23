@@ -41,15 +41,18 @@ A **neighbour** is another live run of the factory. Two neighbours on one piece 
 fault this section removes.
 
 - **Before the first outward write** on an issue (a branch pushed, a pull request opened, a
-  Decision sent), re-read the issue and its repository: an open pull request that cites the issue,
+  Decision sent), re-read the issue and its repository: an open pull request that cites the issue
+  (other than the draft Build itself opened on a `full` issue),
   a newer `checkpoint` row, or a status your stage does not own means a neighbour got there first.
   Write nothing more on it and end; say so in your report.
 - **A pull request says where it stands** through its `factory:` labels (§ Pull requests): a run
   reads them before taking a PR and sets them as it works.
 - **Ops sees every run.** It launches the owner on work no live run is on, and relaunches a run
-  that died (`operating-the-factory`). A stage run never launches another routine.
+  that died (`operating-the-factory`). Pulse tells a person when a stage stops answering
+  (`watching-the-factory`). A stage run never launches another routine.
 - **Two hours of work** ends a Build or Screening run as a failure (`timeout`); Land hands over
-  instead (`landing-pull-requests` § Waiting for checks), which is not a failure.
+  instead (`landing-pull-requests` § Waiting for checks), and Build on a `full` issue ends on a
+  `progress` row at 100 minutes (`executing-issues` § A `full` issue): neither is a failure.
 - **Two neighbours found on one piece of work** is a `signal`, `Rule: two_runs`, written by the one
   that noticed, which then ends.
 
