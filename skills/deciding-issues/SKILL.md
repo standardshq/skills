@@ -121,9 +121,10 @@ The answer resumes the run that asked. `read decision:<id>` for the answer, `ans
 | any other answer to a Land checkpoint whose PR is open | the `ruling` | In review; Land's next run judges it again |
 | any other answer | the `ruling` | Backlog: Screening takes rulings first and routes by `Resume at:` |
 
-Every answer but I take it, superseded included, clears `waitingOn`; a move out of Paused also
-clears `need`, in one update. Then
-end: a run never continues its own stage after its question.
+An answer that takes the issue out of Paused clears `need` and `waitingOn` in the same update
+(I take it keeps `waitingOn`); Merge it clears `waitingOn`. An answer that leaves the issue Paused
+(Draw it with me, or a superseded answer while a newer checkpoint holds the issue) leaves both as
+they are: they belong to the pause in force. Then end: the next stage continues on its own wake.
 
 **The `ruling` row** (`timeline-kinds.md`): `subject: decisions:<id>`; `Decision-maker:` who
 answered, `Recorded by:` your routine, `Source:` `decisions:<id>` and the date, `Resume at:` the

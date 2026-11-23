@@ -55,3 +55,23 @@ body:     Decision-maker: <person>
 
           Taken as recommended, unasked: <one line each, or "none">.
 ```
+
+## An `attempt` row, filled in
+
+Every line is filled; `Cause:` is one of the two words. The run that writes the row then updates
+`failedAttempts` as `SKILL.md` § Three tries says, and re-reads the issue.
+
+```
+kind:     attempt
+stage:    <the stage of the run that could not deliver>
+outcome:  <failed | timeout>
+subject:  <github:owner/repo#N@sha or the branch head, when there is one>
+body:     Outcome: <failed | timeout>
+          Cause: <change | environment>
+          Next: <the step the next run starts from>
+
+          <what was tried, and why it stopped>
+```
+
+`change`: the gate went red on this change, or the change was refused. `environment`: a tool, a
+clone, a login or a push was missing, the run timed out, or it died.

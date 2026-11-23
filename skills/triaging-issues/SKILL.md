@@ -45,7 +45,8 @@ issue's author when they are an active person of the workspace, else the project
 maintainer; `deciding-issues` phrases it. Several outcomes: offer the split into one issue each as
 the recommendation. `Resume at: screening`.
 
-*Done when* `type` holds one value, or the checkpoint is written and the issue Paused.
+*Done when* `type` holds one value, or the issue is stopped as `working-on-issues` § Stopping for
+a person ends: Paused, `need` and `waitingOn` set, under its `checkpoint` row.
 
 ## What you write
 

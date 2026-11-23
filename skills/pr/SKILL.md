@@ -8,6 +8,8 @@ metadata:
 Use this template for writing the PR body:
 
 ```markdown
+<the lines `working-on-issues` § Pull requests requires, each on its own line>
+
 ## Summary
 
 <diagram, diff-sketch, or tree>
