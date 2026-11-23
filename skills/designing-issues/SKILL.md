@@ -1,6 +1,6 @@
 ---
 name: designing-issues
-description: Use when screening routes a full issue to design, or a ruling resumes one at design. Holds the design conversation with the person who asked, on cards, then writes the design into the issue and stops on a Decision for its approval.
+description: Use when screening routes a full issue to design, or a ruling resumes one at design. Holds the design conversation with the person who asked, on cards, writes the design into the issue, stops on a Decision for its approval, then writes its tasks as child issues.
 ---
 
 # Designing issues
@@ -17,7 +17,8 @@ the issue back to you (`Resume at: design`).
 ## Which issues
 
 An issue whose `screening` row of this run says `Verdict: design`, or whose newest `ruling` says
-`Resume at: design`. A feature comes here after its preview was approved.
+`Resume at: design`. A feature comes here after its preview was approved. § 5 runs later, from
+screening's `ready` verdict on the approved design.
 
 ## 1. Look before asking
 
@@ -82,10 +83,15 @@ other section written back word for word, `## Request` left as it is:
 | Section | Holds |
 |---|---|
 | `## Problem` | what they want and why, in their words where they gave them |
-| `## Plan` | goals; non-goals; anti-goals (what would make it a failure even if it works); constraints; the ways considered, the one picked and why; the feature flag it ships behind, when the repository's rules name flags and a person will see the change; your own calls, one per line, each with its reason |
+| `## Plan` | goals; non-goals; anti-goals (what would make it a failure even if it works); constraints; the ways considered, the one picked and why; the feature flag it ships behind, when the repository's rules name flags and a person will see the change; your own calls, one per line, each with its reason; then `### Tasks`, below |
 | `## Acceptance` | each requirement as a result a test or a command proves, with its exact value |
 | `## Seams` | the public seams the change is driven and tested through |
 | `## Out of scope` | the adjacent changes Build leaves alone |
+
+**`### Tasks`** closes `## Plan`: the design cut into the pieces it will be built in, in order. One
+line each: the behaviour the piece adds, the lines of `## Acceptance` it carries, and the pieces it
+needs first. Every line of `## Acceptance` sits in exactly one piece; a piece is small enough to
+build and test in one sitting, and leaves the branch green.
 
 Keep it under 200 lines: decisions and exact results. A change that brings new chrome, a new layout
 or a new interaction carries its approved mockup in `mockups`; the second card is where it was
@@ -97,17 +103,39 @@ this text. » Sort each item as § 1 does: settled goes into the text, yours goe
 your call, theirs goes on the approval card.
 
 *Done when* the five sections are written in under 200 lines, the reader's list is empty or
-sorted, and every line of `## Acceptance` names a value a test can compare.
+sorted, every line of `## Acceptance` names a value a test can compare, and each sits in exactly
+one piece of `### Tasks`.
 
 ## 4. Stop for approval
 
 One Decision to the project's first active maintainer (`working-on-issues` § Stopping for a
 person, `Resume at: screening`). It says in three lines what will be built and the way picked,
-lists your own calls so they can be corrected, and carries the reader's questions that are theirs,
+names the pieces of `### Tasks` in order, lists your own calls so they can be corrected, and carries the reader's questions that are theirs,
 if any. Options: Approve and launch (recommended), Approve, Change (say what), I take it, Close it.
 
 Change returns here: apply it to the design, run the fresh reader again, ask again.
 
-The approving `ruling` is what `screening-issues` reads to route the issue to Ready or to a launch.
-
 *Done when* the approval Decision is sent and the issue is stopped as that section ends.
+
+## 5. Write the tasks
+
+The approval returns the issue to Screening, whose `ready` verdict runs this step before its
+brief and its launch. Create one child issue per
+piece of `### Tasks`, in order, one `write` per task (`working-on-issues/workflow.md`, A large
+issue and its tasks):
+
+| Field | Value |
+|---|---|
+| `parent` | `record:<the issue's id>` |
+| `origin` | `design` |
+| `title` | the behaviour the piece adds |
+| `project`, `type`, `priority` | the parent's |
+| `body` | `## Problem`: the piece in two lines, and `issues:<the parent's id>` for the design; `## Acceptance`: its lines, word for word from the parent |
+| `blockedBy` | the tasks of the pieces it needs first |
+| `status` | `ready` |
+
+Then append to the parent's `### Tasks` each task's id beside its line.
+
+*Done when* a query of the issues whose `parent` is this one returns as many tasks as `### Tasks`
+has pieces, each `ready`, and every line of the parent's `## Acceptance` reads in exactly one of
+them.

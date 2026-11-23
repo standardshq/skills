@@ -95,7 +95,8 @@ Every issue left Ready carries a `priority`: Build's net and Pulse order the pip
 | The issue | Do |
 |---|---|
 | `mine`, `done`, `paused`, `in_progress`, `in_review` | not in the pipe; a ruling on a `mine` or `done` issue is history: leave it |
-| an umbrella (some issue has it as `parent`) | a container, never work: screen its tasks, never route or close it |
+| a task of a parent (`origin: design`, a `parent` set) | settled by its parent's design (`working-on-issues/workflow.md`, A large issue and its tasks). Its only move here: found in Backlog under a `ruling`, it returns to Ready, `need` and `waitingOn` cleared |
+| an older umbrella (its tasks carry another `origin`) | a container, never work: screen its tasks, never route or close it |
 
 Screening closes on repository evidence alone. These stay open whatever the scripts print, because
 their evidence lives outside the repository: an issue with a `ruling`; one a person edited after
@@ -165,7 +166,8 @@ code, so a vague request counts as much as a long one.
 | `standard` | one reviewable change, no trigger | the brief, with a `## Plan` of a few lines: the way taken and why |
 | `full` | several days of work, a request that leaves open what the person wants, or any trigger with a design still open | a design the maintainer approved (`designing-issues`) |
 
-A `full` issue stays one issue, built as one pull request per repository.
+A `full` issue stays one issue for every person and every stage: its design cuts it into tasks
+that Build alone works, on one pull request per repository.
 
 A task of an umbrella (it has a `parent`) skips this step: its size was settled on the umbrella.
 Put the size and the line that drove it in the `screening` row.
@@ -181,11 +183,11 @@ lives in, every other repository read listed with its sha in `body`), then act:
 | `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `done`. File the residual as a new issue when it is real, in `links` with `kind: follows-up` |
 | `close`, `closeReason: duplicate` | § 2 kept the other issue | `done`. The body names the kept issue, `issues:<id>` |
 | `checkpoint` | a symptom (§ 3) | `decision`: fix the family first (recommended), or patch this one |
-| `design` | `full` (§ 4), with no `ruling` answering Approve or Approve and launch to the Decision of `designing-issues` § 4; a feature only once a ruling answered Design it to its preview | `designing-issues`, in this run |
+| `design` | `full` (§ 4), with no `ruling` answering Approve or Approve and launch to the Decision of `designing-issues` § 4,; a feature only once a ruling answered Design it to its preview | `designing-issues`, in this run |
 | `checkpoint` | the right fix changes a public contract, a security posture or an agent's authority; or the route needs a fact or an artifact only a person has | `decision`: the one question that forks the work |
 | `preview` | `type: feature`, not released by a person, with no ruling answering its latest `preview` row | `previewing-features`, in this run |
 | `park` | a ruling parked the feature its latest `preview` row named | stays `backlog` until its `Expires:` |
-| `ready` | every claim resolves, no family owns it, a `full` issue has a ruling answering Approve or Approve and launch to the Decision of `designing-issues` § 4, and a feature has a ruling approving its preview or that design, or a person's release | § 6, then § Launch, else `ready` |
+| `ready` | every claim resolves, no family owns it, a `full` issue has a ruling answering Approve or Approve and launch to the Decision of `designing-issues` § 4, and a feature has a ruling approving its preview or that design, or a person's release | for a `full` issue with no task yet, `designing-issues` § 5 first; then § 6, then § Launch, else `ready` |
 
 A checkpoint stops for a person (`working-on-issues` § Stopping for a person) with the question
 `deciding-issues` phrases, `Resume at: screening`.

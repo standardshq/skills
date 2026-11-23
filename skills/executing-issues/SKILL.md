@@ -6,8 +6,8 @@ description: Build stage. Use when the Build routine is woken or launched on an 
 # Executing issues
 
 One issue, one pull request per repository, ending at the pull request: from In review on, the PR
-is Land's. A `small` or `standard` issue takes one run; a `full` one takes several (§ A `full`
-issue).
+is Land's. A `small` or `standard` issue takes one run; a parent takes several, one task after the
+other (§ A parent and its tasks).
 The acceptance criteria and seams exist in the agent brief before the diff does, so the judge has
 something to compare against that the implementation could not have chosen.
 
@@ -19,17 +19,20 @@ disagrees.
 
 The issue your wake names (`workflow.md`, Build), read with `read-recipe.md`. It is yours to build
 when it is In progress, its latest move into In progress passes `workflow.md` § Launch, it is a
-leaf (no `childIds`), every `blockedBy` issue is Done, and no open PR is linked, or the only open
-PR is the draft Build opened on this issue (§ A `full` issue).
+leaf that is not a task, or a parent (`workflow.md`, A large issue and its tasks), every
+`blockedBy` issue is Done,
+and no open PR is linked, or the only open PR is the draft Build opened on this parent.
 
 Any other issue takes the first exit that matches:
 
 | The issue | Exit |
 |---|---|
+| is a task of a parent (`origin: design`) | the run that holds its parent moved it: end, and say so in your report |
 | is no longer In progress | a person or a neighbour moved it: end, and say so in your report |
 | has an open linked PR that is not Build's draft on it | a run died between opening it and moving the issue: finish § 6's last writes, end; Build starts no second implementation |
 | entered In progress on a move no launch backs | a refusal, `Rule: unlaunched` |
-| has tasks (`childIds`) | a refusal, `Rule: umbrella`: its tasks are the work |
+| is `full` by its newest `screening` row and has no task | a refusal, `Rule: undesigned` |
+| has tasks that carry another `origin` | a refusal, `Rule: umbrella`: its tasks are the work |
 | has a `blockedBy` issue not Done | a refusal, `Rule: blocked`, naming each open one |
 
 A refusal is `working-on-issues` § Refusals: its `signal` the first time, a Decision the second.
@@ -37,7 +40,8 @@ A refusal is `working-on-issues` § Refusals: its `signal` the first time, a Dec
 A launch whose context carries a `Next:` line (Ops relaunching a run that died) starts from it: the
 branch or the patch it names, before anything is rebuilt.
 
-*Done when* you hold one launched leaf issue that is yours, or its exit is written and the run ends.
+*Done when* you hold one launched issue that is yours, a leaf or a parent, or its exit is written
+and the run ends.
 
 ## 2. Before the code
 
@@ -52,7 +56,7 @@ still missing. The work already landed, or the premise is gone: a `decision` che
 
 **The scope.** The brief's `## Problem`, `## Plan`, `## Acceptance`, `## Seams` and
 `## Out of scope`; for a feature, the slice or the design its approving `ruling` names; for a task,
-its umbrella's sections and rulings too. A ruling outranks the section it contradicts.
+its parent's or its umbrella's sections and rulings too. A ruling outranks the section it contradicts.
 `## Acceptance` is the oracle you are judged on: it is read, and left exactly as it is.
 
 **A mockup owed.** The change brings new chrome, a new layout or a new interaction, and no file of
@@ -101,41 +105,52 @@ it was. A criterion or a test's expectation changes only on that person's ruling
 
 *Done when* every acceptance criterion holds in a passing test, and the bug's red test is green.
 
-## A `full` issue
+## A parent and its tasks
 
-An issue is `full` when its newest `screening` row says `Size: full`. It carries an approved design
-and is built over several runs on one branch, one pull request per repository.
-
-**The plan.** The first run (`## Plan` holds no `### Tasks` yet) cuts the design into tasks and
-appends them to `## Plan` under `### Tasks`, a checklist: each task named by the behaviour it adds,
-with the `## Acceptance` lines it carries, ordered by what each needs from the others. Every line
-of `## Acceptance` sits in exactly one task. From then on the checklist changes in one way: a box
-is ticked.
+A parent (`workflow.md`, A large issue and its tasks) is built over several runs on one branch,
+one pull request per repository. Its tasks are the issues whose `parent` is this one and whose
+`origin` is `design`, in the order of the parent's `### Tasks`. You hold the parent; its tasks are
+yours to move.
 
 **Each run**, in order:
 
-1. Read `### Tasks`, the newest `progress` row and `git log` of the branch; they outrank what you
-   remember.
+1. Read the tasks and their statuses, the parent's newest `progress` row, and `git log` of the
+   branch; they outrank what you remember.
 2. Run the repository's quickest check from `verify` on the branch before adding anything: red
    here is fixed first.
-3. Take the next unticked tasks. Tasks that share no file and need nothing from each other go to
-   parallel subagents, one each, with the task, its acceptance lines and the seams; each returns
-   what it changed and the commands it ran. You read the diff and run the tests yourself.
-4. Commit each task once its tests ran green in this run, and tick its box on the issue.
-5. At 100 minutes of work, or when every box is ticked, end the run with three writes, in this
-   order: the `progress` row (`timeline-kinds.md`), its `subject` the commit you are about to push;
-   the push; then the pull request. The first run opens it as a draft, body by `pr`, with the
-   checklist copied under `## Tasks`, and links it in `pullRequests`; a later run ticks the same
-   boxes in that body. The push is the run's last act on the branch: it wakes the next run.
+3. A task in Mine, or Done for a reason other than `done`: pause the parent as `workflow.md`, A
+   large issue and its tasks, says, after step 6's writes. Otherwise take the first task that is
+   Ready and whose `blockedBy` tasks are all In review or Done: set
+   it `in_progress`, then build it as § 3 and § 4 say, against its own `## Acceptance`. Tasks that
+   share no file and need nothing from each other may go to parallel subagents, one each, with the
+   task, its acceptance lines and the seams; each returns what it changed and the commands it ran.
+   You read the diff and run the tests yourself.
+4. Its tests green in this run: commit, then set the task `in_review`. Take the next.
+5. A task that does not get there is written on the task, never on the parent. A red you could
+   not turn green: an `attempt` row and the task's own `failedAttempts` (`working-on-issues`
+   § Three tries), then the task back to `ready` for the next run, or Paused under its checkpoint
+   at 3. Stuck (§ 4): a `stuck` row and its checkpoint, which leaves the task Paused. Go on with
+   the tasks that do not need it.
+6. At 100 minutes of work, or when no task is left to take, end the run with three writes, in this
+   order: a `progress` row on the parent (`timeline-kinds.md`), its `subject` the commit you are
+   about to push; the push; then the pull request's body, one line per task under `## Tasks` (its
+   title, its status). The push is the run's last act on the branch: it wakes the next run.
 
-**The last run**, every box ticked: § 5 on the whole branch, then § 6 from step 2, marking the
-draft ready first. Its body gains `Rollback:` the way back (a revert, a flag to switch off, a
-migration's down path); a change a person can see ships behind the flag the design names, when it
-names one.
+The first run pushes its first task's commit as soon as it is made and opens the pull request as a
+draft, body by `pr`, linked in the parent's `pullRequests`: the draft must exist for the run's
+last push to wake the next one.
 
-*Done when* a re-read shows the issue under this run's `progress` row, the boxes it names ticked on
-the issue and on the draft, and the draft's head equal to the row's `subject`; or one of § 7's
-endings.
+**The last run**, every task In review: § 5 on the whole branch, the push, the draft marked ready,
+then § 6 from step 2 for the parent. Its body gains `Rollback:` the way back (a revert, a flag
+to switch off, a migration's down path); a change a person can see ships behind the flag the
+design names, when it names one.
+
+A run that finds every remaining task Paused, or waiting on a Paused one, pushes what it has and
+ends on its `progress` row, `Next:` naming the tasks that wait on a person.
+
+*Done when* a re-read shows the parent under this run's `progress` row, each task it names In
+review, the draft's head equal to the row's `subject`, and every other task Ready, Paused, In
+review or Done; or one of § 7's endings.
 
 ## 5. The gate
 
@@ -185,7 +200,7 @@ For Build the endings are:
 |---|---|
 | delivered | the issue In review, a PR linked on a green gate |
 | needs a person | the issue Paused under its `checkpoint`, which names exactly what is missing |
-| advanced a `full` issue (§ A `full` issue) | the issue In progress under a `progress` row whose `Done:` names at least one task |
+| worked a parent (§ A parent and its tasks) | the parent In progress under this run's `progress` row |
 | is stuck (§ 4) | the issue Paused under a `stuck` row and its `checkpoint`; `failedAttempts` as it was |
 | could not deliver | the issue In progress under an `attempt` row copied from the filled-in one in `timeline-kinds.md`: `Cause:` change (a red gate, a refused change) or environment (a tool missing mid-way, a timeout, a branch it cannot push), and `Next:` the step the next run starts from; then `failedAttempts` updated as `working-on-issues` § Three tries says |
 

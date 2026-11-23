@@ -32,7 +32,7 @@ A stage is **stopped** when a row holds:
 | Sign | Stopped since |
 |---|---|
 | Build, Land or Screening has work in its pipe and no run that ended well for 2 hours, counted inside its working hours (`workflow.md`, Working hours) | its last run that ended well |
-| an issue In progress with no live run, no open pull request and no row for 1 hour | its move to In progress |
+| an issue In progress that is not a task of a parent, with no live run, no open pull request and no row for 1 hour | its move to In progress |
 | a pull request with `factory:go`, neither merged, enqueued nor `factory:waiting`, for 2 hours | its verdict |
 | GitHub refuses the factory's account on two ticks in a row | the first refusal |
 | the day's spend of the routines, when your tools read it, passes 80 %, then 100 %, of the budget the project's `context` names | the tick that saw it |
@@ -84,7 +84,9 @@ For each `active` goal, oldest first:
 1. **End it** when `until` has passed, or when every attached issue is Done and the Ready and
    Backlog issues of the project hold nothing that fits its `title`: `status: ended` or `reached`,
    and one message to its `owner`: launched, merged, still open, by title.
-2. **Count** its issues In progress. At or over `limit`: nothing to launch.
+2. **Count** its issues In progress. A parent counts for one, its tasks for none
+   (`working-on-issues/workflow.md`, A large issue and its tasks). At or over `limit`: nothing to
+   launch.
 3. **Pick** the next issue: with `launch: ask`, among those marked `picked` (§ 3); with `launch: auto`, among the project's Ready issues that fit the `title`
    and respect the `guidance`. By `priority`, empty last, then oldest. Leave one that
    `operating-the-factory` § Holds names.
@@ -92,7 +94,8 @@ For each `active` goal, oldest first:
    `title`, its `owner` and date, and the answer when one picked it; then `status: in_progress`;
    then mark it `launched` on the goal. Re-read the issue. One launch per goal per tick.
 
-You launch from Ready, and only what `operating-the-factory` § Holds leaves free.
+You launch from Ready, issues that are not tasks, and only what `operating-the-factory` § Holds
+leaves free.
 
 *Done when* each active goal is ended, at its limit, has one more issue In progress under its
 `signal` row, or the reason nothing was launched is in your report.
@@ -100,7 +103,7 @@ You launch from Ready, and only what `operating-the-factory` § Holds leaves fre
 ## 3. Propose the day
 
 Once per person per day, on the day's first tick or when their goal is created. For each `active`
-goal, read the project's open issues and sort the ones that fit:
+goal, read the project's open issues that are not tasks and sort the ones that fit:
 
 - **Ready now:** what you would launch, in order, with one line each: what it unblocks, its size.
 - **Waiting on you:** Paused issues that serve the goal and wait on this person, each by title,
@@ -116,7 +119,8 @@ The answer resumes this run: mark the issues picked `picked`, which § 2 launche
 ticks, and the others `declined`, which are left out of later cards for that goal. An expiry
 resumes it with no answer: every issue stays `proposed`, and nothing is launched.
 
-With no active goal, send the project's first active maintainer the head of Ready, five at most,
+With no active goal, send the project's first active maintainer the head of the Ready issues that are not
+tasks, five at most,
 the same way, under a goal you propose in one line; on their answer, create it (`launch: ask`,
 `until` in 7 days, `owner` that person) with the picked issues attached as `picked`.
 

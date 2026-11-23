@@ -42,7 +42,7 @@ fault this section removes.
 
 - **Before the first outward write** on an issue (a branch pushed, a pull request opened, a
   Decision sent), re-read the issue and its repository: an open pull request that cites the issue
-  (other than the draft Build itself opened on a `full` issue),
+  (other than the draft Build itself opened on a parent),
   a newer `checkpoint` row, or a status your stage does not own means a neighbour got there first.
   Write nothing more on it and end; say so in your report.
 - **A pull request says where it stands** through its `factory:` labels (§ Pull requests): a run
@@ -51,8 +51,9 @@ fault this section removes.
   that died (`operating-the-factory`). Pulse tells a person when a stage stops answering
   (`watching-the-factory`). A stage run never launches another routine.
 - **Two hours of work** ends a Build or Screening run as a failure (`timeout`); Land hands over
-  instead (`landing-pull-requests` § Waiting for checks), and Build on a `full` issue ends on a
-  `progress` row at 100 minutes (`executing-issues` § A `full` issue): neither is a failure.
+  instead (`landing-pull-requests` § Waiting for checks), and Build on a parent ends on a
+  `progress` row at 100 minutes (`executing-issues` § A parent and its tasks): neither is a
+  failure.
 - **Two neighbours found on one piece of work** is a `signal`, `Rule: two_runs`, written by the one
   that noticed, which then ends.
 
@@ -83,7 +84,9 @@ Once it is sent:
 1. Write the `checkpoint` row.
 2. Set `waitingOn` (the recipient) and, except for Merge it, which leaves the issue In review,
    `status: paused` with `need` (`decision` for a ruling, `design` for a mockup), in one update.
-3. Re-read the issue, then end your turn. The Decision carries its own expiry.
+3. Re-read the issue, then end your turn. The Decision carries its own expiry. Build holding a
+   parent, after stopping one of its tasks, goes on with the other tasks and ends as
+   `executing-issues` § A parent and its tasks says.
 
 *Done when* the re-read shows `waitingOn` set and, except for Merge it, `status: paused` with
 `need`, under a `checkpoint` row whose `subject` is the Decision. Every stage skill that pauses an
@@ -123,7 +126,7 @@ to, never rewritten: its permalinks stop a message being handled twice.
 ## Refusals
 
 A run that cannot act on the issue of its wake (no facts, a missing tool, an unlaunched move, an
-umbrella, a blocked issue) writes a `signal` with its `Rule:` and ends. It writes that signal on an
+older umbrella, a blocked issue) writes a `signal` with its `Rule:` and ends. It writes that signal on an
 issue once: a run meeting the same refusal while that signal is the issue's newest row whose
 `stage` is not `ops`, with no person's gesture since, stops for a person with a `decision`
 checkpoint instead. Ops writes a row before each relaunch, so its rows never reset the count.

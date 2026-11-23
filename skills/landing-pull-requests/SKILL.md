@@ -55,7 +55,7 @@ Then align the issue's status with its open PR, whoever left it behind:
 
 | The issue of an open PR is | Do |
 |---|---|
-| any status, its only open PR a draft whose body carries `<!-- factory:build -->` | nothing: Build is still working on it (`executing-issues` § A `full` issue) |
+| any status, its only open PR a draft whose body carries `<!-- factory:build -->` | nothing: Build is still working on it (`executing-issues` § A parent and its tasks) |
 | In review | nothing |
 | Backlog, Ready, In progress or Done | `status: in_review`: the open PR is the work, whoever left the issue behind |
 | Paused | nothing: it waits on a person (§ 3 reads its answer) |
@@ -85,8 +85,8 @@ net:
 
 | Every linked PR of the issue is | Write |
 |---|---|
-| merged | `status: done`, `closeReason: done` |
-| closed unmerged, the issue In review | `status: backlog` and a `released` row naming them, so Screening decides what is left |
+| merged | `status: done`, `closeReason: done`; for a parent, the same on each of its tasks |
+| closed unmerged, the issue In review, or a parent In progress | `status: backlog` and a `released` row naming them, so Screening decides what is left; for a parent, its tasks In review return to `ready` |
 
 *Done when* each PR this run tracks is in exactly one issue's `pullRequests` and carries its link
 line and `factory:tracked`, and no issue this run read still shows In review with every linked PR
@@ -148,7 +148,8 @@ state, those are the history.
 
 Pin the head sha. Read the repository's facts from `targetBranch`, never the head: a PR that edits
 `CODEOWNERS`, a workflow or `## Factory` is judged on the target's values. Gather, as
-`evaluate` § 1 says: the diff, the issue's brief and rulings, every review a person left, and each
+`evaluate` § 1 says: the diff, the issue's brief and rulings (for a parent, its tasks' rulings
+too), every review a person left, and each
 check's conclusion on the head; add the issue's `approved` mockup and its `evidence`, the
 `withheld` paths, and what `sensitiveData` names, which the dossier never quotes.
 

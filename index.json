@@ -9,7 +9,7 @@
   },
   {
     "name": "designing-issues",
-    "description": "Use when screening routes a full issue to design, or a ruling resumes one at design. Holds the design conversation with the person who asked, on cards, then writes the design into the issue and stops on a Decision for its approval."
+    "description": "Use when screening routes a full issue to design, or a ruling resumes one at design. Holds the design conversation with the person who asked, on cards, writes the design into the issue, stops on a Decision for its approval, then writes its tasks as child issues."
   },
   {
     "name": "diagnosing-bugs",

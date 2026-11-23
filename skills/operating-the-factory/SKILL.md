@@ -29,7 +29,8 @@ For each of Intake, Screening, Build and Land, read its runs since the last tick
 
 ### 2. Read the pipe
 
-- **Issues:** every issue that is not Done, with `status`, `priority`, `blockedBy`, `pullRequests`,
+- **Issues:** every issue that is not Done and is not a task of a parent (`workflow.md`, A large
+  issue and its tasks), and for each parent the statuses of its tasks, with `status`, `priority`, `blockedBy`, `pullRequests`,
   `need`, `waitingOn`, `assignee`, and the time of its latest status move; the newest `attempt`,
   `signal` and `screening` row of each In progress, In review and Ready issue.
 - **Pull requests** of each repository of the factory: the open ones with their `factory:` labels,
@@ -88,7 +89,9 @@ with the context « weekly sweep ».
 | a dead Land run, its pull request open | Land | « take over from the ledger » (`landing-pull-requests` § Taking over) |
 | a dead Screening or Intake run | Screening, or nobody | Screening: « screen this issue »; Intake: report the Slack message, a person asks again |
 | an issue In progress for 30 minutes with no open pull request, held by no run | Build | « build this issue » |
-| a `full` issue In progress whose pull request is still Build's draft, with no push for 30 minutes, held by no run | Build | « continue from the newest `progress` row » |
+| a parent In progress with a task it can take (Ready, its `blockedBy` tasks In review or Done), no push for 30 minutes, held by no run | Build | « continue from the newest `progress` row » |
+| a parent In progress whose every remaining task waits on a person | nobody | report the tasks and what each waits on |
+| a task of a parent in Backlog under a `ruling` for 30 minutes | Screening | « return this task to Ready » |
 | an open pull request, not a draft, its checks concluded, no verdict on its head for 30 minutes, held by no run | Land | « judge this head » |
 | a pull request with `factory:changes` and no answers comment for 30 minutes, held by no run | Land | « fix what the verdict asks, then judge » |
 | a pull request with `factory:go` on its head, neither merged, enqueued nor `factory:waiting`, for 10 minutes | Land | « merge by the mode »; « merge the target branch in first » when it is `DIRTY` or left the queue |
