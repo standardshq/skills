@@ -1,6 +1,6 @@
 ---
 name: curating-requests
-description: Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Files one issue per independent request with origin slack in the project that owns it, points a request at an existing issue, asks the reporter in the thread, or declines politely, never twice for one request.
+description: Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Files one issue per independent request with origin slack in the project that owns it, points a request at an existing issue, asks the reporter in the thread, or declines, never twice for one request.
 ---
 
 # Curating requests
@@ -60,9 +60,7 @@ Before the gates, gather what is already known about each request, so your reply
 - **Code:** `git log` on the files the request lands in (§ Reading the code): what shipped or
   changed there in the last weeks.
 
-Done when each request has its history in a line or two, or « nothing found ». What you found
-goes in the reply: « already asked by Numa on 3/11, paused because… » answers before anything
-is filed.
+Done when each request has its history in a line or two, or « nothing found ».
 
 ## Gate 1: which project owns it
 
@@ -91,7 +89,7 @@ must not be able to change it.
 
 The bar is the owning project's own, in its `context` (a build bar, a strategy, what it refuses).
 "Actionable" is not enough. Cosmetic delight, decorative animation and nice-to-have polish fail:
-decline them with the trade-off, kindly and once. An obvious joke is declined, never questioned.
+decline them once, with the trade-off. An obvious joke is declined, never questioned.
 
 This bar is a floor: Screening's preview later weighs a feature's value against its debt and can
 still park or reject it. Decline only what is clearly not worth an issue; send anything arguable
@@ -130,13 +128,12 @@ its history. Challenge when:
 
 A challenge takes one of two forms:
 
-- **Assume**, the default: file the issue on your pick and say it in the reply, with the way to
-  change it: « I'm going with a solid default for the counter; reply *delete* to remove it
-  instead. » The pick goes in `## Problem` as an assumption, the other options beside it. A reply
-  that changes it rewrites that section (Gate 3's open-issue row).
+- **Assume**, the default: file the issue on your pick. The pick goes in `## Problem` as an
+  assumption, the other options beside it; the reply carries the pick and what the reporter
+  answers to change it. A reply that changes it rewrites that section (Gate 3's open-issue row).
 - **Ask**, only when the options are different work (build or delete nothing, one project or
-  another, a feature or a setting the reporter already has): one question, two or three options
-  drawn from the code, your pick first and why in a line. That request is UNCLEAR.
+  another, a feature or a setting the reporter already has): one question carrying two or three
+  options drawn from the code, your pick and why. That request is UNCLEAR.
 
 A bug with observed against expected and one obvious fix, or a request whose end state the
 message already states, is clear: file it as it is.
@@ -205,7 +202,7 @@ judged again with its answer.
 
 - **The reporter is an active person of the workspace:** send the question as a Decision, as
   `deciding-issues` § In Slack says: its card lands in this thread and the reporter answers there.
-  Write it as `deciding-issues` § Ask 2 says, in the language of the message. The answer resumes
+  Write it as `deciding-issues` § Ask 2 says. The answer resumes
   this run: judge the message again with it. Close it files nothing for that request. Expired: file the
   request on your pick, `## Problem` saying the question went unanswered and which pick it carries,
   and reply with the link.
@@ -236,20 +233,23 @@ prioritise.
 
 ## Replies
 
-In the language of the message, **short**: the verdicts on the first line, one line per request,
-three lines at most when there is one, product language. Paths and evidence belong in the issue,
-not the thread.
-
 Order is fixed: decide → write every issue (or duplicate line) → read each back → post **one**
-reply carrying the link of each issue written and the reason of each decline, then the question when
-there is one. A write that failed leaves its request out of the reply: a reply pointing at nothing
+reply. A write that failed leaves its request out of the reply: a reply pointing at nothing
 is worse than none, and no later run retries it for you. The permalink in each issue's `context`
 is what makes a second delivery of the event skip that request: reply only after the write reads
 back.
 
-End a reply that files an issue with what happens next, in one sentence, so a non-developer knows it
-is alive: a bug gets checked against the code and reproduced, a feature gets a value review before
-anyone builds it.
+The reply carries, for each request:
+
+| Request | The reply carries |
+|---|---|
+| filed | the issue's link, and the stage that takes it next: a bug is checked against the code and reproduced, a feature gets a value review before anyone builds it |
+| filed on an assumption | also the pick, and what the reporter answers to change it (Gate 4) |
+| pointed at an existing issue | that issue's link and where it stands (Gate 3) |
+| declined | the reason: how to configure it, or the trade-off |
+| asked in plain text | the question (§ Asking) |
+
+Each also carries what § History found on it.
 
 ## Red flags
 

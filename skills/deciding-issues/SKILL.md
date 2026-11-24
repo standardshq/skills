@@ -32,7 +32,13 @@ The cards of a design conversation carry more: `designing-issues` § 2 says what
 four questions on one card. The rules below apply to each of them, except Close it and I take it,
 which the design's approval card alone offers.
 
-The person reads it cold, perhaps weeks later, in the workspace's language, with no em dash:
+The person reads it cold, perhaps weeks later, with no em dash.
+
+**The recipient's language:** everything the card shows (title, question, situation, every option's
+label and description) is written in the language the recipient writes in: read it from their
+answers to earlier Decisions and their messages. For a recipient who has written nothing yet, take
+the language the workspace's last answered Decisions were answered in. A name quoted from an issue,
+a pull request or the code stays as written.
 
 | Part | Rule |
 |---|---|
