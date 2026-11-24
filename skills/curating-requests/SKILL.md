@@ -202,7 +202,7 @@ judged again with its answer.
 
 - **The reporter is an active person of the workspace:** send the question as a Decision, as
   `deciding-issues` § In Slack says: its card lands in this thread and the reporter answers there.
-  Write it as `deciding-issues` § Ask 2 says, in the language of the message. The answer resumes
+  Write it as `deciding-issues` § Ask 2 says. The answer resumes
   this run: judge the message again with it. Close it files nothing for that request. Expired: file the
   request on your pick, `## Problem` saying the question went unanswered and which pick it carries,
   and reply with the link.
