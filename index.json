@@ -1,7 +1,7 @@
 [
   {
     "name": "curating-requests",
-    "description": "Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Files one issue per independent request with origin slack in the project that owns it, points a request at an existing issue, asks the reporter in the thread, or declines politely, never twice for one request."
+    "description": "Use when a Slack message wakes the Intake routine and must be judged before it enters the factory. Files one issue per independent request with origin slack in the project that owns it, points a request at an existing issue, asks the reporter in the thread, or declines, never twice for one request."
   },
   {
     "name": "deciding-issues",
