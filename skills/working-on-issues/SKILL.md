@@ -131,6 +131,12 @@ issue once: a run meeting the same refusal while that signal is the issue's newe
 `stage` is not `ops`, with no person's gesture since, stops for a person with a `decision`
 checkpoint instead. Ops writes a row before each relaunch, so its rows never reset the count.
 
+`Rule: umbrella` and `Rule: blocked` do not wait for a second run: the issue would stay In
+progress, and every wake would meet the same refusal. The run that writes either signal stops for
+a person with a `decision` checkpoint in that same run, so the issue leaves In progress at its
+first refusal. A second `umbrella` or `blocked` signal on one issue with no person's gesture
+between them is itself a fault.
+
 ## Only screening queues
 
 Ready is reached by Screening's route or by a person. A routine writes a move `workflow.md` gives to

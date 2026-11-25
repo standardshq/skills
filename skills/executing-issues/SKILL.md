@@ -36,6 +36,8 @@ Any other issue takes the first exit that matches:
 | has a `blockedBy` issue not Done | a refusal, `Rule: blocked`, naming each open one |
 
 A refusal is `working-on-issues` § Refusals: its `signal` the first time, a Decision the second.
+`Rule: umbrella` and `Rule: blocked` take both in this run: the `signal`, then the `decision`
+checkpoint that takes the issue out of In progress.
 
 A launch whose context carries a `Next:` line (Ops relaunching a run that died) starts from it: the
 branch or the patch it names, before anything is rebuilt.
