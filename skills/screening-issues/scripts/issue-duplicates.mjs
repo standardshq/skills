@@ -63,6 +63,7 @@ export function describe(issue) {
     title: values.title ?? "",
     githubNumber: values.githubNumber ?? null,
     open: isOpen(issue),
+    status: values.status ?? null,
     closeReason: values.closeReason ?? null,
     paths: new Set([...text.matchAll(PATH_REF)].map((m) => m[1])),
     refs: new Set([
@@ -118,7 +119,7 @@ export function candidatesFor(target, issues) {
 }
 
 function label(issue) {
-  const state = issue.open ? "" : ` [done: ${issue.closeReason ?? "no reason"}]`;
+  const state = issue.open ? "" : ` [${issue.status}: ${issue.closeReason ?? "no reason"}]`;
   return `issues:${issue.id}${state} ${issue.title}`;
 }
 

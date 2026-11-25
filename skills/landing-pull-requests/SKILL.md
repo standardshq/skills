@@ -57,9 +57,9 @@ Then align the issue's status with its open PR, whoever left it behind:
 |---|---|
 | any status, its only open PR a draft whose body carries `<!-- factory:build -->` | nothing: Build is still working on it (`executing-issues` § A parent and its tasks) |
 | In review | nothing |
-| Backlog, Ready, In progress or Done | `status: in_review`: the open PR is the work, whoever left the issue behind |
+| Backlog, Ready, In progress, Done or Closed | `status: in_review`: the open PR is the work, whoever left the issue behind |
 | Paused | nothing: it waits on a person (§ 3 reads its answer) |
-| Mine | with the project's `reviewMine` on and the PR ready: `status: in_review`, `waitingOn` cleared, judged like any other. A draft, or `reviewMine` off: the person keeps it |
+| Human | with the project's `reviewMine` on and the PR ready: `status: in_review`, `waitingOn` cleared, judged like any other. A draft, or `reviewMine` off: the person keeps it |
 
 **A created issue:** `title` the PR title, `project` the repository record, `status: in_review`,
 `origin: github`, `type` from the title's conventional prefix (`feat` feature, `fix` bug,

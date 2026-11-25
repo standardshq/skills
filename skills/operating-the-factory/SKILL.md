@@ -29,7 +29,7 @@ For each of Intake, Screening, Build, Land and Pulse, read its runs since the la
 
 ### 2. Read the pipe
 
-- **Issues:** every issue that is not Done and is not a task of a parent (`workflow.md`, A large
+- **Issues:** every issue that is not finished (Done or Closed) and is not a task of a parent (`workflow.md`, A large
   issue and its tasks), and for each parent the statuses of its tasks, with `status`, `priority`, `blockedBy`, `pullRequests`,
   `need`, `waitingOn`, `assignee`, and the time of its latest status move; the newest `attempt`,
   `signal` and `screening` row of each In progress, In review and Ready issue.
@@ -98,7 +98,7 @@ with the context « weekly sweep ».
 | a pull request with `factory:changes` and no answers comment for 30 minutes, held by no run | Land | « fix what the verdict asks, then judge » |
 | a pull request with `factory:go` on its head, neither merged, enqueued nor `factory:waiting`, for 10 minutes | Land | « merge by the mode »; « merge the target branch in first » when it is `DIRTY` or left the queue |
 | a pull request carrying `factory:landing` whose status comment is older than 60 minutes | Land | « take over from the ledger » |
-| an issue that is not Done whose every linked pull request is merged | Land | « close this issue » |
+| an issue that is not finished whose every linked pull request is merged | Land | « close this issue » |
 | a Ready issue a person moved there after its newest `screening` row | Screening | « a person released this issue » |
 | a Backlog issue with no `screening` row for 30 minutes, or one whose newest is older than 7 days | Screening | « screen this issue » |
 | two open pull requests citing one issue | nobody | report both links; write `signal`, `Rule: duplicate_pull_request` |
@@ -129,7 +129,7 @@ from its owner since is not relaunched again: it opens the report as « relaunch
 
 A Ready issue stays Ready while one of these holds it:
 
-- **Blocked:** an issue of its `blockedBy` is not Done.
+- **Blocked:** an issue of its `blockedBy` is not finished.
 - **Same files:** an open pull request, or an issue In progress, changes the same component, locale
   file or module (the issue's `## Seams` against the pull request's file list).
 - **Release:** the fix needs a published version of a package its repository consumes.

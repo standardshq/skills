@@ -20,7 +20,7 @@ disagrees.
 The issue your wake names (`workflow.md`, Build), read with `read-recipe.md`. It is yours to build
 when it is In progress, its latest move into In progress passes `workflow.md` § Launch, it is a
 leaf that is not a task, or a parent (`workflow.md`, A large issue and its tasks), every
-`blockedBy` issue is Done,
+`blockedBy` issue is finished (`workflow.md`, Statuses),
 and no open PR is linked, or the only open PR is the draft Build opened on this parent.
 
 Any other issue takes the first exit that matches:
@@ -33,7 +33,7 @@ Any other issue takes the first exit that matches:
 | entered In progress on a move no launch backs | a refusal, `Rule: unlaunched` |
 | is `full` by its newest `screening` row and has no task | a `decision` checkpoint, `Resume at: screening`: Design it first (recommended), Build it as one change (Approve and launch), Close it |
 | has tasks that carry another `origin` | a refusal, `Rule: umbrella`: its tasks are the work |
-| has a `blockedBy` issue not Done | a refusal, `Rule: blocked`, naming each open one |
+| has a `blockedBy` issue not finished | a refusal, `Rule: blocked`, naming each open one |
 
 A refusal is `working-on-issues` § Refusals: its `signal` the first time, a Decision the second.
 `Rule: umbrella` and `Rule: blocked` take both in this run: the `signal`, then the `decision`
@@ -121,7 +121,7 @@ yours to move.
    you remember. A task found In progress is a run's that ended: set it `ready`.
 2. Run the repository's quickest check from `verify` on the branch before adding anything: red
    here is fixed first.
-3. A task in Mine, or Done for a reason other than `done`, that no ruling on the parent has left
+3. A task in Human, or Closed, that no ruling on the parent has left
    out: pause the parent as `workflow.md`, A large issue and its tasks, says, after step 6's
    writes. Otherwise take the first task that is Ready and whose `blockedBy` tasks are all In
    review, Done or left out: set

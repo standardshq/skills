@@ -12,7 +12,7 @@
  * Issues come from the export (`--input`); pull requests and paths are
  * resolved in the repository checkout, on the target branch: a pull request is
  * merged when a commit of that branch names it `(#N)`. Exit code 0 when every
- * claim holds, 1 when one no longer holds (or a cited done issue has no
+ * claim holds, 1 when one no longer holds (or a cited done or closed issue has no
  * `closedAt` to date it), 2 on a usage or input error.
  */
 import { fileURLToPath } from "node:url";
@@ -24,6 +24,7 @@ import {
   createdAtOf,
   git,
   idsOf,
+  isOpen,
   issueText,
   parseArgs,
   readExport,
@@ -60,7 +61,7 @@ async function mergeOf(checkout, ref, number) {
 
 /**
  * A citation is stale when what it names changed after the issue was written:
- * a pull request merged since (the gap may be closed), an issue done since.
+ * a pull request merged since (the gap may be closed), an issue done or closed since.
  * One that changed before is the issue's own evidence, cited correctly.
  */
 async function resolveGithub({ repo, number }, context) {
@@ -86,8 +87,8 @@ function resolveStandards(id, context) {
   if (!issue) return `MISSING  issues:${id}  not in the export`;
   const values = valuesOf(issue);
   const title = values.title ?? "";
-  if (values.status !== "done") return `ok     issue issues:${id}  ${values.status}  ${title}`;
-  const state = `done (${values.closeReason ?? "no reason"})`;
+  if (isOpen(issue)) return `ok     issue issues:${id}  ${values.status}  ${title}`;
+  const state = `${values.status} (${values.closeReason ?? "no reason"})`;
   const closedAt = timeOf(closedAtOf(issue));
   if (Number.isNaN(closedAt)) {
     return `UNDATED  issue issues:${id}  ${state}, no closedAt in the export: read when it closed  ${title}`;

@@ -80,7 +80,7 @@ maintainer, and launches nothing until that person's answer picks.
 
 For each `active` goal, oldest first:
 
-1. **End it** when `until` has passed, or when every attached issue is Done and the Ready and
+1. **End it** when `until` has passed, or when every attached issue is finished (Done or Closed) and the Ready and
    Backlog issues of the project hold nothing that fits its `title`: `status: ended` or `reached`,
    and one message to its `owner`: launched, merged, still open, by title.
 2. **Count** its issues In progress. A parent counts for one, its tasks for none
