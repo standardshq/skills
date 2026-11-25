@@ -143,9 +143,10 @@ test("issue-freshness flags a stale path cited in body or in context", async () 
   const dir = mkdtempSync(join(tmpdir(), "fresh-"));
   execFileSync("git", ["init", "-q", "-b", "main", dir]);
   execFileSync("git", ["-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "x"]);
-  const freshness = (id, values) => {
+  const freshness = (id, values, cited = []) => {
     const file = join(dir, `${id}.json`);
-    writeFileSync(file, JSON.stringify({ projects: [], data: [{ id, createdAt: at(0), values: { title: "t", status: "backlog", ...values } }] }));
+    const data = [{ id, createdAt: at(0), values: { title: "t", status: "backlog", ...values } }, ...cited];
+    writeFileSync(file, JSON.stringify({ projects: [], data }));
     return spawnSync(
       process.execPath,
       [join(skills, "screening-issues/scripts/issue-freshness.mjs"), id, "--input", file, "--checkout", dir, "--branch", "main"],
@@ -155,4 +156,7 @@ test("issue-freshness flags a stale path cited in body or in context", async () 
   assert.match(freshness("i1", { body: "see src/gone/a.ts" }), /src\/gone\/a\.ts/);
   assert.match(freshness("i2", { context: "see src/gone/b.ts" }), /src\/gone\/b\.ts/);
   assert.doesNotMatch(freshness("i3", { problem: "see src/gone/c.ts" }), /src\/gone\/c\.ts/);
+  // A cited issue closed without being delivered is as finished as a done one.
+  const closed = { id: "closed1", createdAt: at(0), closedAt: at(1), values: { title: "c", status: "closed", closeReason: "refuted" } };
+  assert.match(freshness("i4", { body: "see issues:closed1" }, [closed]), /STALE\s+issue issues:closed1\s+closed \(refuted\)/);
 });

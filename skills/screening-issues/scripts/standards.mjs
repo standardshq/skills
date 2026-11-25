@@ -55,7 +55,7 @@ export function byAge(x, y) {
   const right = timeOf(y.createdAt) || 0;
   return left - right || String(x.id).localeCompare(String(y.id));
 }
-/** When the issue moved to `done`: the export's `closedAt`, read from the issue's activity. */
+/** When the issue moved to `done` or `closed`: the export's `closedAt`, read from the issue's activity. */
 export const closedAtOf = (record) => record.closedAt ?? valuesOf(record).closedAt ?? "";
 
 /** Richtext may come back as markdown or as a block tree: every string leaf, in order. */
@@ -143,7 +143,10 @@ export async function readIssues(path, project) {
     : issues;
 }
 
-export const isOpen = (issue) => valuesOf(issue).status !== "done";
+/** The statuses of an issue nobody works on any more: delivered, or closed without being delivered. */
+export const FINISHED_STATUSES = ["done", "closed"];
+
+export const isOpen = (issue) => !FINISHED_STATUSES.includes(valuesOf(issue).status);
 
 export async function git(checkout, args) {
   const { stdout } = await run("git", ["-C", checkout, ...args], { maxBuffer: MAX_BUFFER });

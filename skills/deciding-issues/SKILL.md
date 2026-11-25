@@ -46,7 +46,7 @@ a pull request or the code stays as written.
 | Names | Every issue, PR, commit, file or flag named by what it is: « the pull request that adds undo per tab (merged on 4 October) », never a bare id. |
 | Options | Each says the work it produces, for a user or for the code, then its cost: size tier, a withheld path, a breaking change. The recommended option comes first, marked recommended; the recommendation comes from the evidence, never a fresh opinion. |
 | Close it | Always offered: an issue that no longer deserves building is a legitimate, cheap ruling. |
-| I take it | Always offered on an approval. First and recommended only for a public contract redesign: the person builds it in their own lane, Mine. |
+| I take it | Always offered on an approval. First and recommended only for a public contract redesign: the person builds it in their own lane, Human. |
 | Approve and launch | Beside Approve when the approval is all that stands between the issue and Build, Build's own `design` and gate-red Decisions included (`screening-issues` § Launch, approved and launched). |
 
 ### 3. Mockups
@@ -125,8 +125,8 @@ The answer resumes the run that asked. `read decision:<id>` for the answer, `ans
 | the issue is no longer where you left it (Paused, or In review for Merge it): a person moved it, the PR merged, or a `ruling` row newer than your checkpoint records a person's move (Paused again on a newer checkpoint) | the `ruling`, with `Superseded by:` that gesture and its time | change nothing else |
 | Draw it with me | the `ruling` | it stays Paused for the sitting |
 | Merge it | the `ruling` | it stays In review. The person merges on GitHub, and Land's pipe sets Done |
-| I take it | the `ruling`, and the person's direction added to `## Plan` of `body`, dated and attributed, the rest kept | Mine, `waitingOn` the person who answered, so Needs you shows it |
-| Close it | the `ruling` | Done, `closeReason` `wont_do` unless the answer names refuted, overtaken or duplicate; close its open PRs with a comment naming the ruling |
+| I take it | the `ruling`, and the person's direction added to `## Plan` of `body`, dated and attributed, the rest kept | Human, `waitingOn` the person who answered, so Needs you shows it |
+| Close it | the `ruling` | Closed, `closeReason` `wont_do` unless the answer names refuted, overtaken or duplicate; close its open PRs with a comment naming the ruling |
 | any other answer to a Land checkpoint whose PR is open | the `ruling` | In review; Land's next run judges it again |
 | any other answer | the `ruling` | Backlog: Screening takes rulings first and routes by `Resume at:` |
 
@@ -149,7 +149,7 @@ with the missing context, writing no ruling.
 
 **Expired** (24 hours, the run resumes with no answer): change nothing, end. The issue stays Paused, for a sitting or a person's move to Ready.
 
-**A person's gesture while a Decision is open** (a move to Ready, Mine or Done): only the run that
+**A person's gesture while a Decision is open** (a move to Ready, Human, Done or Closed): only the run that
 asked closes its question. Answered later, the first row above records it
 superseded; expired, it leaves nothing.
 
@@ -183,7 +183,7 @@ you write it down; you never implement, and a ruling from a sitting never launch
 5. **Record** each answer as § Answer:
    `subject` the expired Decision or none, `Recorded by:` the sitting, `Source:` the conversation
    and its date.
-6. **Report** one table: issue, ruling, what happens next (Screening, Mine, Done, still Paused).
+6. **Report** one table: issue, ruling, what happens next (Screening, Human, Closed, still Paused).
    Name every issue you skipped and why. An issue left Paused untouched is a correct outcome.
 
 *Done when* every selected issue is recorded or named as skipped.

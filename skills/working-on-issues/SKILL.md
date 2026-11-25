@@ -93,7 +93,7 @@ Once it is sent:
 issue ends its step on this criterion.
 
 The answer resumes this run; `deciding-issues` says what each answer does. Whoever moves the issue
-out of Paused clears `need` and `waitingOn`, except the move to Mine on I take it, which keeps
+out of Paused clears `need` and `waitingOn`, except the move to Human on I take it, which keeps
 `waitingOn` (the person who took it); after Merge it, the resumed run clears `waitingOn`.
 
 ### The checkpoint row

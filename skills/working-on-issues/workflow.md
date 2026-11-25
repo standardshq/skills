@@ -10,7 +10,7 @@ stateDiagram-v2
   Backlog --> Ready: Screening, triage + screening + preview + design
   Backlog --> InProgress: Screening launches (autoLaunch, Approve and launch)
   Backlog --> Paused: Screening checkpoint, Decision sent
-  Backlog --> Done: Screening closes (refuted, overtaken, duplicate)
+  Backlog --> Closed: Screening closes (refuted, overtaken, duplicate)
   Ready --> InProgress: a person launches, or Pulse under a goal
   Ready --> Paused: Screening checkpoint on a released issue
   InProgress --> InReview: Build opens the PR on a green gate (Land, if Build left it)
@@ -21,16 +21,21 @@ stateDiagram-v2
   InReview --> Backlog: every linked PR closed unmerged
   Paused --> Backlog: the answer is a ruling, Screening re-resolves
   Paused --> Ready: a person moves it, recorded as a ruling
-  Paused --> Mine: ruling "I take it"
+  Paused --> Human: ruling "I take it"
   Paused --> InReview: the answer to a Land checkpoint while its PR is open
-  Paused --> Done: ruling "Close it"
-  Mine --> Ready: a person hands it back
+  Paused --> Closed: ruling "Close it"
+  Human --> Ready: a person hands it back
   Done --> [*]
+  Closed --> [*]
 ```
 
 ## Statuses and who moves them
 
-Statuses: `backlog`, `paused`, `mine`, `ready`, `in_progress`, `in_review`, `done`. Each pipe is
+Statuses: `backlog`, `paused`, `mine`, `ready`, `in_progress`, `in_review`, `done`, `closed`.
+`mine` reads Human on the board: a person keeps the issue. Done is delivered work
+(`closeReason: done`); Closed is an issue closed without being delivered (`refuted`, `overtaken`,
+`duplicate`, `wont_do`). Finished means Done or Closed. An issue closed before Closed existed may
+still be Done with one of those four reasons: read it as Closed. Each pipe is
 ordered by `priority`, empty last, then oldest first (`SKILL.md` § One wake, one piece of work).
 
 | Stage | Routine | Cadence (UTC) | Pipe | Exits | Decision `need` |
@@ -42,7 +47,7 @@ ordered by `priority`, empty last, then oldest first (`SKILL.md` § One wake, on
 | Build | Build | an issue whose status becomes In progress; a push to a draft PR whose body carries `<!-- factory:build -->`; `0 */4 * * *` as the net | the issue of its wake, launched (§ Launch) and with no open PR, or a parent (§ A large issue and its tasks) with Build's own draft; one whose open PR a dead run left, only to finish the move to In review. The net takes the head of the In progress issues with no open PR or with Build's draft | In review once a PR is linked on a green gate; In progress under a `progress` row; Paused | `design` for a mockup owed before code; `decision` for a blocking ruling, stuck work, or the gate red 3 times |
 | Land | Land | a pull request opened, marked ready, merged or closed, or a workflow a pull request started completing; `0 7-17 * * 1-5` as the net | the PR of its wake, tracked first (an issue created In review for one no issue tracks, an issue left behind moved to In review). The net takes, in order (`landing-pull-requests` § 3): a head to judge, every check on it concluded; a ruling to apply, answering a Land checkpoint with anything but Merge it; a go to retry, neither merged, enqueued nor awaiting Merge it; after settling every issue whose linked PRs all merged or closed | Done once every linked PR is merged; Backlog when every linked PR closed unmerged; In review after a fix is pushed or Merge it is sent (`waitingOn` set, no Paused); Paused | `decision`: Merge it, on a withheld path, a required human review or `mode` `human`; no go after 6 rounds |
 | Pulse | Pulse | `*/15 * * * *`; a goal created | the routines' runs, the active goals, the Ready issues | an alert or its all-clear to a person; a Ready issue launched under a goal (§ Launch); one proposal card a day; never another status | none: its proposal is a card, and an unanswered one launches nothing |
-| Ops | Ops | `0 7-17 * * 1-5`, its only wake | the whole factory: every run of the other stages, every issue that is not Done, every open PR | a relaunch of the stage that owns stranded work, a report, once a day an evaluation; never a status a stage owns | none: what waits on a person goes in its report |
+| Ops | Ops | `0 7-17 * * 1-5`, its only wake | the whole factory: every run of the other stages, every issue that is not finished, every open PR | a relaunch of the stage that owns stranded work, a report, once a day an evaluation; never a status a stage owns | none: what waits on a person goes in its report |
 
 **Working hours.** The clocks of Screening, Land and Ops run on weekdays, from 07:00 to 17:00 UTC
 (08:00 to 18:00 in Paris in winter, 09:00 to 19:00 in summer): Ops and Land's net every hour,
@@ -50,11 +55,11 @@ Screening's net every three hours. A trigger has no hours: an event still wakes 
 and at the weekend, and no net or tick follows it before the next working hour.
 
 **The answer.** A Paused issue leaves Paused through the run that asked, on its answer
-(`deciding-issues`): Backlog for a ruling, Mine for "I take it", Done for "Close it", In review for
+(`deciding-issues`): Backlog for a ruling, Human for "I take it", Closed for "Close it", In review for
 the answer to a Land checkpoint while its PR is open; Merge it leaves it In review. A run never continues its own stage after its question.
 
 **A person's gestures.** Launch (Ready to In progress), setting a goal, release (any move to Ready by a person,
-read by Screening as "proceed as last scoped"), taking an issue (to Mine), handing it back (Mine to Ready), and any
+read by Screening as "proceed as last scoped"), taking an issue (to Human), handing it back (Human to Ready), and any
 other board move. A routine never makes these moves, except the launches below.
 
 ## A large issue and its tasks
@@ -76,7 +81,7 @@ parent.
 The parent takes the ordinary statuses: In progress from its launch until every task is In review,
 then In review with its pull request marked ready, then Done.
 
-A task a ruling took (Mine) or closed for any reason but `done` stops its parent: Build's next run
+A task a ruling took (Human) or that is Closed stops its parent: Build's next run
 pauses the parent on a `decision` checkpoint, `Resume at: build`, with the options Build without
 that piece (Approve and launch), I take the whole issue, Close it. A ruling that answers Build
 without it leaves that task out: the parent is complete once every other task is In review.

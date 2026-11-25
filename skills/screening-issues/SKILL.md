@@ -58,9 +58,9 @@ that tree, so a root covers its repositories.
 
 1. Query the `issues` object for the issues filed on the project record or any record under it, with your record tools, all statuses, every page.
 2. Write each record as above; `body` and `context` as text (markdown), relations as ids.
-3. For each `done` issue the screened issue cites (`issues:<id>`, or `#N` matching an imported
+3. For each `done` or `closed` issue the screened issue cites (`issues:<id>`, or `#N` matching an imported
    issue's `githubNumber`), read its activity and set `closedAt` to the time of its move to
-   `done`. A cited `done` issue without it prints `UNDATED`: date it, then run again.
+   that status. A cited finished issue without it prints `UNDATED`: date it, then run again.
 
 **The checkout:** per repository the issue's work lives in, read its facts (`working-on-issues`
 § Repository facts), which leaves the checkout on `targetBranch`, then `git -C <dir> rev-parse
@@ -94,7 +94,7 @@ Every issue left Ready carries a `priority`: Build's net and Pulse order the pip
 
 | The issue | Do |
 |---|---|
-| `mine`, `done`, `paused`, `in_progress`, `in_review` | not in the pipe; a ruling on a `mine` or `done` issue is history: leave it |
+| `mine`, `done`, `closed`, `paused`, `in_progress`, `in_review` | not in the pipe; a ruling on a `mine`, `done` or `closed` issue is history: leave it |
 | a task of a parent (`origin: design`, a `parent` set) | settled by its parent's design (`working-on-issues/workflow.md`, A large issue and its tasks). Its only move here: found in Backlog under a `ruling`, it returns to Ready, `need` and `waitingOn` cleared |
 | an older umbrella (its tasks carry another `origin`) | a container, never work: screen its tasks, never route or close it |
 
@@ -179,9 +179,9 @@ lives in, every other repository read listed with its sha in `body`), then act:
 
 | Verdict | When | Then |
 |---|---|---|
-| `close`, `closeReason: overtaken` | the gap is closed on the target branch, by a change merged after the issue was filed (a merged pull request naming the issue counts) | `done`. The body names that pull request or commit |
-| `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `done`. File the residual as a new issue when it is real, in `links` with `kind: follows-up` |
-| `close`, `closeReason: duplicate` | § 2 kept the other issue | `done`. The body names the kept issue, `issues:<id>` |
+| `close`, `closeReason: overtaken` | the gap is closed on the target branch, by a change merged after the issue was filed (a merged pull request naming the issue counts) | `closed`. The body names that pull request or commit |
+| `close`, `closeReason: refuted` | the claim is false against the code as it stands, or the proposed fix is wrong or unsafe and what remains is a different issue | `closed`. File the residual as a new issue when it is real, in `links` with `kind: follows-up` |
+| `close`, `closeReason: duplicate` | § 2 kept the other issue | `closed`. The body names the kept issue, `issues:<id>` |
 | `checkpoint` | a symptom (§ 3) | `decision`: fix the family first (recommended), or patch this one |
 | `design` | `full` (§ 4), with no `ruling` answering Approve or Approve and launch to the Decision of `designing-issues` § 4; a feature only once a ruling answered Design it to its preview | `designing-issues`, in this run |
 | `checkpoint` | the right fix changes a public contract, a security posture or an agent's authority; or the route needs a fact or an artifact only a person has | `decision`: the one question that forks the work |
